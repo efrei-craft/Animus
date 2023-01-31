@@ -19,13 +19,15 @@ services:
     command: npm start
     restart: always
     tty: true
-    ports:
-      - "3000:3000"
     depends_on:
       - db
     environment:
       NODE_ENV: production
       DATABASE_URL: postgres://postgres:postgres@db:5432/postgres
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ecapi.rule=Host(`ecapi.dev.efreicraft.fr`)"
+      - "traefik.http.routers.ecapi.entrypoints=websecure"
 
 volumes:
   pg:
