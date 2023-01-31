@@ -1,0 +1,31 @@
+version: '3.8'
+
+name: ecapi_dev
+
+services:
+  db:
+    image: postgres:12.2
+    volumes:
+      - pg:/data/postgres
+      - ./postgres:/docker-entrypoint-initdb.d
+    env_file: .env.local
+    ports:
+      - "5432:5432"
+
+  back:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    tty: true
+    depends_on:
+      - db
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    env_file: .env.local
+
+volumes:
+  pg:
+    driver: local

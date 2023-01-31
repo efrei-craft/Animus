@@ -1,0 +1,26 @@
+{
+  "name": "ecapi",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start:dev": "npx nodemon",
+    "build": "rimraf ./dist && tsc",
+    "start": "node dist/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/client": "^4.9.0",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "@mermaid-js/mermaid-cli": "^8.14.0",
+    "@types/node": "^18.11.18",
+    "nodemon": "2.0.20",
+    "typescript": "^4.9.4",
+    "ts-node": "^10.9.1",
+    "prisma": "^4.9.0"
+  }
+}

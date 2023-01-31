@@ -1,0 +1,70 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Player {
+  uuid        String    @id
+  discordId   String
+  discordRole String    @default("Visiteur")
+  createdAt   DateTime? @default(now())
+  updatedAt   DateTime? @updatedAt
+
+  punishments Punishment[]
+
+  friends   Player[] @relation("userHasFriends")
+  friendsOf Player[] @relation("userHasFriends")
+
+  perms      Permission[]
+  permGroups PermGroup[]
+
+  chatChannel String @default("SERVER")
+}
+
+enum PunishmentType {
+  WARN
+  TEMPMUTE
+  MUTE
+  TEMPBAN
+  BAN
+}
+
+model Punishment {
+  id         Int            @id @default(autoincrement())
+  type       PunishmentType
+  reason     String?
+  punisher   Player?        @relation(fields: [playerUuid], references: [uuid])
+  expires    DateTime?
+  playerUuid String?
+}
+
+model PermGroup {
+  id          Int          @id @default(autoincrement())
+  name        String       @default("Unnamed group")
+  permissions Permission[]
+
+  prefix String  @default("")
+  color  String  @default("7")
+  bold   Boolean @default(false)
+
+  parentGroup PermGroup?  @relation("groupHasParent", fields: [permGroupId], references: [id])
+  childGroups PermGroup[] @relation("groupHasParent")
+  player      Player?     @relation(fields: [playerUuid], references: [uuid])
+  playerUuid  String?
+  permGroupId Int?
+}
+
+model Permission {
+  name        String     @id
+  player      Player?    @relation(fields: [playerUuid], references: [uuid])
+  playerUuid  String?
+  permGroup   PermGroup? @relation(fields: [permGroupId], references: [id])
+  permGroupId Int?
+}
