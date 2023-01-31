@@ -2,7 +2,7 @@ name: CI/CD Portainer
 
 on:
   push:
-    branches: ['main']
+    branches: ['stable']
 
 jobs:
   build-and-push-image:

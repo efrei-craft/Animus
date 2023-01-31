@@ -15,7 +15,7 @@ services:
       PGDATA: /data/postgres
 
   back:
-    image: docker.nexus.jiveoff.fr/efrei-craft/ecapi:main
+    image: docker.nexus.jiveoff.fr/efrei-craft/ecapi:stable
     command: npm start
     restart: always
     tty: true
