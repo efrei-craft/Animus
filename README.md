@@ -41,7 +41,7 @@ Pour configurer & lancer votre environnement de développement local :
 1. Docker & Docker Compose doivent être installés ([ici](https://www.docker.com/products/docker-desktop))
 2. Ce repo doit être cloné
 3. `.env.local.example` doit être copié et renommé en `.env.local`
-3. Les dépendances du repo doivent être installées pour l'IDE (`npm install`)
+4. Les dépendances du repo doivent être installées pour l'IDE (`npm install`)
 
 Une fois ces étapes complétées, l'environnement peut être lancé avec la commande  `docker-compose up`.
 
@@ -80,6 +80,6 @@ La techno pour le front-end n'a pas encore été décidée.
 
 ## Déployer en production
 
-L'image de production est construite à partir du Dockerfile de production (`Dockerfile.prod`).
+L'image de production est construite à partir du Dockerfile de production (`Dockerfile.prod`) et est publiée sur le registry Docker `docker.nexus.jiveoff.fr` (de façon temporaire).
 
 La composition des services en production est définie dans le fichier `docker-compose.prod.yml`.
