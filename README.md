@@ -40,6 +40,7 @@ Pour configurer & lancer votre environnement de développement local :
 
 1. Docker & Docker Compose doivent être installés ([ici](https://www.docker.com/products/docker-desktop))
 2. Ce repo doit être cloné
+3. `.env.local.example` doit être copié et renommé en `.env.local`
 3. Les dépendances du repo doivent être installées pour l'IDE (`npm install`)
 
 Une fois ces étapes complétées, l'environnement peut être lancé avec la commande  `docker-compose up`.
