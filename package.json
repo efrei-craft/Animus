@@ -16,7 +16,6 @@
     "express": "^4.18.2"
   },
   "devDependencies": {
-    "@mermaid-js/mermaid-cli": "^8.14.0",
     "@types/node": "^18.11.18",
     "nodemon": "2.0.20",
     "typescript": "^4.9.4",
