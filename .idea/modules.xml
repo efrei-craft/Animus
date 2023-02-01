@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/ECAPI.iml" filepath="$PROJECT_DIR$/.idea/ECAPI.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/Animus.iml" filepath="$PROJECT_DIR$/.idea/Animus.iml" />
     </modules>
   </component>
 </project>
