@@ -29,6 +29,16 @@ services:
       - "traefik.http.routers.ecapi.rule=Host(`ecapi.dev.efreicraft.fr`)"
       - "traefik.http.routers.ecapi.entrypoints=websecure"
 
+  adminer:
+    image: adminer
+    restart: always
+    environment:
+      ADMINER_DESIGN: mvt
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ecapi.rule=Host(`db.dev.efreicraft.fr`)"
+      - "traefik.http.routers.ecapi.entrypoints=websecure"
+
 volumes:
   pg:
     driver: local
