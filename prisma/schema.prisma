@@ -10,12 +10,15 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum ChatChannels {
+  SERVER
+  GLOBAL
+  LOCAL
+  PARTY
+}
+
 model Player {
-  uuid        String    @id
-  discordId   String
-  discordRole String    @default("Visiteur")
-  createdAt   DateTime? @default(now())
-  updatedAt   DateTime? @updatedAt
+  uuid String @id
 
   punishments Punishment[]
 
@@ -25,8 +28,32 @@ model Player {
   perms      Permission[]
   permGroups PermGroup[]
 
-  chatChannel String @default("SERVER")
+  chatChannel ChatChannels @default(SERVER)
+
+  discordUser   DiscordUser? @relation(fields: [discordUserId], references: [id])
+  discordUserId String?
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
+  gameServer           GameServer? @relation(fields: [gameServerServerName], references: [serverName])
+  gameServerServerName String?
+
+  party   Party? @relation("partyOwner")
+  partyId Int?
+
+  memberOfParty   Party? @relation(fields: [memberOfPartyId], references: [id])
+  memberOfPartyId Int?
 }
+
+model DiscordUser {
+  id          String   @id
+  discordId   String
+  discordRole String   @default("Visiteur")
+  Player      Player[]
+}
+
+// Punishment related models
 
 enum PunishmentType {
   WARN
@@ -45,13 +72,15 @@ model Punishment {
   playerUuid String?
 }
 
+// Permission related models
+
 model PermGroup {
   id          Int          @id @default(autoincrement())
   name        String       @default("Unnamed group")
   permissions Permission[]
 
   prefix String  @default("")
-  color  String  @default("7")
+  color  String  @default("&7")
   bold   Boolean @default(false)
 
   parentGroup PermGroup?  @relation("groupHasParent", fields: [permGroupId], references: [id])
@@ -67,4 +96,72 @@ model Permission {
   playerUuid  String?
   permGroup   PermGroup? @relation(fields: [permGroupId], references: [id])
   permGroupId Int?
+}
+
+// Game related models
+
+enum Template {
+  MINI
+}
+
+enum GameStatus {
+  WAITING
+  STARTING
+  INGAME
+  ENDING
+}
+
+model Game {
+  name      String @id
+  color     String @default("&7")
+  ludosGame String
+  material  String
+
+  minQueueToStart Int @default(1)
+  maxPlayers      Int @default(8)
+
+  template Template @default(MINI)
+
+  gameServers          GameServer[] @relation("gameServers")
+  requestedGameServers GameServer[] @relation("requestedGameServers")
+}
+
+model GameServer {
+  serverName String @id
+
+  game     Game   @relation("gameServers", fields: [gameName], references: [name])
+  gameName String
+
+  requestedGame     Game?   @relation("requestedGameServers", fields: [requestedGameName], references: [name])
+  requestedGameName String?
+
+  template Template @default(MINI)
+
+  address String
+  status  GameStatus @default(WAITING)
+
+  players Player[]
+
+  ready Boolean @default(false)
+
+  permanent Boolean @default(false)
+
+  lastHeartbeat DateTime @default(now())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Party {
+  id   Int    @id @default(autoincrement())
+  name String @default("Unnamed party")
+
+  owner     Player @relation("partyOwner", fields: [ownerUuid], references: [uuid])
+  ownerUuid String @unique
+
+  members Player[]
+
+  public    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

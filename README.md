@@ -67,7 +67,7 @@ docker-compose exec db psql -U postgres
 Pour interagir avec la librairie Prisma à l'intérieur du conteneur de développement, il faut utiliser la commande suivante :
 
 ```bash
-docker-compose exec backend npx prisma
+docker-compose exec back npx prisma
 ```
 
 Le CLI de Prisma nous permettra d'effectuer des migrations de base de données, de valider le schema etc.
