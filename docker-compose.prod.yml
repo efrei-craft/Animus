@@ -8,6 +8,8 @@ services:
     volumes:
       - pg:/data/postgres
       - ./postgres:/docker-entrypoint-initdb.d
+    networks:
+      net:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -24,6 +26,9 @@ services:
     environment:
       NODE_ENV: production
       DATABASE_URL: postgres://postgres:postgres@db:5432/postgres
+    networks:
+      net:
+      rp:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.ecapi.rule=Host(`ecapi.dev.efreicraft.fr`)"
@@ -34,6 +39,9 @@ services:
     restart: always
     environment:
       ADMINER_DESIGN: mvt
+    networks:
+      net:
+      rp:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.db.rule=Host(`db.dev.efreicraft.fr`)"
@@ -42,3 +50,10 @@ services:
 volumes:
   pg:
     driver: local
+
+networks:
+  rp:
+    external: true
+    name: reverseproxy_nw
+  net:
+
