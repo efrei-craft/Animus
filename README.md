@@ -1,4 +1,4 @@
-# ECAPI
+# Animus
 
 Composant de gestion globale du serveur EfreiCraft.
 Celui a pour vocation de gérer :
@@ -61,18 +61,20 @@ Le back-end utilise :
 Il est possible de parler directement à la base de données avec le CLI de PostgreSQL : 
 
 ```bash
-docker-compose exec db psql -U postgres
+docker compose exec db psql -U postgres
 ```
 
 Pour interagir avec la librairie Prisma à l'intérieur du conteneur de développement, il faut utiliser la commande suivante :
 
 ```bash
-docker-compose exec back npx prisma
+docker compose exec back npx prisma
 ```
 
 Le CLI de Prisma nous permettra d'effectuer des migrations de base de données, de valider le schema etc.
 
 Plus d'informations sur Prisma [ici](https://www.prisma.io/docs/).
+
+**Important:** La commande `docker compose exec back npx prisma db push` doit être utilisée à chaque fois que le schéma de la base de données est modifié.
 
 ### Front-end
 
