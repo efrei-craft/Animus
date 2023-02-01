@@ -17,7 +17,6 @@ services:
 
   back:
     image: docker.nexus.jiveoff.fr/efrei-craft/animus:stable
-    command: npm start
     restart: always
     tty: true
     depends_on:
