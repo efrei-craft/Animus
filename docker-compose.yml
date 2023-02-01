@@ -7,7 +7,6 @@ services:
     image: postgres:12.2
     volumes:
       - pg:/data/postgres
-      - ./postgres:/docker-entrypoint-initdb.d
     env_file: .env.local
     ports:
       - "5432:5432"

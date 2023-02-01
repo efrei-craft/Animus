@@ -7,7 +7,6 @@ services:
     image: postgres:12.2
     volumes:
       - pg:/data/postgres
-      - ./postgres:/docker-entrypoint-initdb.d
     networks:
       net:
     environment:
@@ -34,17 +33,21 @@ services:
       - "traefik.http.routers.animus.rule=Host(`animus.dev.efreicraft.fr`)"
       - "traefik.http.routers.animus.entrypoints=websecure"
 
-  adminer:
-    image: adminer
+  pgadmin:
+    image: dpage/pgadmin4
     restart: always
     environment:
-      ADMINER_DESIGN: mvt
+      PGADMIN_DEFAULT_EMAIL: bureau@efreicraft.fr
+      PGADMIN_DEFAULT_PASSWORD: bureaudev
+      SCRIPT_NAME: /pgadmin
+    volumes:
+      - /config/pgadmin/servers.json:/pgadmin4/servers.json
     networks:
       net:
       rp:
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.db.rule=Host(`db.dev.efreicraft.fr`)"
+      - "traefik.http.routers.db.rule=Host(`db.dev.efreicraft.fr`) && PathPrefix(`/pgadmin`)"
       - "traefik.http.routers.db.entrypoints=websecure"
 
 volumes:
