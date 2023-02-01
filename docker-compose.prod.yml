@@ -36,8 +36,8 @@ services:
       ADMINER_DESIGN: mvt
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.ecapi.rule=Host(`db.dev.efreicraft.fr`)"
-      - "traefik.http.routers.ecapi.entrypoints=websecure"
+      - "traefik.http.routers.db.rule=Host(`db.dev.efreicraft.fr`)"
+      - "traefik.http.routers.db.entrypoints=websecure"
 
 volumes:
   pg:
