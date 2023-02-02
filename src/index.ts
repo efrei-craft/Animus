@@ -1,18 +1,14 @@
-import express from 'express';
-import { PrismaClient } from '@prisma/client'
+import { AnimusApiServer } from './realms/api';
+import consolaGlobalInstance from "consola";
 
-const prisma = new PrismaClient()
-const app = express();
+const server = new AnimusApiServer();
 
-app.get('/', (req, res) => {
-  res.send('Hello World!');
-});
+const initServer = async () => {
+  await server.start();
+}
 
-app.get('/test', async (req, res) => {
-  const players = await prisma.player.findMany();
-  res.send(players);
-});
-
-app.listen(3000, () => {
-  console.log('Example app listening on port 3000!');
+initServer().then(() => {
+  consolaGlobalInstance.success(`Server started successfully.`);
+}).catch((err) => {
+  consolaGlobalInstance.error(`Server failed to start: ${err}`);
 });
