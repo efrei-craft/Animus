@@ -14,9 +14,9 @@
   "license": "ISC",
   "dependencies": {
     "@hapi/hapi": "^21.2.1",
-    "@hapi/joi": "^17.1.1",
     "@prisma/client": "^4.9.0",
-    "consola": "^2.15.3"
+    "consola": "^2.15.3",
+    "joi": "^17.7.0"
   },
   "devDependencies": {
     "@types/node": "^18.11.18",
