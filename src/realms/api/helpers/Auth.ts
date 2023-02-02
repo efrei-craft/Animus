@@ -1,24 +1,22 @@
 import prisma from "../../../clients/Prisma";
-import {ApiScope, Prisma} from "@prisma/client";
+import {ApiScope} from "@prisma/client";
 
-export type ApiKey = Prisma.ApiKeyGetPayload<{
-  select: {
-    id: true,
-    scopes: true,
-  }
-}>;
+export type ApiKey = {
+  key: string;
+  scopes: ApiScope[];
+}
 
-export async function bearerToken(bearer: string | undefined) {
+export async function bearerToken(bearer: string | undefined): Promise<ApiKey> {
   if (bearer?.split(" ")[0] === "Bearer") {
     const token = bearer?.split(" ")[1]
 
     if (token) {
       const apiKey = await prisma.apiKey.findUnique({
         where: {
-          id: token,
+          key: token,
         },
         select: {
-          id: true,
+          key: true,
           scopes: true,
         }
       });
