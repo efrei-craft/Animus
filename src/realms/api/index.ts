@@ -1,28 +1,41 @@
-import Hapi from '@hapi/hapi';
-import { routes as PlayerRoutes } from "./players";
+import {ApiScope, PrismaClient} from "@prisma/client";
+import Fastify, {FastifyInstance} from "fastify";
+
+import { bootstrap } from 'fastify-decorators';
+import { resolve } from 'path';
+
 import consolaGlobalInstance from "consola";
+
+const prisma = new PrismaClient();
 
 export class AnimusApiServer {
 
-  server: Hapi.Server;
+  server: FastifyInstance;
 
   constructor() {
-    this.server = Hapi.server({
-      port: process.env.PORT || 3000,
-      host: process.env.HOST || '0.0.0.0'
-    })
-
-    this.registerServerRoutes();
+    this.server = Fastify({
+      logger: true
+    });
   }
 
   registerServerRoutes() {
     consolaGlobalInstance.debug('Registering server routes...')
-    this.server.route(PlayerRoutes);
+
+    this.server.register(bootstrap, {
+      directory: resolve(__dirname, `controllers`),
+      mask: /\.controller\./,
+    });
   }
 
   async start() {
-    await this.server.start();
-    consolaGlobalInstance.success(`Hapi server running @ ${this.server.info.uri}`);
+    this.server.listen({
+      port: parseInt(process.env.PORT) || 3000,
+      host: process.env.HOST || '0.0.0.0'
+    }).then((address) => {
+      consolaGlobalInstance.success(`Fastify server running @ ${address}`);
+    }).catch((err) => {
+      consolaGlobalInstance.error(`Fastify server failed to start:`, err);
+    });
   }
 
 }

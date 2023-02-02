@@ -17,6 +17,8 @@ enum ChatChannels {
   PARTY
 }
 
+// Player related models
+
 model Player {
   uuid String @id
 
@@ -152,6 +154,8 @@ model GameServer {
   updatedAt DateTime @updatedAt
 }
 
+// Party related models
+
 model Party {
   id   Int    @id @default(autoincrement())
   name String @default("Unnamed party")
@@ -164,4 +168,21 @@ model Party {
   public    Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// API related models
+
+enum ApiScope {
+  SERVER
+  PLAYERS
+  GROUPS
+  PUNISHMENTS
+  GAMES
+  GAMESERVERS
+}
+
+model ApiKey {
+  key     String     @id
+  scopes  ApiScope[]
+  expires DateTime?
 }
