@@ -3,7 +3,7 @@ import {RequestWithKey} from "./HasBearer";
 import {ApiScope} from "@prisma/client";
 
 export function HasScope({scopes = []}: { scopes?: ApiScope[] } = {
-  scopes: []
+  scopes: [],
 }) {
   return function (
     target: Object,

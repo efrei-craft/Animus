@@ -10,6 +10,8 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Player related models
+
 enum ChatChannels {
   SERVER
   GLOBAL
@@ -17,10 +19,9 @@ enum ChatChannels {
   PARTY
 }
 
-// Player related models
-
 model Player {
   uuid String @id
+  username String
 
   punishments Punishment[]
 
@@ -55,6 +56,20 @@ model DiscordUser {
   Player      Player[]
 }
 
+model Party {
+  id   Int    @id @default(autoincrement())
+  name String @default("Unnamed party")
+
+  owner     Player @relation("partyOwner", fields: [ownerUuid], references: [uuid])
+  ownerUuid String @unique
+
+  members Player[]
+
+  public    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 // Punishment related models
 
 enum PunishmentType {
@@ -84,6 +99,8 @@ model PermGroup {
   prefix String  @default("")
   color  String  @default("&7")
   bold   Boolean @default(false)
+
+  defaultGroup Boolean @default(false)
 
   parentGroup PermGroup?  @relation("groupHasParent", fields: [permGroupId], references: [id])
   childGroups PermGroup[] @relation("groupHasParent")
@@ -128,6 +145,8 @@ model Game {
   requestedGameServers GameServer[] @relation("requestedGameServers")
 }
 
+// Server related models
+
 model GameServer {
   serverName String @id
 
@@ -150,22 +169,6 @@ model GameServer {
 
   lastHeartbeat DateTime @default(now())
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-// Party related models
-
-model Party {
-  id   Int    @id @default(autoincrement())
-  name String @default("Unnamed party")
-
-  owner     Player @relation("partyOwner", fields: [ownerUuid], references: [uuid])
-  ownerUuid String @unique
-
-  members Player[]
-
-  public    Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

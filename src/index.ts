@@ -1,12 +1,15 @@
-import { AnimusApiServer } from './realms/api';
+import { AnimusRestServer } from './realms/rest';
 import consolaGlobalInstance from "consola";
 
 import "reflect-metadata";
 
-const server = new AnimusApiServer();
+const server = new AnimusRestServer();
 
 const initServer = async () => {
-  server.registerServerRoutes();
+  consolaGlobalInstance.level = process.env.NODE_ENV === 'production' ? 2 : 5;
+  consolaGlobalInstance.debug(`Initializing server on the ${process.env.NODE_ENV} environment...`);
+
+  await server.registerServerRoutes();
   await server.start();
 }
 

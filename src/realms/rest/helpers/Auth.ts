@@ -27,10 +27,10 @@ export async function bearerToken(bearer: string | undefined): Promise<ApiKey> {
 
       return apiKey;
     } else {
-      throw new Error("invalid_request")
+      throw new Error("missing_bearer_token")
     }
   } else {
-    throw new Error("invalid_request")
+    throw new Error("missing_bearer_token")
   }
 }
 

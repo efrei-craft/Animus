@@ -6,7 +6,6 @@ Celui a pour vocation de gérer :
   - _Consultation d'informations
     - Dernière connexion
     - Première connexion
-    - Nombre de connexions
     - Grades
   -_ Gestion des permissions personnelles
     - Ajout
