@@ -27,7 +27,7 @@ export class AnimusRestServer {
           description: 'Système de gestion du serveur EfreiCraft',
           version: require('../../../package.json').version
         },
-        host: process.env.HOST || 'localhost:3000',
+        host: process.env.API_HOST || 'localhost:3000',
         schemes: process.env.NODE_ENV === 'production' ? ['https'] : ['http'],
         consumes: ['application/json'],
         produces: ['application/json'],

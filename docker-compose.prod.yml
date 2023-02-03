@@ -23,6 +23,7 @@ services:
       - db
     environment:
       NODE_ENV: production
+      API_HOST: animus.dev.efreicraft.fr
       DATABASE_URL: postgres://postgres:postgres@db:5432/postgres
     networks:
       net:
