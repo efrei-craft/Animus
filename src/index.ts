@@ -6,7 +6,7 @@ import "reflect-metadata"
 const server = new AnimusRestServer()
 
 const initServer = async () => {
-  consolaGlobalInstance.level = process.env.NODE_ENV === "production" ? 2 : 5
+  consolaGlobalInstance.level = process.env.NODE_ENV === "production" ? 3 : 5
   consolaGlobalInstance.debug(
     `Initializing server on the ${process.env.NODE_ENV} environment...`
   )
