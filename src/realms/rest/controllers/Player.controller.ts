@@ -17,6 +17,11 @@ export default class PlayerController {
       schema: {
         tags: ['players'],
         summary: 'A player connects to the server',
+        security: [
+          {
+            bearerAuth: []
+          }
+        ],
         ...PlayerConnectSchema
       }
     }

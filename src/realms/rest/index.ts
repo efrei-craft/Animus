@@ -40,10 +40,11 @@ export class AnimusRestServer {
           { name: 'misc', description: 'Miscellaneous api related end-points' },
         ],
         securityDefinitions: {
-          bearerToken: {
+          bearerAuth: {
             type: 'apiKey',
             name: 'Authorization',
             in: 'header',
+            description: 'Enter your Bearer token like this: Bearer {token}'
           }
         }
       }
