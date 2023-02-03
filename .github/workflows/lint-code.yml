@@ -1,6 +1,10 @@
 name: Lint
 
 on:
+  push:
+    branches:
+      - stable
+      - staging
   pull_request:
     branches:
       - stable
