@@ -185,6 +185,7 @@ enum ApiScope {
   PUNISHMENTS
   GAMES
   GAMESERVERS
+  ALL
 }
 
 model ApiKey {

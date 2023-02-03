@@ -3,11 +3,11 @@
 Composant de gestion globale du serveur EfreiCraft.
 Celui a pour vocation de gérer :
 - Les joueurs
-  - _Consultation d'informations
+  - Consultation d'informations
     - Dernière connexion
     - Première connexion
     - Grades
-  -_ Gestion des permissions personnelles
+  - Gestion des permissions personnelles
     - Ajout
     - Suppression
     - Consultation

@@ -37,6 +37,8 @@ export async function bearerToken(bearer: string | undefined): Promise<ApiKey> {
 export function scopeToken(scopes: ApiScope[], key: ApiKey) {
   if (scopes.every(scope => key.scopes.includes(scope))) {
     return true;
+  } else if (key.scopes.includes(ApiScope.ALL)) {
+    return true;
   } else {
     throw new Error("insufficient_scope")
   }

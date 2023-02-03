@@ -1,6 +1,6 @@
 import {FastifySchema} from "fastify";
 import {Static, Type} from '@sinclair/typebox';
-import PlayerSchema from "./common/Player.schema";
+import PlayerSchema from "../../schemas/Player.schema";
 
 enum PlayerConnectError {
   USER_BANNED = 'user-banned',

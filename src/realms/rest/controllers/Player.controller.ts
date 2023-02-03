@@ -4,7 +4,7 @@ import {HasBearer, RequestWithKey} from "../decorators/HasBearer";
 import {HasScope} from "../decorators/HasScope";
 import {ApiScope} from "@prisma/client";
 import PlayerService from "../services/Player.service";
-import {PlayerConnectBodySchema, PlayerConnectSchema} from "../schemas/PlayerConnect.schema";
+import {PlayerConnectBodySchema, PlayerConnectSchema} from "./schemas/Player.schema";
 
 @Controller({ route: '/players' })
 export default class PlayerController {

@@ -8,5 +8,6 @@ export default Type.Object({
   prefix: Type.String(),
   color: Type.String(),
   bold: Type.Boolean(),
+  defaultGroup: Type.Boolean(),
   parentGroupId: Type.Number(),
 }, { $id: 'PermGroup' });
