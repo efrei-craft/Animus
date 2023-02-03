@@ -1,29 +1,13 @@
-export default {
-  $id: 'Player',
-  type: 'object',
-  properties: {
-    uuid: {
-      type: 'string',
-    },
-    username: {
-      type: 'string',
-    },
-    permGroups: {
-      type: 'array',
-      items: {
-        $ref: 'PermGroup#',
-      }
-    },
-    _count: {
-      type: 'object',
-      properties: {
-        friends: {
-          type: 'number',
-        }
-      }
-    },
-    discordUserId: {
-      type: 'string',
-    }
-  }
-}
+import { Type } from '@sinclair/typebox';
+import PermGroupSchema from "./PermGroup.schema";
+
+export default Type.Object({
+  uuid: Type.String(),
+  username: Type.String(),
+  permGroups: Type.Array(Type.Ref(PermGroupSchema)),
+  _count: Type.Object({
+    friends: Type.Number(),
+  }),
+  discordUserId: Type.String(),
+  lastSeen: Type.String(),
+}, { $id: 'Player' });

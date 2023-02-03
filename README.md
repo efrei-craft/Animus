@@ -73,7 +73,7 @@ Le CLI de Prisma nous permettra d'effectuer des migrations de base de données, 
 
 Plus d'informations sur Prisma [ici](https://www.prisma.io/docs/).
 
-**Important:** La commande `docker compose exec back npx prisma migrate dev` doit être exécutée à chaque fois que le schéma de la base de données est modifié. La commande vous créera une migration et l'appliquera à la base de données au déploiement.
+**Important:** La commande `npm run db:migrate` doit être exécutée à chaque fois que vous voulez mettre à jour le schéma de la base de données. La commande vous créera une migration et l'appliquera à la base de données au déploiement.
 
 ### Front-end
 

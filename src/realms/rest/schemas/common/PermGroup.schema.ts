@@ -1,30 +1,12 @@
-export default {
-  $id: 'PermGroup',
-  type: 'object',
-  properties: {
-    id: {
-      type: 'number',
-    },
-    name: {
-      type: 'string',
-    },
-    permissions: {
-      type: 'array',
-      items: {
-        $ref: 'Permission#',
-      }
-    },
-    prefix: {
-      type: 'string',
-    },
-    color: {
-      type: 'string',
-    },
-    bold: {
-      type: 'boolean',
-    },
-    parentGroup: {
-      $ref: 'PermGroup#',
-    }
-  }
-}
+import { Type } from '@sinclair/typebox';
+import PermissionSchema from "./Permission.schema";
+
+export default Type.Object({
+  id: Type.Number(),
+  name: Type.String(),
+  permissions: Type.Array(Type.Ref(PermissionSchema)),
+  prefix: Type.String(),
+  color: Type.String(),
+  bold: Type.Boolean(),
+  parentGroupId: Type.Number(),
+}, { $id: 'PermGroup' });

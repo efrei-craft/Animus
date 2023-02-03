@@ -36,11 +36,12 @@ model Player {
   discordUser   DiscordUser? @relation(fields: [discordUserId], references: [id])
   discordUserId String?
 
+  lastSeen  DateTime  @default(now())
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
 
-  gameServer           GameServer? @relation(fields: [gameServerServerName], references: [serverName])
-  gameServerServerName String?
+  gameServer           GameServer? @relation(fields: [gameServerName], references: [name])
+  gameServerName String?
 
   party   Party? @relation("partyOwner")
   partyId Int?
@@ -102,11 +103,13 @@ model PermGroup {
 
   defaultGroup Boolean @default(false)
 
-  parentGroup PermGroup?  @relation("groupHasParent", fields: [permGroupId], references: [id])
+  parentGroup PermGroup?  @relation("groupHasParent", fields: [parentGroupId], references: [id])
+  parentGroupId Int?
+
   childGroups PermGroup[] @relation("groupHasParent")
+
   player      Player?     @relation(fields: [playerUuid], references: [uuid])
   playerUuid  String?
-  permGroupId Int?
 }
 
 model Permission {
@@ -148,7 +151,7 @@ model Game {
 // Server related models
 
 model GameServer {
-  serverName String @id
+  name String @id
 
   game     Game   @relation("gameServers", fields: [gameName], references: [name])
   gameName String

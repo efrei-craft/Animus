@@ -6,6 +6,7 @@ import { bootstrap } from 'fastify-decorators';
 import FastifySwagger from "@fastify/swagger";
 import FastifySwaggerUI from "@fastify/swagger-ui";
 import * as fs from "fs";
+import {TypeBoxTypeProvider} from "@fastify/type-provider-typebox";
 
 export class AnimusRestServer {
 
@@ -14,7 +15,7 @@ export class AnimusRestServer {
   constructor() {
     this.server = Fastify({
       logger: process.env.NODE_ENV !== 'production'
-    });
+    }).withTypeProvider<TypeBoxTypeProvider>()
   }
 
   async registerServerRoutes() {

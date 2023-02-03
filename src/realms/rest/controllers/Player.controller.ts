@@ -1,10 +1,10 @@
-import {Controller, GET, POST} from "fastify-decorators";
+import {Controller, POST} from "fastify-decorators";
 import {FastifyReply} from "fastify";
 import {HasBearer, RequestWithKey} from "../decorators/HasBearer";
 import {HasScope} from "../decorators/HasScope";
 import {ApiScope} from "@prisma/client";
 import PlayerService from "../services/Player.service";
-import {IPlayerConnect, PlayerConnectSchema} from "../schemas/Player.schema";
+import {PlayerConnectBodySchema, PlayerConnectSchema} from "../schemas/PlayerConnect.schema";
 
 @Controller({ route: '/players' })
 export default class PlayerController {
@@ -14,21 +14,12 @@ export default class PlayerController {
   @POST({
     url: '/connect',
     options: {
-      schema: {
-        tags: ['players'],
-        summary: 'A player connects to the server',
-        security: [
-          {
-            bearerAuth: []
-          }
-        ],
-        ...PlayerConnectSchema
-      }
+      schema: PlayerConnectSchema
     }
   })
   @HasBearer()
   @HasScope({ scopes: [ApiScope.PLAYERS, ApiScope.SERVER] })
-  async connect(req: RequestWithKey<{ Body: IPlayerConnect }>, reply: FastifyReply) {
+  async connect(req: RequestWithKey<{ Body: PlayerConnectBodySchema }>, reply: FastifyReply) {
     const fetchedPlayer = await this.playerService.fetchPlayer(req.body.uuid, req.body.username);
     return reply.send(fetchedPlayer);
   }
