@@ -1,10 +1,9 @@
-import prisma from "../../../clients/Prisma";
-import {Player, Prisma} from "@prisma/client";
-import {Service} from "fastify-decorators";
+import prisma from "../../../clients/Prisma"
+import { Player, Prisma } from "@prisma/client"
+import { Service } from "fastify-decorators"
 
 @Service()
 export default class PlayerService {
-
   /**
    * The select object for public player data.
    * @private
@@ -19,7 +18,7 @@ export default class PlayerService {
         prefix: true,
         color: true,
         bold: true,
-        parentGroupId: true,
+        parentGroupId: true
       }
     },
     _count: {
@@ -28,8 +27,8 @@ export default class PlayerService {
       }
     },
     lastSeen: true,
-    discordUserId: true,
-  };
+    discordUserId: true
+  }
 
   /**
    * Creates a new player
@@ -37,30 +36,33 @@ export default class PlayerService {
    * @param username The player's username
    * @return A promise that resolves to the created player
    */
-  private async createPlayer(uuid: string, username: string): Promise<Partial<Player>> {
+  private async createPlayer(
+    uuid: string,
+    username: string
+  ): Promise<Partial<Player>> {
     const defaultGroups = await prisma.permGroup.findMany({
       where: {
-        defaultGroup: true,
+        defaultGroup: true
       },
       select: {
-        id: true,
+        id: true
       }
-    });
+    })
 
     return prisma.player.create({
       data: {
         uuid,
         username,
         permGroups: {
-          connect: defaultGroups.map(group => {
+          connect: defaultGroups.map((group) => {
             return {
-              id: group.id,
+              id: group.id
             }
           })
         }
       },
-      select: this.PlayerPublicSelect,
-    });
+      select: this.PlayerPublicSelect
+    })
   }
 
   /**
@@ -73,26 +75,25 @@ export default class PlayerService {
     try {
       const player = await prisma.player.findUnique({
         where: {
-          uuid: uuid,
+          uuid: uuid
         },
-        select: this.PlayerPublicSelect,
-      });
-      if(player) {
+        select: this.PlayerPublicSelect
+      })
+      if (player) {
         await prisma.player.update({
           where: {
-            uuid: uuid,
+            uuid: uuid
           },
           data: {
-            lastSeen: new Date(),
+            lastSeen: new Date()
           }
-        });
+        })
       } else {
-        return this.createPlayer(uuid, username);
+        return this.createPlayer(uuid, username)
       }
-      return player;
+      return player
     } catch (e) {
-      throw new Error(e.message);
+      throw new Error(e.message)
     }
   }
-
 }

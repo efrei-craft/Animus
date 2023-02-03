@@ -1,11 +1,10 @@
-import {Service} from "fastify-decorators";
-import {CreateGroupBodySchema} from "../controllers/schemas/Permissions.schema";
-import prisma from "../../../clients/Prisma";
-import {PermGroup, Prisma} from "@prisma/client";
+import { Service } from "fastify-decorators"
+import { CreateGroupBodySchema } from "../controllers/schemas/Permissions.schema"
+import prisma from "../../../clients/Prisma"
+import { PermGroup, Prisma } from "@prisma/client"
 
 @Service()
 export default class PermissionsService {
-
   /**
    * The select object for public PermGroup data.
    * @private
@@ -18,26 +17,25 @@ export default class PermissionsService {
     bold: true,
     permissions: {
       select: {
-        name: true,
+        name: true
       }
     },
     defaultGroup: true,
-    parentGroupId: true,
-  };
+    parentGroupId: true
+  }
 
   async createGroup(group: CreateGroupBodySchema): Promise<Partial<PermGroup>> {
     return prisma.permGroup.create({
       data: {
-        ...group,
+        ...group
       },
       select: this.PermGroupPublicSelect
-    });
+    })
   }
 
   async getGroups(): Promise<Partial<PermGroup>[]> {
     return prisma.permGroup.findMany({
       select: this.PermGroupPublicSelect
-    });
+    })
   }
-
 }

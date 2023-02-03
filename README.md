@@ -2,6 +2,7 @@
 
 Composant de gestion globale du serveur EfreiCraft.
 Celui a pour vocation de gérer :
+
 - Les joueurs
   - Consultation d'informations
     - Dernière connexion
@@ -42,11 +43,12 @@ Pour configurer & lancer votre environnement de développement local :
 3. `.env.local.example` doit être copié et renommé en `.env.local`
 4. Les dépendances du repo doivent être installées pour l'IDE (`npm install`)
 
-Une fois ces étapes complétées, l'environnement peut être lancé avec la commande  `docker-compose up`.
+Une fois ces étapes complétées, l'environnement peut être lancé avec la commande `docker-compose up`.
 
 ## Architecture
 
 Le back-end utilise :
+
 - NodeJS pour le runtime
 - ExpressJS pour le serveur HTTP
   - REST pour le mode de communication
@@ -57,7 +59,7 @@ Le back-end utilise :
 
 #### Database
 
-Il est possible de parler directement à la base de données avec le CLI de PostgreSQL : 
+Il est possible de parler directement à la base de données avec le CLI de PostgreSQL :
 
 ```bash
 docker compose exec db psql -U postgres
@@ -73,7 +75,7 @@ Le CLI de Prisma nous permettra d'effectuer des migrations de base de données, 
 
 Plus d'informations sur Prisma [ici](https://www.prisma.io/docs/).
 
-**Important:** La commande `npm run db:migrate` doit être exécutée à chaque fois que vous voulez mettre à jour le schéma de la base de données. La commande vous créera une migration et l'appliquera à la base de données au déploiement.
+**Important:** La commande `npm run prisma:migrate` doit être exécutée à chaque fois que vous voulez mettre à jour le schéma de la base de données. La commande vous créera une migration et l'appliquera à la base de données au déploiement.
 
 ### Front-end
 

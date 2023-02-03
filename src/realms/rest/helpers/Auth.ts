@@ -1,9 +1,9 @@
-import prisma from "../../../clients/Prisma";
-import {ApiScope} from "@prisma/client";
+import prisma from "../../../clients/Prisma"
+import { ApiScope } from "@prisma/client"
 
 export type ApiKey = {
-  key: string;
-  scopes: ApiScope[];
+  key: string
+  scopes: ApiScope[]
 }
 
 export async function bearerToken(bearer: string | undefined): Promise<ApiKey> {
@@ -13,19 +13,19 @@ export async function bearerToken(bearer: string | undefined): Promise<ApiKey> {
     if (token) {
       const apiKey = await prisma.apiKey.findUnique({
         where: {
-          key: token,
+          key: token
         },
         select: {
           key: true,
-          scopes: true,
+          scopes: true
         }
-      });
+      })
 
       if (!apiKey) {
         throw new Error("invalid_api_key")
       }
 
-      return apiKey;
+      return apiKey
     } else {
       throw new Error("missing_bearer_token")
     }
@@ -35,12 +35,11 @@ export async function bearerToken(bearer: string | undefined): Promise<ApiKey> {
 }
 
 export function scopeToken(scopes: ApiScope[], key: ApiKey) {
-  if (scopes.every(scope => key.scopes.includes(scope))) {
-    return true;
+  if (scopes.every((scope) => key.scopes.includes(scope))) {
+    return true
   } else if (key.scopes.includes(ApiScope.ALL)) {
-    return true;
+    return true
   } else {
     throw new Error("insufficient_scope")
   }
 }
-

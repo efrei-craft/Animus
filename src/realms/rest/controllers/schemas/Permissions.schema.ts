@@ -1,6 +1,6 @@
-import {FastifySchema} from "fastify";
-import {Static, Type} from '@sinclair/typebox';
-import PermGroupSchema from "../../schemas/PermGroup.schema";
+import { FastifySchema } from "fastify"
+import { Static, Type } from "@sinclair/typebox"
+import PermGroupSchema from "../../schemas/PermGroup.schema"
 
 const CreateGroupBodySchema = Type.Object({
   name: Type.String(),
@@ -8,12 +8,12 @@ const CreateGroupBodySchema = Type.Object({
   color: Type.String(),
   bold: Type.Boolean(),
   defaultGroup: Type.Boolean(),
-  parentGroupId: Type.Optional(Type.Number()),
-});
+  parentGroupId: Type.Optional(Type.Number())
+})
 
 export const CreateGroupSchema: FastifySchema = {
-  tags: ['permissions'],
-  summary: 'Creates a PermGroup',
+  tags: ["permissions"],
+  summary: "Creates a PermGroup",
   security: [
     {
       bearerAuth: []
@@ -21,21 +21,21 @@ export const CreateGroupSchema: FastifySchema = {
   ],
   body: CreateGroupBodySchema,
   response: {
-    200: Type.Ref(PermGroupSchema),
-  },
-};
+    200: Type.Ref(PermGroupSchema)
+  }
+}
 
-export type CreateGroupBodySchema = Static<typeof CreateGroupBodySchema>;
+export type CreateGroupBodySchema = Static<typeof CreateGroupBodySchema>
 
 export const GetGroupSchema: FastifySchema = {
-  tags: ['permissions'],
-  summary: 'Gets all PermGroups',
+  tags: ["permissions"],
+  summary: "Gets all PermGroups",
   security: [
     {
       bearerAuth: []
     }
   ],
   response: {
-    200: Type.Array(Type.Ref(PermGroupSchema)),
-  },
-};
+    200: Type.Array(Type.Ref(PermGroupSchema))
+  }
+}

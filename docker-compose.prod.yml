@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 name: animus
 
@@ -59,4 +59,3 @@ networks:
     external: true
     name: reverseproxy_nw
   net:
-
