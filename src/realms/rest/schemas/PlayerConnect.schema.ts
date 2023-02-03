@@ -9,7 +9,7 @@ enum PlayerConnectError {
 const PlayerConnectBodySchema = Type.Object({
   uuid: Type.String(),
   username: Type.String(),
-}, { $id: 'PlayerConnectBody' });
+});
 
 export const PlayerConnectSchema: FastifySchema = {
   tags: ['players'],
@@ -25,7 +25,7 @@ export const PlayerConnectSchema: FastifySchema = {
     400: Type.Object({
       error: Type.String({ enum: Object.values(PlayerConnectError) }),
       message: Type.String(),
-    }, { $id: 'PlayerConnectError' }),
+    }),
   },
 };
 
