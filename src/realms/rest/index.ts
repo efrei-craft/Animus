@@ -8,8 +8,6 @@ import FastifySwaggerUI from "@fastify/swagger-ui"
 import * as fs from "fs"
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox"
 
-import { version } from "../../../package.json"
-
 export class AnimusRestServer {
   server: FastifyInstance
 
@@ -27,7 +25,7 @@ export class AnimusRestServer {
         info: {
           title: "Animus",
           description: "Système de gestion du serveur EfreiCraft",
-          version
+          version: process.env.npm_package_version
         },
         host: process.env.API_HOST || "localhost:3000",
         schemes: process.env.NODE_ENV === "production" ? ["https"] : ["http"],
