@@ -2,6 +2,7 @@ import { Static, Type } from "@sinclair/typebox"
 import { FastifySchema } from "fastify"
 import ApiKeySchema from "../../schemas/ApiKey.schema"
 
+// scopes must check if the value is in Object.keys(ApiScope)
 const CreateAPIKeyBodySchema = Type.Object({
   key: Type.String(),
   description: Type.Optional(Type.String()),
@@ -10,12 +11,7 @@ const CreateAPIKeyBodySchema = Type.Object({
 
 export const CreateAPIKeySchema: FastifySchema = {
   tags: ["misc"],
-  summary: "Creates a new API key",
-  security: [
-    {
-      bearerAuth: []
-    }
-  ],
+  summary: "Creates a new API key - temporarily public",
   body: CreateAPIKeyBodySchema,
   response: {
     200: Type.Ref(ApiKeySchema)
