@@ -30,3 +30,51 @@ export const PlayerConnectSchema: FastifySchema = {
 }
 
 export type PlayerConnectBodySchema = Static<typeof PlayerConnectBodySchema>
+
+const PlayerGetPermissionsParamsSchema = Type.Object({
+  uuid: Type.String()
+})
+
+export const PlayerGetPermissionsSchema: FastifySchema = {
+  tags: ["players"],
+  summary:
+    "Get a player's permissions (also gets the permissions of their permission groups)",
+  security: [
+    {
+      bearerAuth: []
+    }
+  ],
+  params: PlayerGetPermissionsParamsSchema,
+  response: {
+    200: Type.Array(Type.String()),
+    404: Type.Object({
+      error: Type.String({ enum: ["player-not-found"] })
+    })
+  }
+}
+
+const PlayerAddPermissionsParamsSchema = Type.Object({
+  uuid: Type.String()
+})
+
+const PlayerAddPermissionsBodySchema = Type.Object({
+  permissions: Type.Array(Type.String())
+})
+
+export const PlayerAddPermissionsSchema: FastifySchema = {
+  tags: ["players"],
+  summary: "Add permissions to a player",
+  security: [
+    {
+      bearerAuth: []
+    }
+  ],
+  params: PlayerAddPermissionsParamsSchema,
+  body: PlayerAddPermissionsBodySchema,
+  response: {
+    200: Type.Array(Type.String()),
+    404: Type.Object({
+      error: Type.String({ enum: ["player-not-found"] })
+    })
+  }
+}

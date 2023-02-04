@@ -40,7 +40,7 @@ model Player {
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
 
-  gameServer           GameServer? @relation(fields: [gameServerName], references: [name])
+  gameServer     GameServer? @relation(fields: [gameServerName], references: [name])
   gameServerName String?
 
   party   Party? @relation("partyOwner")

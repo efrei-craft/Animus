@@ -96,4 +96,104 @@ export default class PlayerService {
       throw new Error(e.message)
     }
   }
+
+  /**
+   * Gets all permissions for a player
+   * @param uuid The player's UUID
+   * @return A promise that resolves to an array of permission names
+   */
+  async getPermissions(uuid: string): Promise<string[]> {
+    const playerPermissions = await prisma.player.findUnique({
+      where: {
+        uuid: uuid
+      },
+      select: {
+        permGroups: {
+          select: {
+            permissions: {
+              select: {
+                name: true
+              }
+            }
+          }
+        },
+        perms: {
+          select: {
+            name: true
+          }
+        }
+      }
+    })
+
+    if (!playerPermissions) {
+      throw new Error("player-not-found")
+    }
+
+    const permissions = []
+
+    playerPermissions.permGroups.forEach((group) => {
+      group.permissions.forEach((permission) => {
+        permissions.push(permission.name)
+      })
+    })
+
+    playerPermissions.perms.forEach((permission) => {
+      permissions.push(permission.name)
+    })
+
+    return permissions
+  }
+
+  /**
+   * Adds permissions to a player
+   * @param uuid The player's UUID
+   * @param permissions An array of permission names
+   * @return A promise that resolves to an array of permission names that were added
+   */
+  async addPermissions(uuid: string, permissions: string[]): Promise<string[]> {
+    const player = await prisma.player.findUnique({
+      where: {
+        uuid: uuid
+      },
+      select: {
+        perms: {
+          select: {
+            name: true
+          }
+        }
+      }
+    })
+
+    if (!player) {
+      throw new Error("player-not-found")
+    }
+
+    const existingPermissions = player.perms.map((perm) => perm.name)
+
+    const newPermissions = permissions.filter(
+      (permission) => !existingPermissions.includes(permission)
+    )
+
+    await prisma.player.update({
+      where: {
+        uuid: uuid
+      },
+      data: {
+        perms: {
+          connectOrCreate: newPermissions.map((permission) => {
+            return {
+              where: {
+                name: permission
+              },
+              create: {
+                name: permission
+              }
+            }
+          })
+        }
+      }
+    })
+
+    return newPermissions
+  }
 }

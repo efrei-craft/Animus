@@ -13,7 +13,7 @@ const CreateGroupBodySchema = Type.Object({
 
 export const CreateGroupSchema: FastifySchema = {
   tags: ["permissions"],
-  summary: "Creates a PermGroup",
+  summary: "Creates a permission group",
   security: [
     {
       bearerAuth: []
@@ -29,7 +29,7 @@ export type CreateGroupBodySchema = Static<typeof CreateGroupBodySchema>
 
 export const GetGroupSchema: FastifySchema = {
   tags: ["permissions"],
-  summary: "Gets all PermGroups",
+  summary: "Gets all permission groups",
   security: [
     {
       bearerAuth: []
