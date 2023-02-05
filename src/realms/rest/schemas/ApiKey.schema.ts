@@ -6,5 +6,5 @@ export default Type.Object(
     description: Type.Optional(Type.String()),
     scopes: Type.Array(Type.String(), { minItems: 1 })
   },
-  { $id: "ApiKeySchema" }
+  { $id: "ApiKey" }
 )

@@ -2,7 +2,7 @@ import { Type } from "@sinclair/typebox"
 
 export default Type.Object(
   {
-    id: Type.Number()
+    name: Type.String()
   },
   { $id: "Permission" }
 )
