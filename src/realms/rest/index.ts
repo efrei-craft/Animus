@@ -20,6 +20,8 @@ export class AnimusRestServer {
   async registerServerRoutes() {
     consolaGlobalInstance.debug("Registering server routes...")
 
+    await this.registerSchemas()
+
     this.server.register(FastifySwagger, {
       swagger: {
         info: {
@@ -51,10 +53,15 @@ export class AnimusRestServer {
             description: "Enter your Bearer token like this: Bearer {token}"
           }
         }
+      },
+      refResolver: {
+        clone: true,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        buildLocalReference(json, baseUri, fragment, i): string {
+          return json.$id.toString()
+        }
       }
     })
-
-    await this.registerSchemas()
 
     this.server.register(FastifySwaggerUI, {
       routePrefix: "/docs"
@@ -71,7 +78,11 @@ export class AnimusRestServer {
     for (const schema of schemas) {
       const schemaName = schema.split(".")[0]
       const schemaContent = await import(`./schemas/${schema}`)
-      this.server.addSchema(schemaContent.default)
+      this.server.addSchema({
+        $id: schemaName,
+        definition: schemaName,
+        ...schemaContent.default
+      })
       consolaGlobalInstance.debug(
         `Registered schema ${schemaName} to Fastify server`
       )
