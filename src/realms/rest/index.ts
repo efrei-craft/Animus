@@ -78,11 +78,7 @@ export class AnimusRestServer {
     for (const schema of schemas) {
       const schemaName = schema.split(".")[0]
       const schemaContent = await import(`./schemas/${schema}`)
-      this.server.addSchema({
-        $id: schemaName,
-        definition: schemaName,
-        ...schemaContent.default
-      })
+      this.server.addSchema(schemaContent.default)
       consolaGlobalInstance.debug(
         `Registered schema ${schemaName} to Fastify server`
       )
