@@ -38,8 +38,9 @@ export class AnimusRestServer {
             name: "permissions",
             description: "Permissions related end-points"
           },
-          { name: "game", description: "Game related end-points" },
-          { name: "server", description: "Server related end-points" },
+          { name: "games", description: "Games related end-points" },
+          { name: "servers", description: "Servers related end-points" },
+          { name: "queues", description: "Queues related end-points" },
           { name: "misc", description: "Miscellaneous api related end-points" }
         ],
         securityDefinitions: {

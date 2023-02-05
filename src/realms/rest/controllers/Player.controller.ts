@@ -1,14 +1,17 @@
-import { Controller, GET, POST } from "fastify-decorators"
+import { Controller, GET, POST, PUT } from "fastify-decorators"
 import { FastifyReply } from "fastify"
 import { HasBearer, RequestWithKey } from "../decorators/HasBearer"
 import { HasScope } from "../decorators/HasScope"
 import { ApiScope } from "@prisma/client"
 import PlayerService from "../services/Player.service"
 import {
+  PlayerAddPermissionGroupBodySchema,
+  PlayerAddPermissionGroupSchema,
   PlayerAddPermissionsSchema,
   PlayerConnectBodySchema,
   PlayerConnectSchema,
-  PlayerGetPermissionsSchema
+  PlayerGetPermissionsSchema,
+  PlayerInfoSchema
 } from "./schemas/Player.schema"
 
 @Controller({ route: "/players" })
@@ -29,7 +32,27 @@ export default class PlayerController {
   ) {
     const fetchedPlayer = await this.playerService.fetchPlayer(
       req.body.uuid,
+      true,
       req.body.username
+    )
+    return reply.send(fetchedPlayer)
+  }
+
+  @GET({
+    url: "/:uuid",
+    options: {
+      schema: PlayerInfoSchema
+    }
+  })
+  @HasBearer()
+  @HasScope({ scopes: [ApiScope.PLAYERS] })
+  async getPlayerInfo(
+    req: RequestWithKey<{ Params: { uuid: string } }>,
+    reply: FastifyReply
+  ) {
+    const fetchedPlayer = await this.playerService.fetchPlayer(
+      req.params.uuid,
+      false
     )
     return reply.send(fetchedPlayer)
   }
@@ -41,7 +64,7 @@ export default class PlayerController {
     }
   })
   @HasBearer()
-  @HasScope({ scopes: [ApiScope.PLAYERS, ApiScope.SERVER] })
+  @HasScope({ scopes: [ApiScope.PLAYERS] })
   async getPermissions(
     req: RequestWithKey<{ Params: { uuid: string } }>,
     reply: FastifyReply
@@ -70,5 +93,27 @@ export default class PlayerController {
       req.body.permissions
     )
     return reply.send(addedPermissions)
+  }
+
+  @PUT({
+    url: "/:uuid/groups",
+    options: {
+      schema: PlayerAddPermissionGroupSchema
+    }
+  })
+  @HasBearer()
+  @HasScope({ scopes: [ApiScope.PLAYERS] })
+  async addPermissionGroup(
+    req: RequestWithKey<{
+      Params: { uuid: string }
+      Body: PlayerAddPermissionGroupBodySchema
+    }>,
+    reply: FastifyReply
+  ) {
+    const addedPermissionGroup = await this.playerService.addPermissionGroup(
+      req.params.uuid,
+      req.body.groupId
+    )
+    return reply.send(addedPermissionGroup)
   }
 }

@@ -17,13 +17,11 @@ export default class PlayerService {
         name: true,
         prefix: true,
         color: true,
-        bold: true,
-        parentGroupId: true
-      }
-    },
-    _count: {
-      select: {
-        friends: true
+        priority: true,
+        bold: true
+      },
+      orderBy: {
+        priority: "desc"
       }
     },
     lastSeen: true,
@@ -69,9 +67,14 @@ export default class PlayerService {
    * Fetches a player from the database, if the player does not exist, it will be created
    * @param uuid The player's UUID
    * @param username The player's username
+   * @param createOrUpdate Whether to create or update the player
    * @return A promise that resolves to the fetched player
    */
-  async fetchPlayer(uuid: string, username: string): Promise<Partial<Player>> {
+  async fetchPlayer(
+    uuid: string,
+    createOrUpdate: boolean,
+    username = ""
+  ): Promise<Partial<Player>> {
     try {
       const player = await prisma.player.findUnique({
         where: {
@@ -79,17 +82,20 @@ export default class PlayerService {
         },
         select: this.PlayerPublicSelect
       })
-      if (player) {
-        await prisma.player.update({
-          where: {
-            uuid: uuid
-          },
-          data: {
-            lastSeen: new Date()
-          }
-        })
-      } else {
-        return this.createPlayer(uuid, username)
+      if (createOrUpdate) {
+        if (player) {
+          await prisma.player.update({
+            where: {
+              uuid: uuid
+            },
+            data: {
+              lastSeen: new Date(),
+              username
+            }
+          })
+        } else {
+          return this.createPlayer(uuid, username)
+        }
       }
       return player
     } catch (e) {
@@ -195,5 +201,41 @@ export default class PlayerService {
     })
 
     return newPermissions
+  }
+
+  async addPermissionGroup(uuid: string, groupId: number): Promise<void> {
+    const player = await prisma.player.findUnique({
+      where: {
+        uuid: uuid
+      },
+      select: {
+        permGroups: {
+          select: {
+            id: true
+          }
+        }
+      }
+    })
+
+    if (!player) {
+      throw new Error("player-not-found")
+    }
+
+    const existingGroups = player.permGroups.map((group) => group.id)
+
+    if (!existingGroups.includes(groupId)) {
+      await prisma.player.update({
+        where: {
+          uuid: uuid
+        },
+        data: {
+          permGroups: {
+            connect: {
+              id: groupId
+            }
+          }
+        }
+      })
+    }
   }
 }

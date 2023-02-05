@@ -101,6 +101,8 @@ model PermGroup {
   color  String  @default("&7")
   bold   Boolean @default(false)
 
+  priority Int @default(0)
+
   defaultGroup Boolean @default(false)
 
   parentGroup PermGroup?  @relation("groupHasParent", fields: [parentGroupId], references: [id])
@@ -114,6 +116,7 @@ model PermGroup {
 
 model Permission {
   name        String     @id
+  expires     DateTime?
   player      Player?    @relation(fields: [playerUuid], references: [uuid])
   playerUuid  String?
   permGroup   PermGroup? @relation(fields: [permGroupId], references: [id])
@@ -184,7 +187,8 @@ enum ApiScope {
   GROUPS
   PUNISHMENTS
   GAMES
-  GAMESERVERS
+  SERVERS
+  QUEUES
   ALL
 }
 

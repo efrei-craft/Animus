@@ -20,6 +20,7 @@ export default class PermissionsService {
         name: true
       }
     },
+    priority: true,
     defaultGroup: true,
     parentGroupId: true
   }

@@ -50,8 +50,9 @@ Une fois ces étapes complétées, l'environnement peut être lancé avec la com
 Le back-end utilise :
 
 - NodeJS pour le runtime
-- ExpressJS pour le serveur HTTP
+- Fastify pour le serveur HTTP
   - REST pour le mode de communication
+  - Swagger pour la documentation
 - PostgreSQL pour la base de données
 - Prisma pour la gestion de la base de données
 

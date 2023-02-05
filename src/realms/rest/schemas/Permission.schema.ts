@@ -2,7 +2,14 @@ import { Type } from "@sinclair/typebox"
 
 export default Type.Object(
   {
-    name: Type.String()
+    name: Type.String({
+      description: "The permission identifier (used in game as the permission)"
+    }),
+    expires: Type.Optional(
+      Type.Date({
+        description: "The date this permission expires"
+      })
+    )
   },
-  { $id: "Permission" }
+  { $id: "Permission", description: "The schema describing a permission" }
 )
