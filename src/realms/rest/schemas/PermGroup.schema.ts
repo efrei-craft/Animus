@@ -3,7 +3,6 @@ import PermissionSchema from "./Permission.schema"
 
 export default Type.Object(
   {
-    id: Type.Number({ description: "The permission group's ID" }),
     name: Type.String({ description: "The permission group's technical name" }),
     permissions: Type.Array(Type.Ref(PermissionSchema), {
       description: "The permissions this group has"
@@ -26,7 +25,9 @@ export default Type.Object(
     defaultGroup: Type.Boolean({
       description: "Whether or not this group is a default group"
     }),
-    parentGroupId: Type.Number({ description: "The ID of the parent group" })
+    parentGroupName: Type.String({
+      description: "The name of the parent group"
+    })
   },
   {
     $id: "PermGroup",

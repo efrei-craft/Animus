@@ -13,7 +13,6 @@ export default class PlayerService {
     username: true,
     permGroups: {
       select: {
-        id: true,
         name: true,
         prefix: true,
         color: true,
@@ -26,41 +25,6 @@ export default class PlayerService {
     },
     lastSeen: true,
     discordUserId: true
-  }
-
-  /**
-   * Creates a new player
-   * @param uuid The player's UUID
-   * @param username The player's username
-   * @return A promise that resolves to the created player
-   */
-  private async createPlayer(
-    uuid: string,
-    username: string
-  ): Promise<Partial<Player>> {
-    const defaultGroups = await prisma.permGroup.findMany({
-      where: {
-        defaultGroup: true
-      },
-      select: {
-        id: true
-      }
-    })
-
-    return prisma.player.create({
-      data: {
-        uuid,
-        username,
-        permGroups: {
-          connect: defaultGroups.map((group) => {
-            return {
-              id: group.id
-            }
-          })
-        }
-      },
-      select: this.PlayerPublicSelect
-    })
   }
 
   /**
@@ -203,7 +167,7 @@ export default class PlayerService {
     return newPermissions
   }
 
-  async addPermissionGroup(uuid: string, groupId: number): Promise<void> {
+  async addPermissionGroup(uuid: string, groupName: string): Promise<void> {
     const player = await prisma.player.findUnique({
       where: {
         uuid: uuid
@@ -211,7 +175,7 @@ export default class PlayerService {
       select: {
         permGroups: {
           select: {
-            id: true
+            name: true
           }
         }
       }
@@ -221,9 +185,9 @@ export default class PlayerService {
       throw new Error("player-not-found")
     }
 
-    const existingGroups = player.permGroups.map((group) => group.id)
+    const existingGroups = player.permGroups.map((group) => group.name)
 
-    if (!existingGroups.includes(groupId)) {
+    if (!existingGroups.includes(groupName)) {
       await prisma.player.update({
         where: {
           uuid: uuid
@@ -231,11 +195,46 @@ export default class PlayerService {
         data: {
           permGroups: {
             connect: {
-              id: groupId
+              name: groupName
             }
           }
         }
       })
     }
+  }
+
+  /**
+   * Creates a new player
+   * @param uuid The player's UUID
+   * @param username The player's username
+   * @return A promise that resolves to the created player
+   */
+  private async createPlayer(
+    uuid: string,
+    username: string
+  ): Promise<Partial<Player>> {
+    const defaultGroups = await prisma.permGroup.findMany({
+      where: {
+        defaultGroup: true
+      },
+      select: {
+        name: true
+      }
+    })
+
+    return prisma.player.create({
+      data: {
+        uuid,
+        username,
+        permGroups: {
+          connect: defaultGroups.map((group) => {
+            return {
+              name: group.name
+            }
+          })
+        }
+      },
+      select: this.PlayerPublicSelect
+    })
   }
 }

@@ -20,7 +20,7 @@ enum ChatChannels {
 }
 
 model Player {
-  uuid String @id
+  uuid     String @id
   username String
 
   punishments Punishment[]
@@ -93,8 +93,7 @@ model Punishment {
 // Permission related models
 
 model PermGroup {
-  id          Int          @id @default(autoincrement())
-  name        String       @default("Unnamed group")
+  name        String       @id @default("Unnamed group")
   permissions Permission[]
 
   prefix String  @default("")
@@ -105,22 +104,20 @@ model PermGroup {
 
   defaultGroup Boolean @default(false)
 
-  parentGroup PermGroup?  @relation("groupHasParent", fields: [parentGroupId], references: [id])
-  parentGroupId Int?
+  parentGroup     PermGroup? @relation("groupHasParent", fields: [parentGroupName], references: [name])
+  parentGroupName String?
 
   childGroups PermGroup[] @relation("groupHasParent")
 
-  player      Player?     @relation(fields: [playerUuid], references: [uuid])
-  playerUuid  String?
+  player     Player? @relation(fields: [playerUuid], references: [uuid])
+  playerUuid String?
 }
 
 model Permission {
-  name        String     @id
-  expires     DateTime?
-  player      Player?    @relation(fields: [playerUuid], references: [uuid])
-  playerUuid  String?
-  permGroup   PermGroup? @relation(fields: [permGroupId], references: [id])
-  permGroupId Int?
+  name      String      @id
+  expires   DateTime?
+  player    Player[]
+  permGroup PermGroup[]
 }
 
 // Game related models
@@ -193,8 +190,8 @@ enum ApiScope {
 }
 
 model ApiKey {
-  key     String     @id
-  description String @default("No description")
-  scopes  ApiScope[]
-  expires DateTime?
+  key         String     @id
+  description String     @default("No description")
+  scopes      ApiScope[]
+  expires     DateTime?
 }

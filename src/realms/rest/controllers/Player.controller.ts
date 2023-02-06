@@ -7,10 +7,12 @@ import PlayerService from "../services/Player.service"
 import {
   PlayerAddPermissionGroupBodySchema,
   PlayerAddPermissionGroupSchema,
+  PlayerAddPermissionsBodySchema,
   PlayerAddPermissionsSchema,
   PlayerConnectBodySchema,
   PlayerConnectSchema,
   PlayerGetPermissionsSchema,
+  PlayerInfoParamsSchema,
   PlayerInfoSchema
 } from "./schemas/Player.schema"
 
@@ -19,7 +21,7 @@ export default class PlayerController {
   constructor(readonly playerService: PlayerService) {}
 
   @POST({
-    url: "/connect",
+    url: "/:uuid/connect",
     options: {
       schema: PlayerConnectSchema
     }
@@ -27,11 +29,14 @@ export default class PlayerController {
   @HasBearer()
   @HasScope({ scopes: [ApiScope.PLAYERS, ApiScope.SERVER] })
   async connect(
-    req: RequestWithKey<{ Body: PlayerConnectBodySchema }>,
+    req: RequestWithKey<{
+      Body: PlayerConnectBodySchema
+      Params: PlayerInfoParamsSchema
+    }>,
     reply: FastifyReply
   ) {
     const fetchedPlayer = await this.playerService.fetchPlayer(
-      req.body.uuid,
+      req.params.uuid,
       true,
       req.body.username
     )
@@ -47,7 +52,7 @@ export default class PlayerController {
   @HasBearer()
   @HasScope({ scopes: [ApiScope.PLAYERS] })
   async getPlayerInfo(
-    req: RequestWithKey<{ Params: { uuid: string } }>,
+    req: RequestWithKey<{ Params: PlayerInfoParamsSchema }>,
     reply: FastifyReply
   ) {
     const fetchedPlayer = await this.playerService.fetchPlayer(
@@ -66,7 +71,7 @@ export default class PlayerController {
   @HasBearer()
   @HasScope({ scopes: [ApiScope.PLAYERS] })
   async getPermissions(
-    req: RequestWithKey<{ Params: { uuid: string } }>,
+    req: RequestWithKey<{ Params: PlayerInfoParamsSchema }>,
     reply: FastifyReply
   ) {
     const permissions = await this.playerService.getPermissions(req.params.uuid)
@@ -83,8 +88,8 @@ export default class PlayerController {
   @HasScope({ scopes: [ApiScope.PLAYERS, ApiScope.SERVER] })
   async addPermissions(
     req: RequestWithKey<{
-      Params: { uuid: string }
-      Body: { permissions: string[] }
+      Params: PlayerInfoParamsSchema
+      Body: PlayerAddPermissionsBodySchema
     }>,
     reply: FastifyReply
   ) {
@@ -105,14 +110,14 @@ export default class PlayerController {
   @HasScope({ scopes: [ApiScope.PLAYERS] })
   async addPermissionGroup(
     req: RequestWithKey<{
-      Params: { uuid: string }
+      Params: PlayerInfoParamsSchema
       Body: PlayerAddPermissionGroupBodySchema
     }>,
     reply: FastifyReply
   ) {
     const addedPermissionGroup = await this.playerService.addPermissionGroup(
       req.params.uuid,
-      req.body.groupId
+      req.body.groupName
     )
     return reply.send(addedPermissionGroup)
   }

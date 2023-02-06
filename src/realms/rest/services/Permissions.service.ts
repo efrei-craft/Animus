@@ -10,7 +10,6 @@ export default class PermissionsService {
    * @private
    */
   private PermGroupPublicSelect: Prisma.PermGroupSelect = {
-    id: true,
     name: true,
     prefix: true,
     color: true,
@@ -22,7 +21,7 @@ export default class PermissionsService {
     },
     priority: true,
     defaultGroup: true,
-    parentGroupId: true
+    parentGroupName: true
   }
 
   async createGroup(group: CreateGroupBodySchema): Promise<Partial<PermGroup>> {

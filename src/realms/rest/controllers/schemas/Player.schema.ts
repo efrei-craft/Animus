@@ -2,14 +2,17 @@ import { FastifySchema } from "fastify"
 import { Static, Type } from "@sinclair/typebox"
 import PlayerSchema from "../../schemas/Player.schema"
 
+const PlayerInfoParamsSchema = Type.Object({
+  uuid: Type.String()
+})
+
+// Connect
+
 enum PlayerConnectError {
   USER_BANNED = "user-banned"
 }
 
-// Connect
-
 const PlayerConnectBodySchema = Type.Object({
-  uuid: Type.String(),
   username: Type.String()
 })
 
@@ -21,6 +24,7 @@ export const PlayerConnectSchema: FastifySchema = {
       bearerAuth: []
     }
   ],
+  params: PlayerInfoParamsSchema,
   body: PlayerConnectBodySchema,
   response: {
     200: Type.Ref(PlayerSchema),
@@ -34,10 +38,6 @@ export const PlayerConnectSchema: FastifySchema = {
 export type PlayerConnectBodySchema = Static<typeof PlayerConnectBodySchema>
 
 // Get Player Info
-
-const PlayerInfoParamsSchema = Type.Object({
-  uuid: Type.String()
-})
 
 export const PlayerInfoSchema: FastifySchema = {
   tags: ["players"],
@@ -55,6 +55,8 @@ export const PlayerInfoSchema: FastifySchema = {
     })
   }
 }
+
+export type PlayerInfoParamsSchema = Static<typeof PlayerInfoParamsSchema>
 
 // Get Permissions
 
@@ -100,10 +102,14 @@ export const PlayerAddPermissionsSchema: FastifySchema = {
   }
 }
 
+export type PlayerAddPermissionsBodySchema = Static<
+  typeof PlayerAddPermissionsBodySchema
+>
+
 // Add Permission Group
 
 const PlayerAddPermissionGroupBodySchema = Type.Object({
-  groupId: Type.Number()
+  groupName: Type.String()
 })
 
 export const PlayerAddPermissionGroupSchema: FastifySchema = {
