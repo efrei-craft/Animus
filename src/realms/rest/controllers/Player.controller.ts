@@ -40,7 +40,7 @@ export default class PlayerController {
       true,
       req.body.username
     )
-    return reply.send(fetchedPlayer)
+    return reply.code(200).send(fetchedPlayer)
   }
 
   @GET({
@@ -59,7 +59,7 @@ export default class PlayerController {
       req.params.uuid,
       false
     )
-    return reply.send(fetchedPlayer)
+    return reply.code(200).send(fetchedPlayer)
   }
 
   @GET({
@@ -75,7 +75,7 @@ export default class PlayerController {
     reply: FastifyReply
   ) {
     const permissions = await this.playerService.getPermissions(req.params.uuid)
-    return reply.send(permissions)
+    return reply.code(200).send(permissions)
   }
 
   @POST({
@@ -97,7 +97,7 @@ export default class PlayerController {
       req.params.uuid,
       req.body.permissions
     )
-    return reply.send(addedPermissions)
+    return reply.code(200).send(addedPermissions)
   }
 
   @DELETE({
@@ -119,7 +119,7 @@ export default class PlayerController {
       req.params.uuid,
       req.body.permissions
     )
-    return reply.send(removedPermissions)
+    return reply.code(200).send(removedPermissions)
   }
 
   @PUT({
@@ -141,6 +141,6 @@ export default class PlayerController {
       req.params.uuid,
       req.body.groupName
     )
-    return reply.send(addedPermissionGroup)
+    return reply.code(200).send(addedPermissionGroup)
   }
 }

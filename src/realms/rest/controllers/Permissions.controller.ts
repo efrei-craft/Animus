@@ -26,7 +26,7 @@ export default class PermissionsController {
     reply: FastifyReply
   ) {
     const createdGroup = await this.permissionsService.createGroup(req.body)
-    return reply.send(createdGroup)
+    return reply.code(200).send(createdGroup)
   }
 
   @GET({
@@ -39,6 +39,6 @@ export default class PermissionsController {
   @HasSchemaScope()
   async getGroups(req: RequestWithKey, reply: FastifyReply) {
     const groups = await this.permissionsService.getGroups()
-    return reply.send(groups)
+    return reply.code(200).send(groups)
   }
 }
