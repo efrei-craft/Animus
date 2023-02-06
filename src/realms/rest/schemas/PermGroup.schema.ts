@@ -12,8 +12,7 @@ export default Type.Object(
     }),
     color: Type.String({
       description:
-        "The color this group has, shown in game and formatted with an ampersand (&)",
-      examples: ["&c", "&a", "&b"]
+        "The color this group has, shown in game and formatted with an ampersand (&)"
     }),
     bold: Type.Boolean({
       description: "Whether or not this group's prefix is bold"

@@ -1,13 +1,12 @@
 import { Controller, GET, POST } from "fastify-decorators"
-import { HasBearer, RequestWithKey } from "../decorators/HasBearer"
+import { HasApiKey, RequestWithKey } from "../decorators/HasApiKey"
 import {
   CreateGroupBodySchema,
   CreateGroupSchema,
   GetGroupSchema
 } from "./schemas/Permissions.schema"
 import { FastifyReply } from "fastify"
-import { HasScope } from "../decorators/HasScope"
-import { ApiScope } from "@prisma/client"
+import { HasSchemaScope } from "../decorators/HasSchemaScope"
 import PermissionsService from "../services/Permissions.service"
 
 @Controller({ route: "/permissions" })
@@ -20,8 +19,8 @@ export default class PermissionsController {
       schema: CreateGroupSchema
     }
   })
-  @HasBearer()
-  @HasScope({ scopes: [ApiScope.GROUPS] })
+  @HasApiKey()
+  @HasSchemaScope()
   async createGroup(
     req: RequestWithKey<{ Body: CreateGroupBodySchema }>,
     reply: FastifyReply
@@ -36,8 +35,8 @@ export default class PermissionsController {
       schema: GetGroupSchema
     }
   })
-  @HasBearer()
-  @HasScope({ scopes: [ApiScope.GROUPS] })
+  @HasApiKey()
+  @HasSchemaScope()
   async getGroups(req: RequestWithKey, reply: FastifyReply) {
     const groups = await this.permissionsService.getGroups()
     return reply.send(groups)

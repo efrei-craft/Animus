@@ -181,6 +181,7 @@ model GameServer {
 enum ApiScope {
   SERVER
   PLAYERS
+  PERMISSIONS
   GROUPS
   PUNISHMENTS
   GAMES

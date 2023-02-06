@@ -6,40 +6,37 @@ export type ApiKey = {
   scopes: ApiScope[]
 }
 
-export async function bearerToken(bearer: string | undefined): Promise<ApiKey> {
-  if (bearer?.split(" ")[0] === "Bearer") {
-    const token = bearer?.split(" ")[1]
-
-    if (token) {
-      const apiKey = await prisma.apiKey.findUnique({
-        where: {
-          key: token
-        },
-        select: {
-          key: true,
-          scopes: true
-        }
-      })
-
-      if (!apiKey) {
-        throw new Error("invalid_api_key")
+export async function fetchApiKey(key: string | undefined): Promise<ApiKey> {
+  if (key) {
+    const apiKey = await prisma.apiKey.findUnique({
+      where: {
+        key
+      },
+      select: {
+        key: true,
+        scopes: true
       }
+    })
 
-      return apiKey
-    } else {
-      throw new Error("missing_bearer_token")
+    if (!apiKey) {
+      throw new Error("invalid_api_key")
     }
+
+    return apiKey
   } else {
-    throw new Error("missing_bearer_token")
+    throw new Error("missing_api_key")
   }
 }
 
-export function scopeToken(scopes: ApiScope[], key: ApiKey) {
+export function hasAuthorization(scopes: ApiScope[], key: ApiKey) {
   if (scopes.every((scope) => key.scopes.includes(scope))) {
     return true
   } else if (key.scopes.includes(ApiScope.ALL)) {
     return true
   } else {
-    throw new Error("insufficient_scope")
+    let missingScopes = scopes.filter((scope) => !key.scopes.includes(scope))
+    throw new Error(
+      "insufficient_scope (missing " + missingScopes.join(", ") + ")"
+    )
   }
 }

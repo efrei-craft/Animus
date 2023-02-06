@@ -167,6 +167,57 @@ export default class PlayerService {
     return newPermissions
   }
 
+  /**
+   * Removes permissions from a player
+   * @param uuid The player's UUID
+   * @param permissions An array of permission names
+   * @return A promise that resolves to an array of permission names that were removed
+   */
+  async removePermissions(
+    uuid: string,
+    permissions: string[]
+  ): Promise<string[]> {
+    const player = await prisma.player.findUnique({
+      where: {
+        uuid: uuid
+      },
+      select: {
+        perms: {
+          select: {
+            name: true
+          }
+        }
+      }
+    })
+
+    if (!player) {
+      throw new Error("player-not-found")
+    }
+
+    const existingPermissions = player.perms.map((perm) => perm.name)
+
+    const removePermissions = permissions.filter((permission) =>
+      existingPermissions.includes(permission)
+    )
+
+    await prisma.player.update({
+      where: {
+        uuid: uuid
+      },
+      data: {
+        perms: {
+          disconnect: removePermissions.map((permission) => {
+            return {
+              name: permission
+            }
+          })
+        }
+      }
+    })
+
+    return removePermissions
+  }
+
   async addPermissionGroup(uuid: string, groupName: string): Promise<void> {
     const player = await prisma.player.findUnique({
       where: {

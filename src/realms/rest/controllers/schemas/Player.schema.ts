@@ -1,6 +1,7 @@
 import { FastifySchema } from "fastify"
 import { Static, Type } from "@sinclair/typebox"
 import PlayerSchema from "../../schemas/Player.schema"
+import { ApiScope } from "@prisma/client"
 
 const PlayerInfoParamsSchema = Type.Object({
   uuid: Type.String()
@@ -21,7 +22,7 @@ export const PlayerConnectSchema: FastifySchema = {
   summary: "A player connects to the server",
   security: [
     {
-      bearerAuth: []
+      apiKey: [ApiScope.PLAYERS, ApiScope.SERVER]
     }
   ],
   params: PlayerInfoParamsSchema,
@@ -44,7 +45,7 @@ export const PlayerInfoSchema: FastifySchema = {
   summary: "Get information about a player",
   security: [
     {
-      bearerAuth: []
+      apiKey: [ApiScope.PLAYERS]
     }
   ],
   params: PlayerInfoParamsSchema,
@@ -66,12 +67,12 @@ export const PlayerGetPermissionsSchema: FastifySchema = {
     "Get a player's permissions (also gets the permissions of their permission groups)",
   security: [
     {
-      bearerAuth: []
+      apiKey: [ApiScope.PLAYERS, ApiScope.PERMISSIONS]
     }
   ],
   params: PlayerInfoParamsSchema,
   response: {
-    200: Type.Array(Type.String()),
+    200: Type.Array(Type.String({ description: "The player's permissions" })),
     404: Type.Object({
       error: Type.String({ enum: ["player-not-found"] })
     })
@@ -80,7 +81,7 @@ export const PlayerGetPermissionsSchema: FastifySchema = {
 
 // Add Permission
 
-const PlayerAddPermissionsBodySchema = Type.Object({
+const PlayerPermissionsBodySchema = Type.Object({
   permissions: Type.Array(Type.String())
 })
 
@@ -89,22 +90,42 @@ export const PlayerAddPermissionsSchema: FastifySchema = {
   summary: "Add permissions to a player",
   security: [
     {
-      bearerAuth: []
+      apiKey: [ApiScope.PLAYERS, ApiScope.PERMISSIONS]
     }
   ],
   params: PlayerInfoParamsSchema,
-  body: PlayerAddPermissionsBodySchema,
+  body: PlayerPermissionsBodySchema,
   response: {
-    200: Type.Array(Type.String()),
+    200: Type.Array(Type.String({ description: "The added permissions" })),
     404: Type.Object({
       error: Type.String({ enum: ["player-not-found"] })
     })
   }
 }
 
-export type PlayerAddPermissionsBodySchema = Static<
-  typeof PlayerAddPermissionsBodySchema
+export type PlayerPermissionsBodySchema = Static<
+  typeof PlayerPermissionsBodySchema
 >
+
+// Remove Permissions
+
+export const PlayerRemovePermissionsSchema: FastifySchema = {
+  tags: ["players"],
+  summary: "Remove permissions from a player",
+  security: [
+    {
+      apiKey: [ApiScope.PLAYERS, ApiScope.PERMISSIONS]
+    }
+  ],
+  params: PlayerInfoParamsSchema,
+  body: PlayerPermissionsBodySchema,
+  response: {
+    200: Type.Array(Type.String({ description: "The removed permissions" })),
+    404: Type.Object({
+      error: Type.String({ enum: ["player-not-found"] })
+    })
+  }
+}
 
 // Add Permission Group
 
@@ -114,12 +135,12 @@ const PlayerAddPermissionGroupBodySchema = Type.Object({
 
 export const PlayerAddPermissionGroupSchema: FastifySchema = {
   tags: ["players"],
-  summary: "Add a permission group to a player",
   security: [
     {
-      bearerAuth: []
+      apiKey: [ApiScope.PLAYERS, ApiScope.GROUPS]
     }
   ],
+  summary: "Add a permission group to a player",
   params: PlayerInfoParamsSchema,
   body: PlayerAddPermissionGroupBodySchema,
   response: {

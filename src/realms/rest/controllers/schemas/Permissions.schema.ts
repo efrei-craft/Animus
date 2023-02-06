@@ -1,6 +1,7 @@
 import { FastifySchema } from "fastify"
 import { Static, Type } from "@sinclair/typebox"
 import PermGroupSchema from "../../schemas/PermGroup.schema"
+import { ApiScope } from "@prisma/client"
 
 const CreateGroupBodySchema = Type.Object({
   name: Type.String(),
@@ -16,7 +17,7 @@ export const CreateGroupSchema: FastifySchema = {
   summary: "Creates a permission group",
   security: [
     {
-      bearerAuth: []
+      apiKey: [ApiScope.GROUPS]
     }
   ],
   body: CreateGroupBodySchema,
@@ -32,7 +33,7 @@ export const GetGroupSchema: FastifySchema = {
   summary: "Gets all permission groups",
   security: [
     {
-      bearerAuth: []
+      apiKey: [ApiScope.GROUPS]
     }
   ],
   response: {
