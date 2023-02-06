@@ -109,8 +109,7 @@ model PermGroup {
 
   childGroups PermGroup[] @relation("groupHasParent")
 
-  player     Player? @relation(fields: [playerUuid], references: [uuid])
-  playerUuid String?
+  players Player[]
 }
 
 model Permission {
