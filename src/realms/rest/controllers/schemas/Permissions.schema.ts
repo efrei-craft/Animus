@@ -9,7 +9,7 @@ const CreateGroupBodySchema = Type.Object({
   color: Type.String(),
   bold: Type.Boolean(),
   defaultGroup: Type.Boolean(),
-  parentGroupId: Type.Optional(Type.Number())
+  parentGroupName: Type.Optional(Type.String())
 })
 
 export const CreateGroupSchema: FastifySchema = {
