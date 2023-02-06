@@ -140,12 +140,17 @@ model Game {
   name      String @id
   color     String @default("&7")
   ludosGame String
-  material  String
+
+  menuMaterial  String
+  menuDescription String @default("No description")
+  menuOrder      Int    @default(0)
 
   minQueueToStart Int @default(1)
   maxPlayers      Int @default(8)
 
   template Template @default(MINI)
+
+  available Boolean @default(false)
 
   gameServers          GameServer[] @relation("gameServers")
   requestedGameServers GameServer[] @relation("requestedGameServers")
@@ -187,7 +192,7 @@ enum ApiScope {
   GROUPS
   PUNISHMENTS
   GAMES
-  SERVERS
+  GAMESERVERS
   QUEUES
   ALL
 }
