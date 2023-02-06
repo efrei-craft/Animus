@@ -29,6 +29,10 @@ export class AnimusRestServer {
       routePrefix: "/docs"
     })
 
+    this.server.get("/", async (request, reply) => {
+      reply.redirect("/docs")
+    })
+
     this.server.register(bootstrap, {
       directory: resolve(__dirname, `controllers`),
       mask: /\.controller\./

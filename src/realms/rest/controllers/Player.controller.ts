@@ -78,7 +78,7 @@ export default class PlayerController {
     return reply.code(200).send(permissions)
   }
 
-  @POST({
+  @PUT({
     url: "/:uuid/permissions",
     options: {
       schema: PlayerAddPermissionsSchema

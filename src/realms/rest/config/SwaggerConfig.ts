@@ -1,11 +1,11 @@
-import {RegisterOptions} from "fastify";
-import {FastifyDynamicSwaggerOptions} from "@fastify/swagger";
+import { RegisterOptions } from "fastify";
+import { FastifyDynamicSwaggerOptions } from "@fastify/swagger";
 
 const SwaggerConfig: RegisterOptions & FastifyDynamicSwaggerOptions = {
   swagger: {
     info: {
       title: "Animus",
-      description: "Système de gestion du serveur EfreiCraft",
+      description: "Système de gestion du serveur Efrei Craft",
       version: process.env.npm_package_version
     },
     host: process.env.API_HOST || "localhost:3000",
