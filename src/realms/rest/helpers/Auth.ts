@@ -34,7 +34,7 @@ export function hasAuthorization(scopes: ApiScope[], key: ApiKey) {
   } else if (key.scopes.includes(ApiScope.ALL)) {
     return true
   } else {
-    let missingScopes = scopes.filter((scope) => !key.scopes.includes(scope))
+    const missingScopes = scopes.filter((scope) => !key.scopes.includes(scope))
     throw new Error(
       "insufficient_scope (missing " + missingScopes.join(", ") + ")"
     )
