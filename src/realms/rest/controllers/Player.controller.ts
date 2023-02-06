@@ -1,8 +1,6 @@
-import { Controller, GET, POST, PUT } from "fastify-decorators"
+import { Controller, DELETE, GET, POST, PUT } from "fastify-decorators"
 import { FastifyReply } from "fastify"
-import { HasBearer, RequestWithKey } from "../decorators/HasBearer"
-import { HasScope } from "../decorators/HasScope"
-import { ApiScope } from "@prisma/client"
+import { HasApiKey, RequestWithKey } from "../decorators/HasApiKey"
 import PlayerService from "../services/Player.service"
 import {
   PlayerAddPermissionGroupBodySchema,
@@ -11,27 +9,34 @@ import {
   PlayerConnectBodySchema,
   PlayerConnectSchema,
   PlayerGetPermissionsSchema,
-  PlayerInfoSchema
+  PlayerInfoParamsSchema,
+  PlayerInfoSchema,
+  PlayerPermissionsBodySchema,
+  PlayerRemovePermissionsSchema
 } from "./schemas/Player.schema"
+import { HasSchemaScope } from "../decorators/HasSchemaScope"
 
 @Controller({ route: "/players" })
 export default class PlayerController {
   constructor(readonly playerService: PlayerService) {}
 
   @POST({
-    url: "/connect",
+    url: "/:uuid/connect",
     options: {
       schema: PlayerConnectSchema
     }
   })
-  @HasBearer()
-  @HasScope({ scopes: [ApiScope.PLAYERS, ApiScope.SERVER] })
+  @HasApiKey()
+  @HasSchemaScope()
   async connect(
-    req: RequestWithKey<{ Body: PlayerConnectBodySchema }>,
+    req: RequestWithKey<{
+      Body: PlayerConnectBodySchema
+      Params: PlayerInfoParamsSchema
+    }>,
     reply: FastifyReply
   ) {
     const fetchedPlayer = await this.playerService.fetchPlayer(
-      req.body.uuid,
+      req.params.uuid,
       true,
       req.body.username
     )
@@ -44,10 +49,10 @@ export default class PlayerController {
       schema: PlayerInfoSchema
     }
   })
-  @HasBearer()
-  @HasScope({ scopes: [ApiScope.PLAYERS] })
+  @HasApiKey()
+  @HasSchemaScope()
   async getPlayerInfo(
-    req: RequestWithKey<{ Params: { uuid: string } }>,
+    req: RequestWithKey<{ Params: PlayerInfoParamsSchema }>,
     reply: FastifyReply
   ) {
     const fetchedPlayer = await this.playerService.fetchPlayer(
@@ -63,10 +68,10 @@ export default class PlayerController {
       schema: PlayerGetPermissionsSchema
     }
   })
-  @HasBearer()
-  @HasScope({ scopes: [ApiScope.PLAYERS] })
+  @HasApiKey()
+  @HasSchemaScope()
   async getPermissions(
-    req: RequestWithKey<{ Params: { uuid: string } }>,
+    req: RequestWithKey<{ Params: PlayerInfoParamsSchema }>,
     reply: FastifyReply
   ) {
     const permissions = await this.playerService.getPermissions(req.params.uuid)
@@ -79,12 +84,12 @@ export default class PlayerController {
       schema: PlayerAddPermissionsSchema
     }
   })
-  @HasBearer()
-  @HasScope({ scopes: [ApiScope.PLAYERS, ApiScope.SERVER] })
+  @HasApiKey()
+  @HasSchemaScope()
   async addPermissions(
     req: RequestWithKey<{
-      Params: { uuid: string }
-      Body: { permissions: string[] }
+      Params: PlayerInfoParamsSchema
+      Body: PlayerPermissionsBodySchema
     }>,
     reply: FastifyReply
   ) {
@@ -95,24 +100,46 @@ export default class PlayerController {
     return reply.send(addedPermissions)
   }
 
+  @DELETE({
+    url: "/:uuid/permissions",
+    options: {
+      schema: PlayerRemovePermissionsSchema
+    }
+  })
+  @HasApiKey()
+  @HasSchemaScope()
+  async removePermissions(
+    req: RequestWithKey<{
+      Params: PlayerInfoParamsSchema
+      Body: PlayerPermissionsBodySchema
+    }>,
+    reply: FastifyReply
+  ) {
+    const removedPermissions = await this.playerService.removePermissions(
+      req.params.uuid,
+      req.body.permissions
+    )
+    return reply.send(removedPermissions)
+  }
+
   @PUT({
     url: "/:uuid/groups",
     options: {
       schema: PlayerAddPermissionGroupSchema
     }
   })
-  @HasBearer()
-  @HasScope({ scopes: [ApiScope.PLAYERS] })
+  @HasApiKey()
+  @HasSchemaScope()
   async addPermissionGroup(
     req: RequestWithKey<{
-      Params: { uuid: string }
+      Params: PlayerInfoParamsSchema
       Body: PlayerAddPermissionGroupBodySchema
     }>,
     reply: FastifyReply
   ) {
     const addedPermissionGroup = await this.playerService.addPermissionGroup(
       req.params.uuid,
-      req.body.groupId
+      req.body.groupName
     )
     return reply.send(addedPermissionGroup)
   }
