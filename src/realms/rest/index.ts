@@ -26,7 +26,16 @@ export class AnimusRestServer {
     this.server.register(FastifySwagger, SwaggerConfig)
 
     this.server.register(FastifySwaggerUI, {
-      routePrefix: "/docs"
+      routePrefix: "/docs",
+      uiConfig: {
+        displayOperationId: true,
+        persistAuthorization: true,
+        syntaxHighlight: {
+          activate: true,
+          theme: "agate"
+        },
+        deepLinking: true
+      }
     })
 
     this.server.get("/", async (request, reply) => {
