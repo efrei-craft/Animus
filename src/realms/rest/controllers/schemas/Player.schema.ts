@@ -20,6 +20,7 @@ const PlayerConnectBodySchema = Type.Object({
 export const PlayerConnectSchema: FastifySchema = {
   tags: ["players"],
   summary: "A player connects to the server",
+  operationId: "playerConnect",
   security: [
     {
       apiKey: [ApiScope.PLAYERS, ApiScope.SERVER]
@@ -43,6 +44,7 @@ export type PlayerConnectBodySchema = Static<typeof PlayerConnectBodySchema>
 export const PlayerInfoSchema: FastifySchema = {
   tags: ["players"],
   summary: "Get information about a player",
+  operationId: "getPlayerInfo",
   security: [
     {
       apiKey: [ApiScope.PLAYERS]
@@ -65,6 +67,7 @@ export const PlayerGetPermissionsSchema: FastifySchema = {
   tags: ["players"],
   summary:
     "Get a player's permissions (also gets the permissions of their permission groups)",
+  operationId: "getPlayerPermissions",
   security: [
     {
       apiKey: [ApiScope.PLAYERS, ApiScope.PERMISSIONS]
@@ -88,6 +91,7 @@ const PlayerPermissionsBodySchema = Type.Object({
 export const PlayerAddPermissionsSchema: FastifySchema = {
   tags: ["players"],
   summary: "Add permissions to a player",
+  operationId: "addPlayerPermissions",
   security: [
     {
       apiKey: [ApiScope.PLAYERS, ApiScope.PERMISSIONS]
@@ -112,6 +116,7 @@ export type PlayerPermissionsBodySchema = Static<
 export const PlayerRemovePermissionsSchema: FastifySchema = {
   tags: ["players"],
   summary: "Remove permissions from a player",
+  operationId: "removePlayerPermissions",
   security: [
     {
       apiKey: [ApiScope.PLAYERS, ApiScope.PERMISSIONS]
@@ -135,12 +140,13 @@ const PlayerAddPermissionGroupBodySchema = Type.Object({
 
 export const PlayerAddPermissionGroupSchema: FastifySchema = {
   tags: ["players"],
+  summary: "Add a permission group to a player",
+  operationId: "addPlayerPermissionGroup",
   security: [
     {
       apiKey: [ApiScope.PLAYERS, ApiScope.GROUPS]
     }
   ],
-  summary: "Add a permission group to a player",
   params: PlayerInfoParamsSchema,
   body: PlayerAddPermissionGroupBodySchema,
   response: {
@@ -168,6 +174,7 @@ export const PlayerChangeChannelSchema: FastifySchema = {
     }
   ],
   summary: "Change a player's chat channel",
+  operationId: "changePlayerChannel",
   params: PlayerInfoParamsSchema,
   body: PlayerChangeChannelBodySchema,
   response: {
