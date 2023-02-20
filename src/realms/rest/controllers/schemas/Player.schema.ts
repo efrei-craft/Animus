@@ -1,7 +1,7 @@
 import { FastifySchema } from "fastify"
 import { Static, Type } from "@sinclair/typebox"
 import PlayerSchema from "../../schemas/Player.schema"
-import { ApiScope } from "@prisma/client"
+import { ApiScope, ChatChannels } from "@prisma/client"
 
 const PlayerInfoParamsSchema = Type.Object({
   uuid: Type.String()
@@ -150,4 +150,34 @@ export const PlayerAddPermissionGroupSchema: FastifySchema = {
 
 export type PlayerAddPermissionGroupBodySchema = Static<
   typeof PlayerAddPermissionGroupBodySchema
+>
+
+// Change Chat Channel
+
+const PlayerChangeChannelBodySchema = Type.Object({
+  channel: Type.String({
+    enum: Object.keys(ChatChannels)
+  })
+})
+
+export const PlayerChangeChannelSchema: FastifySchema = {
+  tags: ["players"],
+  security: [
+    {
+      apiKey: [ApiScope.PLAYERS, ApiScope.CHAT]
+    }
+  ],
+  summary: "Change a player's chat channel",
+  params: PlayerInfoParamsSchema,
+  body: PlayerChangeChannelBodySchema,
+  response: {
+    200: Type.Object({}),
+    404: Type.Object({
+      error: Type.String({ enum: ["player-not-found", "invalid-channel"] })
+    })
+  }
+}
+
+export type PlayerChangeChannelBodySchema = Static<
+  typeof PlayerChangeChannelBodySchema
 >

@@ -22,6 +22,7 @@ const SwaggerConfig: RegisterOptions & FastifyDynamicSwaggerOptions = {
       {name: "games", description: "Games related end-points"},
       {name: "servers", description: "Servers related end-points"},
       {name: "queues", description: "Queues related end-points"},
+      {name: "chat", description: "Chat related end-points"},
       {name: "misc", description: "Miscellaneous api related end-points"}
     ],
     securityDefinitions: {

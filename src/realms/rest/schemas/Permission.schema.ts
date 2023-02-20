@@ -6,8 +6,8 @@ export default Type.Object(
       description: "The permission identifier (used in game as the permission)"
     }),
     expires: Type.Optional(
-      Type.Date({
-        description: "The date this permission expires"
+      Type.String({
+        description: "The date the permission expires (ISO 8601)"
       })
     )
   },

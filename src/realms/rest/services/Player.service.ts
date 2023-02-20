@@ -1,6 +1,7 @@
 import prisma from "../../../clients/Prisma"
-import { Player, Prisma } from "@prisma/client"
+import { ChatChannels, Player, Prisma } from "@prisma/client"
 import { Service } from "fastify-decorators"
+import { ApiError } from "../helpers/Error"
 
 @Service()
 export default class PlayerService {
@@ -23,6 +24,7 @@ export default class PlayerService {
         priority: "desc"
       }
     },
+    chatChannel: true,
     lastSeen: true,
     discordUserId: true
   }
@@ -96,7 +98,7 @@ export default class PlayerService {
     })
 
     if (!playerPermissions) {
-      throw new Error("player-not-found")
+      throw new ApiError("player-not-found", 404)
     }
 
     const permissions = []
@@ -135,7 +137,7 @@ export default class PlayerService {
     })
 
     if (!player) {
-      throw new Error("player-not-found")
+      throw new ApiError("player-not-found", 404)
     }
 
     const existingPermissions = player.perms.map((perm) => perm.name)
@@ -191,7 +193,7 @@ export default class PlayerService {
     })
 
     if (!player) {
-      throw new Error("player-not-found")
+      throw new ApiError("player-not-found", 404)
     }
 
     const existingPermissions = player.perms.map((perm) => perm.name)
@@ -233,7 +235,7 @@ export default class PlayerService {
     })
 
     if (!player) {
-      throw new Error("player-not-found")
+      throw new ApiError("player-not-found", 404)
     }
 
     const existingGroups = player.permGroups.map((group) => group.name)
@@ -286,6 +288,36 @@ export default class PlayerService {
         }
       },
       select: this.PlayerPublicSelect
+    })
+  }
+
+  /**
+   * Changes a player's chat channel
+   * @param uuid The player's UUID
+   * @param channel The channel to change to
+   */
+  async changeChannel(uuid: string, channel: string): Promise<void> {
+    if (!ChatChannels[channel]) {
+      throw new ApiError("invalid-channel", 400)
+    }
+
+    const player = await prisma.player.findUnique({
+      where: {
+        uuid
+      }
+    })
+
+    if (!player) {
+      throw new ApiError("player-not-found", 404)
+    }
+
+    await prisma.player.update({
+      where: {
+        uuid
+      },
+      data: {
+        chatChannel: ChatChannels[channel]
+      }
     })
   }
 }

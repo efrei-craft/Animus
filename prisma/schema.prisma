@@ -190,6 +190,7 @@ enum ApiScope {
   PUNISHMENTS
   GAMES
   GAMESERVERS
+  CHAT
   QUEUES
   ALL
 }

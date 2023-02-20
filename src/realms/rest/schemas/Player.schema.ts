@@ -1,5 +1,6 @@
 import { Type } from "@sinclair/typebox"
 import PermGroupSchema from "./PermGroup.schema"
+import { ChatChannels } from "@prisma/client"
 
 const PermGroupSchemaWithoutPermissions = Type.Omit(PermGroupSchema, [
   "permissions",
@@ -21,7 +22,11 @@ export default Type.Object(
       Type.String({ description: "The player's Discord user ID" })
     ),
     lastSeen: Type.String({
-      description: "The date the player was last seen in game"
+      description: "The date the player was last seen in game (ISO 8601)"
+    }),
+    chatChannel: Type.String({
+      description: "The player's chat channel",
+      enum: Object.keys(ChatChannels)
     })
   },
   {
