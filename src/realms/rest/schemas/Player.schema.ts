@@ -1,23 +1,12 @@
 import { Type } from "@sinclair/typebox"
-import PermGroupSchema from "./PermGroup.schema"
 import { ChatChannels } from "@prisma/client"
-
-const PermGroupSchemaWithoutPermissions = Type.Omit(PermGroupSchema, [
-  "permissions",
-  "parentGroupName",
-  "defaultGroup"
-])
-PermGroupSchemaWithoutPermissions.$id = "PermGroupPlayer"
-PermGroupSchemaWithoutPermissions.description =
-  "A minimal permission group schema for players"
+import PermGroupPlayer from "./PermGroupPlayer.schema"
 
 export default Type.Object(
   {
     uuid: Type.String({ description: "The player's Minecraft UUID" }),
     username: Type.String({ description: "The player's Minecraft username" }),
-    permGroups: Type.Array(PermGroupSchemaWithoutPermissions, {
-      description: "The player's permission groups"
-    }),
+    permGroups: Type.Array(Type.Ref(PermGroupPlayer)),
     discordUserId: Type.Optional(
       Type.String({ description: "The player's Discord user ID" })
     ),
