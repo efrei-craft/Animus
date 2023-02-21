@@ -40,8 +40,8 @@ model Player {
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
 
-  gameServer     GameServer? @relation(fields: [gameServerName], references: [name])
-  gameServerName String?
+  server     Server? @relation(fields: [serverName], references: [name])
+  serverName String?
 
   party   Party? @relation("partyOwner")
   partyId Int?
@@ -113,17 +113,13 @@ model PermGroup {
 }
 
 model Permission {
-  name      String      @id
-  expires   DateTime?
-  player    Player[]
-  permGroup PermGroup[]
+  name       String      @id
+  expires    DateTime?
+  players    Player[]
+  permGroups PermGroup[]
 }
 
 // Game related models
-
-enum Template {
-  MINI
-}
 
 enum GameStatus {
   WAITING
@@ -137,25 +133,60 @@ model Game {
   color     String @default("&7")
   ludosGame String
 
-  menuMaterial  String
+  menuMaterial    String
   menuDescription String @default("No description")
-  menuOrder      Int    @default(0)
+  menuOrder       Int    @default(0)
 
   minQueueToStart Int @default(1)
   maxPlayers      Int @default(8)
 
-  template Template @default(MINI)
+  template Template @relation(fields: [templateName], references: [name], onDelete: Cascade)
+
+  permissionToPlay String
 
   available Boolean @default(false)
 
   gameServers          GameServer[] @relation("gameServers")
   requestedGameServers GameServer[] @relation("requestedGameServers")
+  templateName         String
 }
 
 // Server related models
 
-model GameServer {
+model Template {
+  name       String   @id
+  repository String
+  games      Game[]
+  servers    Server[]
+}
+
+model Server {
   name String @id
+
+  template Template @relation(fields: [templateName], references: [name], onDelete: Cascade)
+
+  address String
+
+  players    Player[]
+  maxPlayers Int      @default(16)
+
+  permissionToJoin String
+
+  ready     Boolean @default(false)
+  permanent Boolean @default(false)
+
+  lastHeartbeat DateTime @default(now())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  gameServer   GameServer?
+  templateName String
+}
+
+model GameServer {
+  server     Server @relation(fields: [serverName], references: [name], onDelete: Cascade)
+  serverName String @unique
 
   game     Game   @relation("gameServers", fields: [gameName], references: [name])
   gameName String
@@ -163,21 +194,7 @@ model GameServer {
   requestedGame     Game?   @relation("requestedGameServers", fields: [requestedGameName], references: [name])
   requestedGameName String?
 
-  template Template @default(MINI)
-
-  address String
-  status  GameStatus @default(WAITING)
-
-  players Player[]
-
-  ready Boolean @default(false)
-
-  permanent Boolean @default(false)
-
-  lastHeartbeat DateTime @default(now())
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  status GameStatus @default(WAITING)
 }
 
 // API related models
