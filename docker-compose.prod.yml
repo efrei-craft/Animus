@@ -19,18 +19,22 @@ services:
     image: docker.nexus.jiveoff.fr/efrei-craft/animus:stable
     restart: always
     tty: true
+    deploy:
+      replicas: 3
+      restart_policy:
+        condition: on-failure
     depends_on:
       - db
     environment:
       NODE_ENV: production
-      API_HOST: animus.dev.efreicraft.fr
+      API_HOST: api.dev.efreicraft.fr
       DATABASE_URL: postgres://postgres:postgres@db:5432/postgres
     networks:
       net:
       rp:
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.animus.rule=Host(`animus.dev.efreicraft.fr`)"
+      - "traefik.http.routers.animus.rule=Host(`api.dev.efreicraft.fr`)"
       - "traefik.http.routers.animus.entrypoints=websecure"
 
   pgadmin:
