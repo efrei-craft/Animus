@@ -20,7 +20,7 @@ services:
     restart: always
     tty: true
     deploy:
-      replicas: 3
+      replicas: 2
       restart_policy:
         condition: on-failure
     depends_on:
