@@ -25,6 +25,7 @@ services:
         - "traefik.enable=true"
         - "traefik.http.routers.animus.rule=Host(`api.dev.efreicraft.fr`)"
         - "traefik.http.routers.animus.entrypoints=websecure"
+        - "traefik.http.services.animus.loadbalancer.server.port=3000"
     depends_on:
       - db
     environment:
