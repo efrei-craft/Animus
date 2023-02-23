@@ -15,6 +15,7 @@ const CreateGroupBodySchema = Type.Object({
 export const CreateGroupSchema: FastifySchema = {
   tags: ["permissions"],
   summary: "Creates a permission group",
+  operationId: "createGroup",
   security: [
     {
       apiKey: [ApiScope.GROUPS]
@@ -31,6 +32,7 @@ export type CreateGroupBodySchema = Static<typeof CreateGroupBodySchema>
 export const GetGroupSchema: FastifySchema = {
   tags: ["permissions"],
   summary: "Gets all permission groups",
+  operationId: "getGroups",
   security: [
     {
       apiKey: [ApiScope.GROUPS]

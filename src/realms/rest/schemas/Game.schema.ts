@@ -1,5 +1,4 @@
 import { Type } from "@sinclair/typebox"
-import { Template } from "@prisma/client"
 
 export default Type.Object(
   {
@@ -27,8 +26,8 @@ export default Type.Object(
     maxPlayers: Type.Number({
       description: "The maximum amount of players for the game"
     }),
-    template: Type.String({
-      enum: Object.keys(Template)
+    templateId: Type.Number({
+      description: "The template ID of the game"
     }),
     available: Type.Boolean({
       description: "Whether the game is available"

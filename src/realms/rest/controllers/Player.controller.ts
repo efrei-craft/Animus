@@ -1,4 +1,4 @@
-import { Controller, DELETE, GET, POST, PUT } from "fastify-decorators"
+import { Controller, DELETE, GET, PATCH, POST, PUT } from "fastify-decorators"
 import { FastifyReply } from "fastify"
 import { HasApiKey, RequestWithKey } from "../decorators/HasApiKey"
 import PlayerService from "../services/Player.service"
@@ -6,6 +6,8 @@ import {
   PlayerAddPermissionGroupBodySchema,
   PlayerAddPermissionGroupSchema,
   PlayerAddPermissionsSchema,
+  PlayerChangeChannelBodySchema,
+  PlayerChangeChannelSchema,
   PlayerConnectBodySchema,
   PlayerConnectSchema,
   PlayerGetPermissionsSchema,
@@ -142,5 +144,27 @@ export default class PlayerController {
       req.body.groupName
     )
     return reply.code(200).send(addedPermissionGroup)
+  }
+
+  @PATCH({
+    url: "/:uuid/channel",
+    options: {
+      schema: PlayerChangeChannelSchema
+    }
+  })
+  @HasApiKey()
+  @HasSchemaScope()
+  async changeChannel(
+    req: RequestWithKey<{
+      Params: PlayerInfoParamsSchema
+      Body: PlayerChangeChannelBodySchema
+    }>,
+    reply: FastifyReply
+  ) {
+    const changedChannel = await this.playerService.changeChannel(
+      req.params.uuid,
+      req.body.channel
+    )
+    return reply.code(200).send(changedChannel)
   }
 }

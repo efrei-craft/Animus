@@ -1,6 +1,6 @@
 # Animus
 
-Composant de gestion globale du serveur EfreiCraft.
+Composant de gestion globale du serveur Efrei Craft.
 Celui a pour vocation de gérer :
 
 - Les joueurs

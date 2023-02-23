@@ -12,6 +12,7 @@ const CreateAPIKeyBodySchema = Type.Object({
 export const CreateAPIKeySchema: FastifySchema = {
   tags: ["misc"],
   summary: "Creates a new API key - temporarily public",
+  operationId: "createAPIKey",
   body: CreateAPIKeyBodySchema,
   response: {
     200: Type.Ref(ApiKeySchema)
