@@ -58,7 +58,4 @@ volumes:
     driver: local
 
 networks:
-  rp:
-    external: true
-    name: reverseproxy_nw
   net:
