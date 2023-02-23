@@ -21,6 +21,10 @@ services:
       replicas: 2
       restart_policy:
         condition: on-failure
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.animus.rule=Host(`api.dev.efreicraft.fr`)"
+        - "traefik.http.routers.animus.entrypoints=websecure"
     depends_on:
       - db
     environment:
@@ -29,10 +33,6 @@ services:
       DATABASE_URL: postgres://postgres:postgres@db:5432/postgres
     networks:
       net:
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.animus.rule=Host(`api.dev.efreicraft.fr`)"
-      - "traefik.http.routers.animus.entrypoints=websecure"
 
   pgadmin:
     image: dpage/pgadmin4
@@ -46,10 +46,11 @@ services:
       - /config/pgadmin/config_local.py:/pgadmin4/config_local.py
     networks:
       net:
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.db.rule=Host(`db.dev.efreicraft.fr`) && PathPrefix(`/pgadmin`)"
-      - "traefik.http.routers.db.entrypoints=websecure"
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.db.rule=Host(`db.dev.efreicraft.fr`) && PathPrefix(`/pgadmin`)"
+        - "traefik.http.routers.db.entrypoints=websecure"
 
 volumes:
   pg:
