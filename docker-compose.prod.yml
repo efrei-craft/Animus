@@ -32,6 +32,9 @@ services:
       API_HOST: api.dev.efreicraft.fr
       DATABASE_URL: postgres://postgres:postgres@db:5432/postgres
     networks:
+      traefik_public:
+        aliases:
+          - api.dev.efreicraft.fr
       net:
 
   pgadmin:
@@ -58,3 +61,5 @@ volumes:
 
 networks:
   net:
+  traefik_public:
+    external: true
