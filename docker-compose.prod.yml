@@ -29,7 +29,6 @@ services:
       DATABASE_URL: postgres://postgres:postgres@db:5432/postgres
     networks:
       net:
-      rp:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.animus.rule=Host(`api.dev.efreicraft.fr`)"
@@ -47,7 +46,6 @@ services:
       - /config/pgadmin/config_local.py:/pgadmin4/config_local.py
     networks:
       net:
-      rp:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.db.rule=Host(`db.dev.efreicraft.fr`) && PathPrefix(`/pgadmin`)"
