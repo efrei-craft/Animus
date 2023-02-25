@@ -71,7 +71,6 @@ services:
     networks:
       net:
     deploy:
-      mode: global
       labels:
         - "traefik.enable=true"
         - "traefik.http.routers.db.rule=Host(`db.dev.efreicraft.fr`) && PathPrefix(`/pgadmin`)"
