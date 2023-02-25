@@ -18,6 +18,8 @@ services:
     tty: true
     depends_on:
       - db
+    environment:
+      SERVER_TYPE: rest
     volumes:
       - .:/app
       - /app/node_modules
@@ -32,6 +34,8 @@ services:
     tty: true
     depends_on:
       - rest
+    environment:
+      SERVER_TYPE: worker
     volumes:
       - .:/app
       - /app/node_modules
