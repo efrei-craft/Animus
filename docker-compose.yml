@@ -11,7 +11,7 @@ services:
     ports:
       - "5432:5432"
 
-  back:
+  rest:
     build:
       context: .
       dockerfile: Dockerfile
@@ -23,6 +23,19 @@ services:
       - /app/node_modules
     ports:
       - "3000:3000"
+    env_file: .env.local
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    tty: true
+    depends_on:
+      - rest
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /var/run/docker.sock:/var/run/docker.sock
     env_file: .env.local
 
 volumes:

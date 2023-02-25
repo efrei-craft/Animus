@@ -1,12 +1,13 @@
 import { AnimusRestServer } from "./realms/rest"
-import consolaGlobalInstance from "consola"
 
+import consolaGlobalInstance from "consola"
 import "reflect-metadata"
 
-const server = new AnimusRestServer()
+consolaGlobalInstance.level = process.env.NODE_ENV === "production" ? 3 : 5
 
-const initServer = async () => {
-  consolaGlobalInstance.level = process.env.NODE_ENV === "production" ? 3 : 5
+const initRestServer = async () => {
+  const server = new AnimusRestServer()
+
   consolaGlobalInstance.debug(
     `Initializing server on the ${process.env.NODE_ENV} environment...`
   )
@@ -15,10 +16,26 @@ const initServer = async () => {
   await server.start()
 }
 
-initServer()
-  .then(() => {
-    consolaGlobalInstance.success(`Server started successfully.`)
-  })
-  .catch((err) => {
-    consolaGlobalInstance.error(`Server failed to start: ${err}`)
-  })
+const initWorkerServer = async () => {
+  consolaGlobalInstance.debug(
+    `Initializing worker on the ${process.env.NODE_ENV} environment...`
+  )
+}
+
+if (process.env.SERVER_TYPE === "rest") {
+  initRestServer()
+    .then(() => {
+      consolaGlobalInstance.success(`Rest server started successfully.`)
+    })
+    .catch((err) => {
+      consolaGlobalInstance.error(`Server failed to start: ${err}`)
+    })
+} else if (process.env.SERVER_TYPE === "worker") {
+  initWorkerServer()
+    .then(() => {
+      consolaGlobalInstance.success(`Worker server started successfully.`)
+    })
+    .catch((err) => {
+      consolaGlobalInstance.error(`Server failed to start: ${err}`)
+    })
+}
