@@ -44,7 +44,6 @@ services:
     restart: always
     tty: true
     deploy:
-      mode: global
       replicas: 1
       restart_policy:
         condition: on-failure
