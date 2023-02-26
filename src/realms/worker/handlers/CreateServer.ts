@@ -32,11 +32,7 @@ export default async (templateName: string) => {
     HostConfig: {
       NetworkMode: process.env.INFRASTRUCTURE_NAME
     },
-    Env: [
-      `SERVER_NAME=${serverName}`,
-      `TEMPLATE_NAME=${template.name}`,
-      ...getNeededVars()
-    ]
+    Env: [`TEMPLATE_NAME=${template.name}`, ...getNeededVars()]
   })
 
   const container = await docker.getContainer(serverName)
