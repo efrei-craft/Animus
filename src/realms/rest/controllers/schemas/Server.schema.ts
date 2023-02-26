@@ -20,7 +20,7 @@ export const ServerInfoSchema: FastifySchema = {
   ],
   params: ServerInfoParamsSchema,
   response: {
-    200: ServerSchema,
+    200: Type.Ref(ServerSchema),
     400: Type.Object({
       message: Type.String()
     })
