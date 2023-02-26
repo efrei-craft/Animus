@@ -107,7 +107,7 @@ services:
     deploy:
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.commander.rule=Host(`toolkit.dev.efreicraft.fr`) && Path(`/commander`)"
+        - "traefik.http.routers.commander.rule=Host(`toolkit.dev.efreicraft.fr`) && PathPrefix(`/commander`)"
         - "traefik.http.routers.commander.entrypoints=websecure"
         - "traefik.http.services.commander.loadbalancer.server.port=8081"
 
