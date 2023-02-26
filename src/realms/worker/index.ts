@@ -1,57 +1,20 @@
 import redis from "../../clients/Redis"
 import consolaGlobalInstance from "consola"
-import docker from "../../clients/Docker"
-import { serverNameGenerator } from "./helpers/ServerNameGenerator"
-import prisma from "../../clients/Prisma"
+import { resolve } from "path"
+import * as fs from "fs"
 
 export class AnimusWorker {
-  private workerMethods = {
-    "create-server": async (templateName: string) => {
-      const template = await prisma.template.findUnique({
-        where: {
-          name: templateName
-        },
-        select: {
-          name: true,
-          repository: true
-        }
-      })
+  workerMethods = []
 
-      if (!template) {
-        throw new Error(`Template ${templateName} does not exist`)
-      }
-
+  private async registerWorkerMethods() {
+    const handlers = await fs.promises.readdir(resolve(__dirname, "handlers"))
+    for (const handler of handlers) {
+      const handlerName = handler.split(".")[0]
+      const handlerContent = await import(`./handlers/${handler}`)
+      this.workerMethods[handlerName] = handlerContent.default
       consolaGlobalInstance.debug(
-        `Creating server with the ${templateName} template...`
+        `Registered handler ${handlerName} to AnimusWorker`
       )
-
-      const serverName = serverNameGenerator(template.name)
-
-      await docker.createContainer({
-        name: serverName,
-        Image: template.repository,
-        HostConfig: {
-          NetworkMode: process.env.INFRASTRUCTURE_NAME
-        }
-      })
-
-      const container = await docker.getContainer(serverName)
-
-      console.log(await container.inspect())
-      await container.start()
-
-      await prisma.server.create({
-        data: {
-          name: serverName,
-          template: {
-            connect: {
-              name: template.name
-            }
-          }
-        }
-      })
-
-      consolaGlobalInstance.success(`Server ${serverName} created and started`)
     }
   }
 
@@ -80,6 +43,7 @@ export class AnimusWorker {
 
   async start() {
     consolaGlobalInstance.success(`Worker listening for queues...`)
+    await this.registerWorkerMethods()
     while (true) {
       await this.handleQueues()
       await new Promise((resolve) => setTimeout(resolve, 1000))

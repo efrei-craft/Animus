@@ -8,7 +8,7 @@ const SwaggerConfig: RegisterOptions & FastifyDynamicSwaggerOptions = {
       description: "Système de gestion du serveur Efrei Craft",
       version: process.env.npm_package_version
     },
-    host: process.env.API_HOST || "localhost:3000",
+    host: process.env.SWAGGER_URL || "localhost:3000",
     schemes: process.env.NODE_ENV === "production" ? ["https"] : ["http"],
     consumes: ["application/json"],
     produces: ["application/json"],

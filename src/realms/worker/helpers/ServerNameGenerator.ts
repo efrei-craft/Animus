@@ -12,14 +12,4 @@ const serverNameGenerator = function (template: string): string {
   return `${infrastructure}.${template}${randomId}`
 }
 
-const serverNameGeneratorWithNode = function (
-  template: string,
-  node: string
-): string {
-  const infrastructure = process.env.INFRASTRUCTURE_NAME
-
-  const randomId = generateRandomId()
-  return `${infrastructure}.n${node}.${template}${randomId}`
-}
-
-export { serverNameGenerator, serverNameGeneratorWithNode }
+export { serverNameGenerator }

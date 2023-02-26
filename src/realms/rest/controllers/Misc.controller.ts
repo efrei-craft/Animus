@@ -1,7 +1,8 @@
-import { Controller, POST } from "fastify-decorators"
+import { Controller, GET, POST } from "fastify-decorators"
 import {
   CreateAPIKeyBodySchema,
-  CreateAPIKeySchema
+  CreateAPIKeySchema,
+  HelloSchema
 } from "./schemas/Misc.schema"
 import { FastifyReply, FastifyRequest } from "fastify"
 import MiscService from "../services/Misc.service"
@@ -23,5 +24,15 @@ export default class MiscController {
     const { key, description, scopes } = request.body
     const apiKey = await this.miscService.createAPIKey(key, description, scopes)
     return reply.code(200).send(apiKey)
+  }
+
+  @GET({
+    url: "/hello",
+    options: {
+      schema: HelloSchema
+    }
+  })
+  async ok(request: FastifyRequest, reply: FastifyReply) {
+    return reply.code(200).send({ ok: true })
   }
 }

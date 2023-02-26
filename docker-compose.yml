@@ -86,5 +86,6 @@ volumes:
 
 networks:
   realm:
-    name: infralocal_realm
+    name: infralocal
     driver: bridge
+    attachable: true
