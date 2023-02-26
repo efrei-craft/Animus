@@ -88,7 +88,7 @@ services:
     deploy:
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.adminer.rule=Host(`toolkit.dev.efreicraft.fr`) && PathPrefix(`/adminer`)"
+        - "traefik.http.routers.adminer.rule=Host(`toolkit.dev.efreicraft.fr`) && Path(`/adminer`)"
         - "traefik.http.routers.adminer.entrypoints=websecure"
         - "traefik.http.services.adminer.loadbalancer.server.port=8080"
 
@@ -106,7 +106,7 @@ services:
     deploy:
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.commander.rule=Host(`toolkit.dev.efreicraft.fr`) && PathPrefix(`/redis-commander`)"
+        - "traefik.http.routers.commander.rule=Host(`toolkit.dev.efreicraft.fr`) && Path(`/redis-commander`)"
         - "traefik.http.routers.commander.entrypoints=websecure"
         - "traefik.http.services.commander.loadbalancer.server.port=8081"
 
