@@ -26,7 +26,8 @@ export class AnimusWorker {
       )
 
       const serverName = serverNameGenerator(template.name)
-      console.log(serverName)
+
+      await docker.pull(template.repository)
 
       await docker.createContainer({
         name: serverName,

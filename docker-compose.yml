@@ -72,6 +72,14 @@ services:
     networks:
       realm:
 
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    networks:
+      realm:
+
 volumes:
   pg:
     driver: local
