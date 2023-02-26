@@ -88,9 +88,9 @@ services:
     deploy:
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.db.rule=Host(`toolkit.dev.efreicraft.fr`) && PathPrefix(`/adminer`)"
-        - "traefik.http.routers.db.entrypoints=websecure"
-        - "traefik.http.services.db.loadbalancer.server.port=8080"
+        - "traefik.http.routers.adminer.rule=Host(`toolkit.dev.efreicraft.fr`) && PathPrefix(`/adminer`)"
+        - "traefik.http.routers.adminer.entrypoints=websecure"
+        - "traefik.http.services.adminer.loadbalancer.server.port=8080"
 
   redis-commander:
     container_name: redis-commander
@@ -102,9 +102,9 @@ services:
     deploy:
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.db.rule=Host(`toolkit.dev.efreicraft.fr`) && PathPrefix(`/redis-commander`)"
-        - "traefik.http.routers.db.entrypoints=websecure"
-        - "traefik.http.services.db.loadbalancer.server.port=8081"
+        - "traefik.http.routers.commander.rule=Host(`toolkit.dev.efreicraft.fr`) && PathPrefix(`/redis-commander`)"
+        - "traefik.http.routers.commander.entrypoints=websecure"
+        - "traefik.http.services.commander.loadbalancer.server.port=8081"
 
 volumes:
   pg:
