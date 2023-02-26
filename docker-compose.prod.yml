@@ -118,5 +118,6 @@ volumes:
 networks:
   net:
     name: ${INFRASTRUCTURE_NAME}
+    attachable: true
   traefik_public:
     external: true
