@@ -29,12 +29,29 @@ export class AnimusWorker {
 
       await docker.createContainer({
         name: serverName,
-        Image: template.repository
+        Image: template.repository,
+        HostConfig: {
+          NetworkMode: process.env.INFRASTRUCTURE_NAME
+        }
       })
 
-      const container = await docker.getContainer(serverName).inspect()
+      const container = await docker.getContainer(serverName)
 
-      console.log(container)
+      console.log(await container.inspect())
+      await container.start()
+
+      await prisma.server.create({
+        data: {
+          name: serverName,
+          template: {
+            connect: {
+              name: template.name
+            }
+          }
+        }
+      })
+
+      consolaGlobalInstance.success(`Server ${serverName} created and started`)
     }
   }
 
