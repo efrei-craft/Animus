@@ -43,7 +43,7 @@ Pour configurer & lancer votre environnement de développement local :
 3. `.env.local.example` doit être copié et renommé en `.env.local`
 4. Les dépendances du repo doivent être installées pour l'IDE (`npm install`)
 
-Une fois ces étapes complétées, l'environnement peut être lancé avec la commande `docker-compose up`.
+Une fois ces étapes complétées, l'environnement peut être lancé avec la commande `docker-compose up -d`.
 
 ## Architecture
 
@@ -76,7 +76,9 @@ Le CLI de Prisma nous permettra d'effectuer des migrations de base de données, 
 
 Plus d'informations sur Prisma [ici](https://www.prisma.io/docs/).
 
-**Important:** La commande `npm run prisma:migrate` doit être exécutée à chaque fois que vous voulez mettre à jour le schéma de la base de données. La commande vous créera une migration et l'appliquera à la base de données au déploiement.
+**Important:** La commande `npm run prisma:dev:migrate` doit être exécutée à chaque fois que vous voulez mettre à jour le schéma de la base de données. La commande vous créera une migration et l'appliquera à la base de données au déploiement.
+
+Vous pouvez également remplir la BDD avec des données de test en exécutant la commande `npm run prisma:dev:seed`.
 
 ### Front-end
 

@@ -8,9 +8,9 @@
     "build": "rimraf ./dist && tsc",
     "start:prod": "node dist/index.js",
     "start:migrate:prod": "prisma migrate deploy && npm run start:prod",
-    "prisma:migrate": "cross-env DATABASE_URL=postgresql://postgres:postgres@localhost:5432/postgres prisma migrate dev && npm run docker:restart-db-consumers",
     "docker:restart-db-consumers": "docker-compose restart rest && docker-compose restart worker",
-    "seed": "cross-env DATABASE_URL=postgresql://postgres:postgres@localhost:5432/postgres prisma db seed",
+    "prisma:dev:migrate": "cross-env DATABASE_URL=postgresql://postgres:postgres@localhost:5432/postgres prisma migrate dev && npm run docker:restart-db-consumers",
+    "prisma:dev:seed": "cross-env DATABASE_URL=postgresql://postgres:postgres@localhost:5432/postgres prisma db seed",
     "lint": "eslint --ext .js,.ts .",
     "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\""
   },
