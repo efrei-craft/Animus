@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/Animus.iml" filepath="$PROJECT_DIR$/.idea/Animus.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../Servo/templates/.idea/templates.iml" filepath="$PROJECT_DIR$/../../Servo/templates/.idea/templates.iml" />
     </modules>
   </component>
 </project>
