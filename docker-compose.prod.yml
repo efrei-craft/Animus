@@ -42,8 +42,6 @@ services:
       REDIS_PASSWORD: ${REDIS_PASSWORD}
     networks:
       traefik_public:
-        aliases:
-          - api.dev.efreicraft.fr
       net:
 
   worker:
@@ -85,6 +83,7 @@ services:
     restart: always
     networks:
       net:
+      traefik_public:
     deploy:
       labels:
         - "traefik.enable=true"
@@ -103,6 +102,7 @@ services:
       REDIS_PASSWORD: ${REDIS_PASSWORD}
     networks:
       net:
+      traefik_public:
     deploy:
       labels:
         - "traefik.enable=true"
