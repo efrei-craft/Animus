@@ -112,6 +112,6 @@ volumes:
 
 networks:
   net:
-    name: ${INFRASTRUCTURE_NAME}_realm
+    name: ${INFRASTRUCTURE_NAME}
   traefik_public:
     external: true
