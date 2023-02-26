@@ -36,13 +36,16 @@ export default async (templateName: string) => {
   })
 
   const container = await docker.getContainer(serverName)
-
-  console.log(await container.inspect())
   await container.start()
+
+  const inspection = await container.inspect()
 
   await prisma.server.create({
     data: {
       name: serverName,
+      address:
+        inspection.NetworkSettings.Networks[process.env.INFRASTRUCTURE_NAME]
+          .IPAddress,
       template: {
         connect: {
           name: template.name

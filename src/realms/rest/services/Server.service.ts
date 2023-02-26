@@ -38,6 +38,10 @@ export default class ServerService {
       throw new ApiError("server-not-found", 404)
     }
 
+    if (!includeGameServer) {
+      delete server.gameServer
+    }
+
     return server
   }
 }
