@@ -2,6 +2,7 @@ import { AnimusRestServer } from "./realms/rest"
 
 import consolaGlobalInstance from "consola"
 import "reflect-metadata"
+import { AnimusWorker } from "./realms/worker"
 
 consolaGlobalInstance.level = process.env.NODE_ENV === "production" ? 3 : 5
 
@@ -17,9 +18,13 @@ const initRestServer = async () => {
 }
 
 const initWorkerServer = async () => {
+  const server = new AnimusWorker()
+
   consolaGlobalInstance.debug(
     `Initializing worker on the ${process.env.NODE_ENV} environment...`
   )
+
+  await server.start()
 }
 
 if (process.env.SERVER_TYPE === "rest") {

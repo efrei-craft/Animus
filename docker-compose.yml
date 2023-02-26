@@ -10,6 +10,8 @@ services:
     env_file: .env.local
     ports:
       - "5432:5432"
+    networks:
+      realm:
 
   rest:
     build:
@@ -18,6 +20,7 @@ services:
     tty: true
     depends_on:
       - db
+      - redis
     environment:
       SERVER_TYPE: rest
     volumes:
@@ -26,6 +29,15 @@ services:
     ports:
       - "3000:3000"
     env_file: .env.local
+    networks:
+      realm:
+
+  redis:
+    image: bitnami/redis:latest
+    restart: always
+    env_file: .env.local
+    networks:
+      realm:
 
   worker:
     build:
@@ -33,7 +45,12 @@ services:
       dockerfile: Dockerfile
     tty: true
     depends_on:
-      - rest
+      - db
+      - redis
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
     environment:
       SERVER_TYPE: worker
     volumes:
@@ -41,7 +58,25 @@ services:
       - /app/node_modules
       - /var/run/docker.sock:/var/run/docker.sock
     env_file: .env.local
+    networks:
+      realm:
+
+  redis-commander:
+    container_name: redis-commander
+    hostname: redis-commander
+    image: rediscommander/redis-commander:latest
+    restart: always
+    env_file: .env.local
+    ports:
+      - "8081:8081"
+    networks:
+      realm:
 
 volumes:
   pg:
     driver: local
+
+networks:
+  realm:
+    name: infralocal_realm
+    driver: bridge

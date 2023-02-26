@@ -165,12 +165,12 @@ model Server {
 
   template Template @relation(fields: [templateName], references: [name], onDelete: Cascade)
 
-  address String
+  address String?
 
   players    Player[]
   maxPlayers Int      @default(16)
 
-  permissionToJoin String
+  permissionToJoin String @default("")
 
   ready     Boolean @default(false)
   permanent Boolean @default(false)
