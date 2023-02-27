@@ -3,6 +3,16 @@ import consolaGlobalInstance from "consola"
 import { serverNameGenerator } from "../helpers/ServerNameGenerator"
 import docker from "../../../clients/Docker"
 import { getNeededVars } from "../helpers/EnvGetter"
+import { ApiError } from "../../rest/helpers/Error"
+
+import * as crypto from "crypto"
+
+function getForwardingSecret() {
+  return crypto
+    .createHash("md5")
+    .update(process.env.INFRASTRUCTURE_NAME)
+    .digest("hex")
+}
 
 export default async (templateName: string) => {
   const template = await prisma.template.findUnique({
@@ -16,7 +26,7 @@ export default async (templateName: string) => {
   })
 
   if (!template) {
-    throw new Error(`Template ${templateName} does not exist`)
+    throw new ApiError("template-not-found", 404)
   }
 
   consolaGlobalInstance.debug(
@@ -30,9 +40,23 @@ export default async (templateName: string) => {
     Hostname: serverName,
     Image: template.repository,
     HostConfig: {
-      NetworkMode: process.env.INFRASTRUCTURE_NAME
+      NetworkMode: process.env.INFRASTRUCTURE_NAME,
+      PortBindings:
+        process.env.NODE_ENV === "development" && template.name === "proxy"
+          ? {
+              "25577/tcp": [
+                {
+                  HostPort: "25565"
+                }
+              ]
+            }
+          : {}
     },
-    Env: [`TEMPLATE_NAME=${template.name}`, ...getNeededVars()]
+    Env: [
+      `TEMPLATE_NAME=${template.name}`,
+      `ENV_FORWARDING_SECRET=${getForwardingSecret()}`,
+      ...getNeededVars()
+    ]
   })
 
   const container = await docker.getContainer(serverName)

@@ -2,6 +2,7 @@ import { Service } from "fastify-decorators"
 import { Prisma, Server } from "@prisma/client"
 import prisma from "../../../clients/Prisma"
 import { ApiError } from "../helpers/Error"
+import redis from "../../../clients/Redis"
 
 @Service()
 export default class ServerService {
@@ -60,6 +61,43 @@ export default class ServerService {
     )
 
     return servers
+  }
+
+  async readyServer(name: string) {
+    const server = await prisma.server.findFirst({
+      where: {
+        name
+      },
+      select: {
+        ready: true,
+        template: {
+          select: {
+            name: true
+          }
+        }
+      }
+    })
+
+    if (!server) {
+      throw new ApiError("server-not-found", 404)
+    }
+
+    if (server.ready) {
+      throw new ApiError("server-already-ready", 400)
+    }
+
+    await prisma.server.update({
+      where: {
+        name
+      },
+      data: {
+        ready: true
+      }
+    })
+
+    if (server.template.name !== "proxy") {
+      redis.publish("proxy", "ACV##addServer##" + name)
+    }
   }
 
   private filterNullProperties<T>(obj: T): T {

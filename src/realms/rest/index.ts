@@ -46,6 +46,23 @@ export class AnimusRestServer {
       directory: resolve(__dirname, `controllers`),
       mask: /\.controller\./
     })
+
+    // custom content type parser for json to allow for empty body
+    this.server.addContentTypeParser(
+      "application/json",
+      { parseAs: "string" },
+      (req, body, done) => {
+        try {
+          if (typeof body === "string") {
+            const json = body ? JSON.parse(body) : {}
+            done(null, json)
+          }
+        } catch (err) {
+          err.statusCode = 400
+          done(err, undefined)
+        }
+      }
+    )
   }
 
   async registerSchemas() {

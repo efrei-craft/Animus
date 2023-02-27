@@ -1,5 +1,6 @@
 import prisma from "../../../clients/Prisma"
 import { ApiScope } from "@prisma/client"
+import { ApiError } from "./Error"
 
 export type ApiKey = {
   key: string
@@ -19,12 +20,12 @@ export async function fetchApiKey(key: string | undefined): Promise<ApiKey> {
     })
 
     if (!apiKey) {
-      throw new Error("invalid_api_key")
+      throw new ApiError("invalid-api-key", 401)
     }
 
     return apiKey
   } else {
-    throw new Error("missing_api_key")
+    throw new ApiError("missing-api-key", 401)
   }
 }
 
@@ -34,9 +35,6 @@ export function hasAuthorization(scopes: ApiScope[], key: ApiKey) {
   } else if (key.scopes.includes(ApiScope.ALL)) {
     return true
   } else {
-    const missingScopes = scopes.filter((scope) => !key.scopes.includes(scope))
-    throw new Error(
-      "insufficient_scope (missing " + missingScopes.join(", ") + ")"
-    )
+    throw new ApiError(`missing-scopes`, 403)
   }
 }

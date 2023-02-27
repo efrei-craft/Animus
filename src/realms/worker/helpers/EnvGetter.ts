@@ -3,7 +3,8 @@ const NEEDED_ENV = [
   "REDIS_PORT",
   "REDIS_PASSWORD",
   "REDIS_DB",
-  "API_HOST"
+  "API_HOST",
+  "API_TOKEN"
 ]
 
 function getNeededVars() {

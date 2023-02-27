@@ -1,6 +1,7 @@
 import { Service } from "fastify-decorators"
 import { ApiKey, ApiScope } from "@prisma/client"
 import prisma from "../../../clients/Prisma"
+import { ApiError } from "../helpers/Error"
 
 @Service()
 export default class MiscService {
@@ -16,13 +17,13 @@ export default class MiscService {
     })
 
     if (existing) {
-      throw new Error("key-already-exists")
+      throw new ApiError("api-key-already-exists", 409)
     }
 
     const existingScopes: ApiScope[] = []
     for (const scope of scopes) {
       if (!Object.values(ApiScope).includes(scope as ApiScope)) {
-        throw new Error("invalid-scope")
+        throw new ApiError("invalid-scope", 400)
       }
       existingScopes.push(ApiScope[scope])
     }

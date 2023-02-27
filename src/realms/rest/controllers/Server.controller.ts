@@ -1,9 +1,10 @@
-import { Controller, GET } from "fastify-decorators"
+import { Controller, GET, PATCH } from "fastify-decorators"
 import { HasApiKey, RequestWithKey } from "../decorators/HasApiKey"
 import { FastifyReply } from "fastify"
 import {
   ServerInfoParamsSchema,
   ServerInfoSchema,
+  ServerReadySchema,
   ServersQueryStringSchema,
   ServersSchema
 } from "./schemas/Server.schema"
@@ -47,5 +48,21 @@ export default class ServerController {
       req.query.hasNotTemplate
     )
     return reply.code(200).send(fetchedServers)
+  }
+
+  @PATCH({
+    url: "/:id/ready",
+    options: {
+      schema: ServerReadySchema
+    }
+  })
+  @HasApiKey()
+  @HasSchemaScope()
+  async readyServer(
+    req: RequestWithKey<{ Params: ServerInfoParamsSchema }>,
+    reply: FastifyReply
+  ) {
+    const readyServer = await this.serverService.readyServer(req.params.id)
+    return reply.code(200).send(readyServer)
   }
 }

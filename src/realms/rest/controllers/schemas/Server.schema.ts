@@ -53,3 +53,15 @@ export const ServersSchema: FastifySchema = {
     200: Type.Array(Type.Ref(ServerSchema))
   }
 }
+
+export const ServerReadySchema: FastifySchema = {
+  tags: ["servers"],
+  summary: "Marks a server as ready",
+  operationId: "readyServer",
+  security: [
+    {
+      apiKey: [ApiScope.SERVER]
+    }
+  ],
+  params: ServerInfoParamsSchema
+}

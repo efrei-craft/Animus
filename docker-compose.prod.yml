@@ -62,6 +62,7 @@ services:
     environment:
       NODE_ENV: production
 
+      API_HOST: ${API_HOST}
       SERVER_TYPE: worker
       INFRASTRUCTURE_NAME: ${INFRASTRUCTURE_NAME}
 

@@ -65,7 +65,7 @@ export default class PlayerService {
       }
       return player
     } catch (e) {
-      throw new Error(e.message)
+      throw new ApiError("player-fetch-failed", 500)
     }
   }
 
