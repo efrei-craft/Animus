@@ -20,16 +20,12 @@ export default class ServerService {
     lastHeartbeat: true
   }
 
-  async fetchServer(
-    name: string,
-    includeGameServer: boolean
-  ): Promise<Partial<Server>> {
-    const server = await prisma.server.findUnique({
+  async fetchServer(name: string): Promise<Partial<Server>> {
+    let server = await prisma.server.findFirst({
       where: {
         name
       },
       select: {
-        gameServer: includeGameServer,
         ...this.ServerPublicSelect
       }
     })
@@ -38,10 +34,37 @@ export default class ServerService {
       throw new ApiError("server-not-found", 404)
     }
 
-    if (!includeGameServer) {
-      delete server.gameServer
-    }
+    server = this.filterNullProperties<Partial<Server>>(server)
 
     return server
+  }
+
+  async fetchServers(
+    hasTemplate?: string[],
+    hasNotTemplate?: string[]
+  ): Promise<Partial<Server>[]> {
+    let servers = await prisma.server.findMany({
+      where: {
+        template: {
+          name: {
+            in: hasTemplate,
+            notIn: hasNotTemplate
+          }
+        }
+      },
+      select: this.ServerPublicSelect
+    })
+
+    servers = servers.map((server) =>
+      this.filterNullProperties<Partial<Server>>(server)
+    )
+
+    return servers
+  }
+
+  private filterNullProperties<T>(obj: T): T {
+    return Object.fromEntries(
+      Object.entries(obj).filter(([_, v]) => v !== null)
+    ) as T
   }
 }

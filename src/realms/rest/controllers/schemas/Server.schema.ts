@@ -20,9 +20,36 @@ export const ServerInfoSchema: FastifySchema = {
   ],
   params: ServerInfoParamsSchema,
   response: {
-    200: Type.Ref(ServerSchema),
-    400: Type.Object({
-      message: Type.String()
+    200: Type.Ref(ServerSchema)
+  }
+}
+
+const ServersQueryStringSchema = Type.Object({
+  hasTemplate: Type.Optional(
+    Type.Array(Type.String(), {
+      description: "Filters servers that have the specified template"
     })
+  ),
+  hasNotTemplate: Type.Optional(
+    Type.Array(Type.String(), {
+      description: "Filters servers that do not have the specified template"
+    })
+  )
+})
+
+export type ServersQueryStringSchema = Static<typeof ServersQueryStringSchema>
+
+export const ServersSchema: FastifySchema = {
+  tags: ["servers"],
+  summary: "Gets all servers",
+  operationId: "getServers",
+  security: [
+    {
+      apiKey: [ApiScope.SERVER]
+    }
+  ],
+  querystring: ServersQueryStringSchema,
+  response: {
+    200: Type.Array(Type.Ref(ServerSchema))
   }
 }
