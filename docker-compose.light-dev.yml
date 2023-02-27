@@ -1,0 +1,74 @@
+version: "3.8"
+
+name: animus_dev_light
+
+services:
+  db:
+    image: postgres:12.2
+    volumes:
+      - pg:/data/postgres
+    env_file: .env.local
+    ports:
+      - "5432:5432"
+    networks:
+      realm:
+
+  rest:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    tty: true
+    depends_on:
+      - db
+      - redis
+    environment:
+      SERVER_TYPE: rest
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    env_file: .env.local
+    networks:
+      realm:
+
+  redis:
+    image: bitnami/redis:latest
+    restart: always
+    env_file: .env.local
+    ports:
+      - "6379:6379"
+    networks:
+      realm:
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    tty: true
+    depends_on:
+      - db
+      - redis
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+    environment:
+      SERVER_TYPE: worker
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /var/run/docker.sock:/var/run/docker.sock
+    env_file: .env.local
+    networks:
+      realm:
+
+volumes:
+  pg:
+    driver: local
+
+networks:
+  realm:
+    name: infralocal
+    driver: bridge
+    attachable: true
