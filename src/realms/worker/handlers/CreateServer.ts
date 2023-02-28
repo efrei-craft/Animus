@@ -39,20 +39,6 @@ export const method: WorkerMethod = {
 
     const serverName = serverNameGenerator(template.name)
 
-    const containerLabels = {
-      "animus.server": "true",
-      "animus.server.name": serverName,
-      "animus.server.template": template.name,
-      "traefik.enable": "true"
-    }
-
-    containerLabels[
-      `traefik.tcp.routers.${serverName.replace(".", "_")}.rule`
-    ] = `Host(\`efreicraft.fr\`)`
-    containerLabels[
-      `traefik.tcp.routers.${serverName.replace(".", "_")}.entrypoints`
-    ] = `minecraft`
-
     await docker.createContainer({
       name: serverName,
       Hostname: serverName,
@@ -60,8 +46,7 @@ export const method: WorkerMethod = {
       HostConfig: {
         NetworkMode: process.env.INFRASTRUCTURE_NAME,
         PortBindings:
-          template.type === ServerType.VELOCITY &&
-          process.env.NODE_ENV === "development"
+          template.type === ServerType.VELOCITY
             ? {
                 "25577/tcp": [
                   {
@@ -71,20 +56,17 @@ export const method: WorkerMethod = {
               }
             : {}
       },
-      Labels: containerLabels,
+      Labels: {
+        "animus.server": "true",
+        "animus.server.name": serverName,
+        "animus.server.template": template.name
+      },
       Env: [
         `TEMPLATE_NAME=${template.name}`,
         `ENV_FORWARDING_SECRET=${getForwardingSecret()}`,
         ...getNeededVars()
       ]
     })
-
-    if (template.type === ServerType.VELOCITY) {
-      const traefikNetwork = await docker.getNetwork("traefik_public")
-      await traefikNetwork.connect({
-        Container: serverName
-      })
-    }
 
     const container = await docker.getContainer(serverName)
     await container.start()
