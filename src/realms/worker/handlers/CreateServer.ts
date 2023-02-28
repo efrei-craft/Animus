@@ -57,7 +57,9 @@ export const method: WorkerMethod = {
       Labels: {
         "animus.server": "true",
         "animus.server.name": serverName,
-        "animus.server.template": template.name
+        "animus.server.template": template.name,
+        "traefik.enable": "true",
+        "traefik.tcp.routers.vanilla.entrypoints": "minecraft"
       },
       Env: [
         `TEMPLATE_NAME=${template.name}`,
