@@ -37,6 +37,20 @@ export const method: WorkerMethod = {
 
     const serverName = serverNameGenerator(template.name)
 
+    const containerLabels = {
+      "animus.server": "true",
+      "animus.server.name": serverName,
+      "animus.server.template": template.name,
+      "traefik.enable": "true"
+    }
+
+    containerLabels[
+      `traefik.tcp.routers.${serverName}.rule`
+    ] = `Host(\`efreicraft.fr\`)`
+    containerLabels[
+      `traefik.tcp.routers.${serverName}.entrypoints`
+    ] = `minecraft`
+
     await docker.createContainer({
       name: serverName,
       Hostname: serverName,
@@ -54,13 +68,7 @@ export const method: WorkerMethod = {
               }
             : {}
       },
-      Labels: {
-        "animus.server": "true",
-        "animus.server.name": serverName,
-        "animus.server.template": template.name,
-        "traefik.enable": "true",
-        "traefik.tcp.routers.vanilla.entrypoints": "minecraft"
-      },
+      Labels: containerLabels,
       Env: [
         `TEMPLATE_NAME=${template.name}`,
         `ENV_FORWARDING_SECRET=${getForwardingSecret()}`,
