@@ -47,10 +47,10 @@ export const method: WorkerMethod = {
     }
 
     containerLabels[
-      `traefik.tcp.routers.${serverName}.rule`
+      `traefik.tcp.routers.${serverName.replace(".", "_")}.rule`
     ] = `Host(\`efreicraft.fr\`)`
     containerLabels[
-      `traefik.tcp.routers.${serverName}.entrypoints`
+      `traefik.tcp.routers.${serverName.replace(".", "_")}.entrypoints`
     ] = `minecraft`
 
     await docker.createContainer({
