@@ -1466,8 +1466,8 @@
     },
     {
       "type": "text",
-      "version": 235,
-      "versionNonce": 1565403293,
+      "version": 245,
+      "versionNonce": 815028862,
       "isDeleted": false,
       "id": "Bq_ssXjRtWgGWxKpcvyBu",
       "fillStyle": "hachure",
@@ -1480,7 +1480,7 @@
       "y": 973.1293792724609,
       "strokeColor": "#000000",
       "backgroundColor": "transparent",
-      "width": 173.8333282470703,
+      "width": 172.46665954589844,
       "height": 24,
       "seed": 487638622,
       "groupIds": [
@@ -1488,16 +1488,16 @@
       ],
       "roundness": null,
       "boundElements": [],
-      "updated": 1677578372267,
+      "updated": 1677579316409,
       "link": null,
       "locked": false,
       "fontSize": 20,
       "fontFamily": 1,
-      "text": "prod.193c.proxy12s",
+      "text": "infraprod.proxy12s",
       "textAlign": "left",
       "verticalAlign": "top",
       "containerId": null,
-      "originalText": "prod.193c.proxy12s"
+      "originalText": "infraprod.proxy12s"
     },
     {
       "type": "rectangle",
