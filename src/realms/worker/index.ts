@@ -13,9 +13,9 @@ export class AnimusWorker {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   private constructor() {}
 
-  workerMethods: WorkerMethod[] = []
+  private workerMethods: WorkerMethod[] = []
 
-  workerRegistered = false
+  private workerRegistered = false
 
   private async registerWorkerMethods() {
     this.workerRegistered = true
@@ -107,14 +107,18 @@ export class AnimusWorker {
       } else {
         data.on("data", function (chunk) {
           const event = JSON.parse(chunk.toString())
-          if (event.status === "die") {
-            AnimusWorker.getInstance()
-              .getLogger()
-              .info(`Server ${event.id} died`)
-            AnimusWorker.getInstance().insertIntoQueue(
-              "ServerDied",
-              event.Actor.Attributes.name
-            )
+          if (event.Actor.Attributes["animus.server"] === "true") {
+            const statusMethods =
+              AnimusWorker.getInstance().workerMethods.filter((method) =>
+                method.meta?.hooks?.docker.some((hook) => hook === event.status)
+              )
+
+            for (const method of statusMethods) {
+              AnimusWorker.getInstance().insertIntoQueue(
+                method.meta.name,
+                event.Actor.Attributes.name
+              )
+            }
           }
         })
       }

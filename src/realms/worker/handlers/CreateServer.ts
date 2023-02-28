@@ -53,6 +53,11 @@ export const method: WorkerMethod = {
               }
             : {}
       },
+      Labels: {
+        "animus.server": "true",
+        "animus.server.name": serverName,
+        "animus.server.template": template.name
+      },
       Env: [
         `TEMPLATE_NAME=${template.name}`,
         `ENV_FORWARDING_SECRET=${getForwardingSecret()}`,

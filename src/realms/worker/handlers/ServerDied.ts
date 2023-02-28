@@ -1,10 +1,26 @@
-import { WorkerMethod } from "../types"
+import { DockerHookType, WorkerMethod } from "../types"
+import prisma from "../../../clients/Prisma"
+import RedisClient from "../../../clients/Redis"
 
 export const method: WorkerMethod = {
   exec: async (arg: string) => {
-    console.log("ServerDied.ts: " + arg)
+    await prisma.server.delete({
+      where: {
+        name: arg
+      }
+    })
+
+    await RedisClient.getInstance().publishToPlugin(
+      "proxy",
+      "ACV",
+      "removeServer",
+      arg
+    )
   },
   meta: {
-    queueType: "set"
+    queueType: "set",
+    hooks: {
+      docker: [DockerHookType.DIE]
+    }
   }
 }

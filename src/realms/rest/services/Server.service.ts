@@ -96,7 +96,7 @@ export default class ServerService {
     })
 
     if (server.template.name !== "proxy") {
-      RedisClient.getInstance().publishToPlugin(
+      await RedisClient.getInstance().publishToPlugin(
         "proxy",
         "ACV",
         "addServer",
