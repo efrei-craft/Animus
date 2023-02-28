@@ -1,6 +1,6 @@
 version: "3.8"
 
-name: animus_dev_light
+name: animus_dev
 
 services:
   db:
@@ -69,6 +69,6 @@ volumes:
 
 networks:
   realm:
-    name: infralocal
+    name: infradev
     driver: bridge
     attachable: true
