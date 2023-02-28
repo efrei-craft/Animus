@@ -2,7 +2,7 @@ import { Service } from "fastify-decorators"
 import { Prisma, Server } from "@prisma/client"
 import prisma from "../../../clients/Prisma"
 import { ApiError } from "../helpers/Error"
-import redis from "../../../clients/Redis"
+import RedisClient from "../../../clients/Redis"
 
 @Service()
 export default class ServerService {
@@ -96,12 +96,18 @@ export default class ServerService {
     })
 
     if (server.template.name !== "proxy") {
-      redis.publish("proxy", "ACV##addServer##" + name)
+      RedisClient.getInstance().publishToPlugin(
+        "proxy",
+        "ACV",
+        "addServer",
+        name
+      )
     }
   }
 
   private filterNullProperties<T>(obj: T): T {
     return Object.fromEntries(
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       Object.entries(obj).filter(([_, v]) => v !== null)
     ) as T
   }

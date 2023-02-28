@@ -1,5 +1,5 @@
 import { resolve } from "path"
-import consolaGlobalInstance from "consola"
+import consolaGlobalInstance, { Consola } from "consola"
 
 import Fastify, { FastifyInstance } from "fastify"
 import { bootstrap } from "fastify-decorators"
@@ -10,22 +10,23 @@ import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox"
 import SwaggerConfig from "./config/SwaggerConfig"
 
 export class AnimusRestServer {
-  server: FastifyInstance
+  private static instance: AnimusRestServer
 
-  constructor() {
-    this.server = Fastify({
-      logger: process.env.NODE_ENV !== "production"
-    }).withTypeProvider<TypeBoxTypeProvider>()
-  }
+  private logger: Consola
+
+  private server: FastifyInstance
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  private constructor() {}
 
   async registerServerRoutes() {
-    consolaGlobalInstance.debug("Registering server routes...")
+    this.getLogger().debug("Registering server routes and schemas...")
 
     await this.registerSchemas()
 
-    this.server.register(FastifySwagger, SwaggerConfig)
+    this.getServer().register(FastifySwagger, SwaggerConfig)
 
-    this.server.register(FastifySwaggerUI, {
+    this.getServer().register(FastifySwaggerUI, {
       routePrefix: "/docs",
       uiConfig: {
         displayOperationId: true,
@@ -38,17 +39,17 @@ export class AnimusRestServer {
       }
     })
 
-    this.server.get("/", async (request, reply) => {
+    this.getServer().get("/", async (request, reply) => {
       reply.redirect("/docs")
     })
 
-    this.server.register(bootstrap, {
+    this.getServer().register(bootstrap, {
       directory: resolve(__dirname, `controllers`),
       mask: /\.controller\./
     })
 
     // custom content type parser for json to allow for empty body
-    this.server.addContentTypeParser(
+    this.getServer().addContentTypeParser(
       "application/json",
       { parseAs: "string" },
       (req, body, done) => {
@@ -70,24 +71,49 @@ export class AnimusRestServer {
     for (const schema of schemas) {
       const schemaName = schema.split(".")[0]
       const schemaContent = await import(`./schemas/${schema}`)
-      this.server.addSchema(schemaContent.default)
-      consolaGlobalInstance.debug(
+      this.getServer().addSchema(schemaContent.default)
+      this.getLogger().debug(
         `Registered schema ${schemaName} to Fastify server`
       )
     }
   }
 
   async start() {
-    this.server
+    await this.registerServerRoutes()
+
+    this.getServer()
       .listen({
         port: parseInt(process.env.PORT) || 3000,
         host: process.env.HOST || "0.0.0.0"
       })
       .then((address) => {
-        consolaGlobalInstance.success(`Fastify server running @ ${address}`)
+        this.getLogger().ready(`Fastify server running @ ${address}`)
       })
       .catch((err) => {
-        consolaGlobalInstance.error(`Fastify server failed to start:`, err)
+        this.getLogger().error(`Fastify server failed to start:`, err)
       })
+  }
+
+  getServer(): FastifyInstance {
+    if (!this.server) {
+      this.server = Fastify({
+        logger: process.env.NODE_ENV !== "production"
+      }).withTypeProvider<TypeBoxTypeProvider>()
+    }
+    return this.server
+  }
+
+  getLogger() {
+    if (!this.logger) {
+      this.logger = consolaGlobalInstance.withTag("REST")
+    }
+    return this.logger
+  }
+
+  static getInstance(): AnimusRestServer {
+    if (!AnimusRestServer.instance) {
+      AnimusRestServer.instance = new AnimusRestServer()
+    }
+    return AnimusRestServer.instance
   }
 }
