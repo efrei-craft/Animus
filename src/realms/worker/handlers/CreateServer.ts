@@ -6,6 +6,7 @@ import { getNeededVars } from "../helpers/EnvGetter"
 import * as crypto from "crypto"
 import { WorkerMethod } from "../types"
 import { AnimusWorker } from "../index"
+import { ServerType } from "@prisma/client"
 
 function getForwardingSecret() {
   return crypto
@@ -23,7 +24,8 @@ export const method: WorkerMethod = {
       select: {
         name: true,
         repository: true,
-        port: true
+        port: true,
+        type: true
       }
     })
 
@@ -58,7 +60,7 @@ export const method: WorkerMethod = {
       HostConfig: {
         NetworkMode: process.env.INFRASTRUCTURE_NAME,
         PortBindings:
-          process.env.NODE_ENV === "development" && template.name === "proxy"
+          template.type === ServerType.VELOCITY
             ? {
                 "25577/tcp": [
                   {
@@ -75,6 +77,13 @@ export const method: WorkerMethod = {
         ...getNeededVars()
       ]
     })
+
+    if (template.type === ServerType.VELOCITY) {
+      const traefikNetwork = await docker.getNetwork("traefik_public")
+      await traefikNetwork.connect({
+        Container: serverName
+      })
+    }
 
     const container = await docker.getContainer(serverName)
     await container.start()
