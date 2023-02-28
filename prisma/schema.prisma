@@ -28,8 +28,8 @@ model Player {
   friends   Player[] @relation("userHasFriends")
   friendsOf Player[] @relation("userHasFriends")
 
-  perms      Permission[]
-  permGroups PermGroup[]
+  perms      Permission[] @relation("playerHasPermission")
+  permGroups PermGroup[]  @relation("playerHasGroup")
 
   chatChannel ChatChannels @default(SERVER)
 
@@ -94,7 +94,7 @@ model Punishment {
 
 model PermGroup {
   name        String       @id @default("Unnamed group")
-  permissions Permission[]
+  permissions Permission[] @relation("groupHasPermission")
 
   prefix String  @default("")
   color  String  @default("&7")
@@ -109,15 +109,15 @@ model PermGroup {
 
   childGroups PermGroup[] @relation("groupHasParent")
 
-  players Player[]
+  players Player[] @relation("playerHasGroup")
 }
 
 model Permission {
   name       String      @id
   expires    DateTime?
   serverType String[]
-  players    Player[]
-  permGroups PermGroup[]
+  players    Player[]    @relation("playerHasPermission")
+  permGroups PermGroup[] @relation("groupHasPermission")
 }
 
 // Game related models
