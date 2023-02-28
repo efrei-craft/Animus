@@ -18,6 +18,7 @@ export const method: WorkerMethod = {
       arg
     )
 
+    // TODO: Have a mode where we don't remove the container so we keep the logs
     const container = await docker.getContainer(arg)
     await container.remove()
   },
