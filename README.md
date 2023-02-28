@@ -38,6 +38,10 @@ L'idée serait de passer la majorité des fonctionnalités de Servo à ECAPI.
 
 <img src="./doc/Animus.png" alt="Schéma de l'infrastructure" />
 
+## Diagramme Entité-Relation
+
+<img src="./prisma/ERD.svg" alt="Prisma" />
+
 ## Setup d'un environnement de développement
 
 Pour configurer & lancer votre environnement de développement local :
