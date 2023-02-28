@@ -34,6 +34,12 @@ const ServersQueryStringSchema = Type.Object({
     Type.Array(Type.String(), {
       description: "Filters servers that do not have the specified template"
     })
+  ),
+  deployedUnder: Type.Optional(
+    Type.Array(Type.String({ examples: ["proxy", "proxy.events"] }), {
+      description:
+        "Filters servers that are deployed under the specified template (for instance, event servers that should only be deployed under a specific event proxy)"
+    })
   )
 })
 

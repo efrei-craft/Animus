@@ -45,7 +45,8 @@ export default class ServerController {
   ) {
     const fetchedServers = await this.serverService.fetchServers(
       req.query.hasTemplate,
-      req.query.hasNotTemplate
+      req.query.hasNotTemplate,
+      req.query.deployedUnder
     )
     return reply.code(200).send(fetchedServers)
   }

@@ -1,58 +1,82 @@
-import { PrismaClient } from "@prisma/client"
+import { PrismaClient, ServerType } from "@prisma/client"
 
 const prisma = new PrismaClient()
 
 async function loadTemplates() {
   await prisma.template.upsert({
-    where: { name: "mini" },
-    update: {},
-    create: {
-      name: "mini",
-      repository: "docker.nexus.jiveoff.fr/efrei-craft/templates/mini"
-    },
-    select: {
-      name: true,
-      repository: true
-    }
-  })
-
-  await prisma.template.upsert({
-    where: { name: "lobby" },
-    update: {},
-    create: {
-      name: "lobby",
-      repository: "docker.nexus.jiveoff.fr/efrei-craft/templates/lobby"
-    },
-    select: {
-      name: true,
-      repository: true
-    }
-  })
-
-  await prisma.template.upsert({
     where: { name: "proxy" },
     update: {},
     create: {
       name: "proxy",
-      repository: "docker.nexus.jiveoff.fr/efrei-craft/templates/proxy"
+      repository: "docker.nexus.jiveoff.fr/efrei-craft/templates/proxy",
+      type: ServerType.VELOCITY
     },
     select: {
       name: true,
       repository: true
     }
   })
-}
 
-async function loadServers() {
-  await prisma.server.upsert({
+  await prisma.template.upsert({
+    where: { name: "proxy.events" },
+    update: {},
+    create: {
+      name: "proxy.events",
+      repository: "docker.nexus.jiveoff.fr/efrei-craft/templates/proxy",
+      type: ServerType.VELOCITY
+    }
+  })
+
+  await prisma.template.upsert({
+    where: { name: "mini" },
+    update: {},
+    create: {
+      name: "mini",
+      repository: "docker.nexus.jiveoff.fr/efrei-craft/templates/mini",
+      type: ServerType.PAPER,
+      parentTemplates: {
+        connect: [
+          {
+            name: "proxy"
+          }
+        ]
+      }
+    }
+  })
+
+  await prisma.template.upsert({
+    where: { name: "mini.events" },
+    update: {},
+    create: {
+      name: "mini.events",
+      repository: "docker.nexus.jiveoff.fr/efrei-craft/templates/mini",
+      type: ServerType.PAPER,
+      parentTemplates: {
+        connect: [
+          {
+            name: "proxy.events"
+          }
+        ]
+      }
+    }
+  })
+
+  await prisma.template.upsert({
     where: { name: "lobby" },
     update: {},
     create: {
       name: "lobby",
-      template: {
-        connect: {
-          name: "lobby"
-        }
+      repository: "docker.nexus.jiveoff.fr/efrei-craft/templates/lobby",
+      type: ServerType.PAPER,
+      parentTemplates: {
+        connect: [
+          {
+            name: "proxy"
+          },
+          {
+            name: "proxy.events"
+          }
+        ]
       }
     }
   })
@@ -60,7 +84,6 @@ async function loadServers() {
 
 async function main() {
   await loadTemplates()
-  await loadServers()
 }
 
 main()

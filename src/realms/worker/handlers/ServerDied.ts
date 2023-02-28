@@ -2,14 +2,26 @@ import { DockerHookType, WorkerMethod } from "../types"
 import prisma from "../../../clients/Prisma"
 import RedisClient from "../../../clients/Redis"
 import docker from "../../../clients/Docker"
+import { AnimusWorker } from "../index"
 
 export const method: WorkerMethod = {
   exec: async (arg: string) => {
-    await prisma.server.delete({
+    const serverTemplate = await prisma.server.findFirst({
       where: {
         name: arg
+      },
+      select: {
+        template: {
+          select: {
+            autoremove: true
+          }
+        }
       }
     })
+
+    if (!serverTemplate) {
+      return
+    }
 
     await RedisClient.getInstance().publishToPlugin(
       "proxy",
@@ -18,9 +30,20 @@ export const method: WorkerMethod = {
       arg
     )
 
-    // TODO: Have a mode where we don't remove the container so we keep the logs
-    const container = await docker.getContainer(arg)
-    await container.remove()
+    if (serverTemplate?.template.autoremove) {
+      try {
+        const container = await docker.getContainer(arg)
+        await container.remove()
+      } catch (e) {
+        AnimusWorker.getInstance().getLogger().error(e)
+      }
+    }
+
+    await prisma.server.delete({
+      where: {
+        name: arg
+      }
+    })
   },
   meta: {
     queueType: "set",

@@ -1,5 +1,5 @@
 import { Service } from "fastify-decorators"
-import { Prisma, Server } from "@prisma/client"
+import { Prisma, Server, ServerType } from "@prisma/client"
 import prisma from "../../../clients/Prisma"
 import { ApiError } from "../helpers/Error"
 import RedisClient from "../../../clients/Redis"
@@ -8,7 +8,13 @@ import RedisClient from "../../../clients/Redis"
 export default class ServerService {
   private ServerPublicSelect: Prisma.ServerSelect = {
     name: true,
-    template: true,
+    template: {
+      select: {
+        name: true,
+        repository: true,
+        type: true
+      }
+    },
     maxPlayers: true,
     gameServer: true,
     address: true,
@@ -42,7 +48,8 @@ export default class ServerService {
 
   async fetchServers(
     hasTemplate?: string[],
-    hasNotTemplate?: string[]
+    hasNotTemplate?: string[],
+    deployedUnder?: string[]
   ): Promise<Partial<Server>[]> {
     let servers = await prisma.server.findMany({
       where: {
@@ -50,6 +57,13 @@ export default class ServerService {
           name: {
             in: hasTemplate,
             notIn: hasNotTemplate
+          },
+          parentTemplates: {
+            some: {
+              name: {
+                in: deployedUnder
+              }
+            }
           }
         }
       },
@@ -72,7 +86,13 @@ export default class ServerService {
         ready: true,
         template: {
           select: {
-            name: true
+            name: true,
+            type: true,
+            parentTemplates: {
+              select: {
+                name: true
+              }
+            }
           }
         }
       }
@@ -95,13 +115,15 @@ export default class ServerService {
       }
     })
 
-    if (server.template.name !== "proxy") {
-      await RedisClient.getInstance().publishToPlugin(
-        "proxy",
-        "ACV",
-        "addServer",
-        name
-      )
+    if (server.template.type !== ServerType.VELOCITY) {
+      for (const parentTemplate of server.template.parentTemplates) {
+        await RedisClient.getInstance().publishToPlugin(
+          parentTemplate.name,
+          "ACV",
+          "addServer",
+          name
+        )
+      }
     }
   }
 

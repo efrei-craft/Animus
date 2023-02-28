@@ -153,11 +153,24 @@ model Game {
 
 // Server related models
 
+enum ServerType {
+  VELOCITY
+  PAPER
+}
+
 model Template {
-  name       String   @id
+  name       String @id
   repository String
-  games      Game[]
-  servers    Server[]
+
+  type ServerType @default(PAPER)
+
+  autoremove Boolean @default(false)
+
+  parentTemplates Template[] @relation("parentTemplates")
+  childTemplates  Template[] @relation("parentTemplates")
+
+  games   Game[]
+  servers Server[]
 }
 
 model Server {
