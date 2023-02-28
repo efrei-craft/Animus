@@ -115,6 +115,7 @@ model PermGroup {
 model Permission {
   name       String      @id
   expires    DateTime?
+  serverType String[]
   players    Player[]
   permGroups PermGroup[]
 }

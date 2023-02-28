@@ -13,7 +13,12 @@ export const method: WorkerMethod = {
       select: {
         template: {
           select: {
-            autoremove: true
+            autoremove: true,
+            parentTemplates: {
+              select: {
+                name: true
+              }
+            }
           }
         }
       }
@@ -23,12 +28,14 @@ export const method: WorkerMethod = {
       return
     }
 
-    await RedisClient.getInstance().publishToPlugin(
-      "proxy",
-      "ACV",
-      "removeServer",
-      arg
-    )
+    for (const parentTemplate of serverTemplate.template.parentTemplates) {
+      await RedisClient.getInstance().publishToPlugin(
+        parentTemplate.name,
+        "ACV",
+        "removeServer",
+        arg
+      )
+    }
 
     if (serverTemplate?.template.autoremove) {
       try {
