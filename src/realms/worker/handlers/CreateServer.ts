@@ -22,7 +22,8 @@ export const method: WorkerMethod = {
       },
       select: {
         name: true,
-        repository: true
+        repository: true,
+        port: true
       }
     })
 
@@ -47,7 +48,7 @@ export const method: WorkerMethod = {
             ? {
                 "25577/tcp": [
                   {
-                    HostPort: "25565"
+                    HostPort: template.port.toString()
                   }
                 ]
               }

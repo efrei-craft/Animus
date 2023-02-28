@@ -162,6 +162,8 @@ model Template {
   name       String @id
   repository String
 
+  port Int @default(25565)
+
   type ServerType @default(PAPER)
 
   autoremove Boolean @default(false)

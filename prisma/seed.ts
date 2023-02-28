@@ -23,7 +23,8 @@ async function loadTemplates() {
     create: {
       name: "proxy.events",
       repository: "docker.nexus.jiveoff.fr/efrei-craft/templates/proxy",
-      type: ServerType.VELOCITY
+      type: ServerType.VELOCITY,
+      port: 25566
     }
   })
 

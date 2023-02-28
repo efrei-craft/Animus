@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Template" ADD COLUMN     "port" INTEGER NOT NULL DEFAULT 25565;
