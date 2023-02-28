@@ -60,7 +60,8 @@ export const method: WorkerMethod = {
       HostConfig: {
         NetworkMode: process.env.INFRASTRUCTURE_NAME,
         PortBindings:
-          template.type === ServerType.VELOCITY
+          template.type === ServerType.VELOCITY &&
+          process.env.NODE_ENV === "development"
             ? {
                 "25577/tcp": [
                   {
