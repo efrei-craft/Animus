@@ -34,6 +34,10 @@ Celui a pour vocation de gérer :
 
 L'idée serait de passer la majorité des fonctionnalités de Servo à ECAPI.
 
+## Schéma de l'infrastructure
+
+<img src="./doc/Animus.png" alt="Schéma de l'infrastructure" width="600"/>
+
 ## Setup d'un environnement de développement
 
 Pour configurer & lancer votre environnement de développement local :
