@@ -66,6 +66,8 @@ services:
       NODE_ENV: production
 
       API_HOST: ${API_HOST}
+      API_TOKEN: ${API_TOKEN}
+
       SERVER_TYPE: worker
       INFRASTRUCTURE_NAME: ${INFRASTRUCTURE_NAME}
 
