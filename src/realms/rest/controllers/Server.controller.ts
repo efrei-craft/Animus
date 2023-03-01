@@ -1,4 +1,4 @@
-import { Controller, GET, PATCH } from "fastify-decorators"
+import { Controller, GET, PATCH, PUT } from "fastify-decorators"
 import { HasApiKey, RequestWithKey } from "../decorators/HasApiKey"
 import { FastifyReply } from "fastify"
 import {
@@ -6,7 +6,9 @@ import {
   ServerInfoSchema,
   ServerReadySchema,
   ServersQueryStringSchema,
-  ServersSchema
+  ServersSchema,
+  UpdateGameServerBodySchema,
+  UpdateGameServerSchema
 } from "./schemas/Server.schema"
 import ServerService from "../services/Server.service"
 import { HasSchemaScope } from "../decorators/HasSchemaScope"
@@ -14,22 +16,6 @@ import { HasSchemaScope } from "../decorators/HasSchemaScope"
 @Controller({ route: "/servers" })
 export default class ServerController {
   constructor(readonly serverService: ServerService) {}
-
-  @GET({
-    url: "/:id",
-    options: {
-      schema: ServerInfoSchema
-    }
-  })
-  @HasApiKey()
-  @HasSchemaScope()
-  async getServerInfo(
-    req: RequestWithKey<{ Params: ServerInfoParamsSchema }>,
-    reply: FastifyReply
-  ) {
-    const fetchedServer = await this.serverService.fetchServer(req.params.id)
-    return reply.code(200).send(fetchedServer)
-  }
 
   @GET({
     url: "",
@@ -51,8 +37,26 @@ export default class ServerController {
     return reply.code(200).send(fetchedServers)
   }
 
+  @GET({
+    url: "/:serverId",
+    options: {
+      schema: ServerInfoSchema
+    }
+  })
+  @HasApiKey()
+  @HasSchemaScope()
+  async getServerInfo(
+    req: RequestWithKey<{ Params: ServerInfoParamsSchema }>,
+    reply: FastifyReply
+  ) {
+    const fetchedServer = await this.serverService.fetchServer(
+      req.params.serverId
+    )
+    return reply.code(200).send(fetchedServer)
+  }
+
   @PATCH({
-    url: "/:id/ready",
+    url: "/:serverId/ready",
     options: {
       schema: ServerReadySchema
     }
@@ -63,7 +67,31 @@ export default class ServerController {
     req: RequestWithKey<{ Params: ServerInfoParamsSchema }>,
     reply: FastifyReply
   ) {
-    const readyServer = await this.serverService.readyServer(req.params.id)
+    const readyServer = await this.serverService.readyServer(
+      req.params.serverId
+    )
     return reply.code(200).send(readyServer)
+  }
+
+  @PUT({
+    url: "/:serverId/gameserver",
+    options: {
+      schema: UpdateGameServerSchema
+    }
+  })
+  @HasApiKey()
+  @HasSchemaScope()
+  async updateGameServer(
+    req: RequestWithKey<{
+      Params: ServerInfoParamsSchema
+      Body: UpdateGameServerBodySchema
+    }>,
+    reply: FastifyReply
+  ) {
+    const updatedServer = await this.serverService.updateGameServer(
+      req.params.serverId,
+      req.body
+    )
+    return reply.code(200).send(updatedServer)
   }
 }

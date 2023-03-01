@@ -22,6 +22,25 @@ import { HasSchemaScope } from "../decorators/HasSchemaScope"
 export default class PlayerController {
   constructor(readonly playerService: PlayerService) {}
 
+  @GET({
+    url: "/:uuid",
+    options: {
+      schema: PlayerInfoSchema
+    }
+  })
+  @HasApiKey()
+  @HasSchemaScope()
+  async getPlayerInfo(
+    req: RequestWithKey<{ Params: PlayerInfoParamsSchema }>,
+    reply: FastifyReply
+  ) {
+    const fetchedPlayer = await this.playerService.fetchPlayer(
+      req.params.uuid,
+      false
+    )
+    return reply.code(200).send(fetchedPlayer)
+  }
+
   @POST({
     url: "/:uuid/connect",
     options: {
@@ -41,25 +60,6 @@ export default class PlayerController {
       req.params.uuid,
       true,
       req.body.username
-    )
-    return reply.code(200).send(fetchedPlayer)
-  }
-
-  @GET({
-    url: "/:uuid",
-    options: {
-      schema: PlayerInfoSchema
-    }
-  })
-  @HasApiKey()
-  @HasSchemaScope()
-  async getPlayerInfo(
-    req: RequestWithKey<{ Params: PlayerInfoParamsSchema }>,
-    reply: FastifyReply
-  ) {
-    const fetchedPlayer = await this.playerService.fetchPlayer(
-      req.params.uuid,
-      false
     )
     return reply.code(200).send(fetchedPlayer)
   }

@@ -11,7 +11,6 @@ export default class GamesService {
   private GamePublicSelect: Prisma.GameSelect = {
     name: true,
     color: true,
-    ludosGame: true,
     menuMaterial: true,
     menuDescription: true,
     menuOrder: true,

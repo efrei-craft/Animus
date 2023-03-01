@@ -1,8 +1,15 @@
 import { Service } from "fastify-decorators"
-import { Prisma, Server, ServerType } from "@prisma/client"
+import {
+  GameServer,
+  GameStatus,
+  Prisma,
+  Server,
+  ServerType
+} from "@prisma/client"
 import prisma from "../../../clients/Prisma"
 import { ApiError } from "../helpers/Error"
 import RedisClient from "../../../clients/Redis"
+import { UpdateGameServerBodySchema } from "../controllers/schemas/Server.schema"
 
 @Service()
 export default class ServerService {
@@ -83,6 +90,7 @@ export default class ServerService {
         name
       },
       select: {
+        ...this.ServerPublicSelect,
         ready: true,
         template: {
           select: {
@@ -115,6 +123,8 @@ export default class ServerService {
       }
     })
 
+    server.ready = true
+
     if (server.template.type !== ServerType.VELOCITY) {
       for (const parentTemplate of server.template.parentTemplates) {
         await RedisClient.getInstance().publishToPlugin(
@@ -125,6 +135,86 @@ export default class ServerService {
         )
       }
     }
+
+    return server
+  }
+
+  async updateGameServer(
+    serverId: string,
+    newGameServer: UpdateGameServerBodySchema
+  ) {
+    const server = await prisma.server.findFirst({
+      where: {
+        name: serverId
+      },
+      select: {
+        ...this.ServerPublicSelect
+      }
+    })
+
+    if (!server) {
+      throw new ApiError("server-not-found", 404)
+    }
+
+    const game = await prisma.game.findFirst({
+      where: {
+        name: newGameServer.gameName
+      },
+      select: {
+        name: true
+      }
+    })
+
+    if (!game) {
+      throw new ApiError("game-not-found", 404)
+    }
+
+    let result: Partial<GameServer>
+
+    if (server.gameServer === null) {
+      const res = await prisma.server.update({
+        where: {
+          name: serverId
+        },
+        data: {
+          gameServer: {
+            create: {
+              gameName: game.name,
+              status: GameStatus[newGameServer.status]
+            }
+          }
+        },
+        select: {
+          gameServer: {
+            select: {
+              gameName: true,
+              status: true
+            }
+          }
+        }
+      })
+
+      result = res.gameServer
+    } else {
+      result = await prisma.gameServer.update({
+        where: {
+          serverName: serverId
+        },
+        data: {
+          gameName: newGameServer.gameName !== null ? game.name : undefined,
+          status:
+            newGameServer.status !== null
+              ? GameStatus[newGameServer.status]
+              : undefined
+        },
+        select: {
+          gameName: true,
+          status: true
+        }
+      })
+    }
+
+    return result
   }
 
   private filterNullProperties<T>(obj: T): T {

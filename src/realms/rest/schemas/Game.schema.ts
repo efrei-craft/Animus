@@ -8,9 +8,6 @@ export default Type.Object(
     color: Type.String({
       description: "The color of the game (amp color code)"
     }),
-    ludosGame: Type.String({
-      description: "The name of the game in Ludos"
-    }),
     menuMaterial: Type.String({
       description: "The material of the game (menu)"
     }),

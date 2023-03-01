@@ -1,10 +1,10 @@
 import { FastifySchema } from "fastify"
-import { ApiScope } from "@prisma/client"
+import { ApiScope, GameStatus } from "@prisma/client"
 import { Static, Type } from "@sinclair/typebox"
 import ServerSchema from "../../schemas/Server.schema"
 
 const ServerInfoParamsSchema = Type.Object({
-  id: Type.String()
+  serverId: Type.String()
 })
 
 export type ServerInfoParamsSchema = Static<typeof ServerInfoParamsSchema>
@@ -69,5 +69,50 @@ export const ServerReadySchema: FastifySchema = {
       apiKey: [ApiScope.SERVER]
     }
   ],
-  params: ServerInfoParamsSchema
+  params: ServerInfoParamsSchema,
+  response: {
+    200: Type.Array(Type.Ref(ServerSchema))
+  }
+}
+
+const UpdateGameServerBodySchema = Type.Object({
+  gameName: Type.Optional(
+    Type.String({
+      description: "The game to set the server to"
+    })
+  ),
+  status: Type.Optional(
+    Type.String({
+      description: "The status to set the server to",
+      enum: Object.keys(GameStatus)
+    })
+  )
+})
+
+export type UpdateGameServerBodySchema = Static<
+  typeof UpdateGameServerBodySchema
+>
+
+export const UpdateGameServerSchema: FastifySchema = {
+  tags: ["servers"],
+  summary: "Updates a game server",
+  operationId: "updateGameServer",
+  security: [
+    {
+      apiKey: [ApiScope.SERVER, ApiScope.GAMESERVERS]
+    }
+  ],
+  params: ServerInfoParamsSchema,
+  body: UpdateGameServerBodySchema,
+  response: {
+    200: Type.Object({
+      gameName: Type.String({
+        description: "The game to set the server to"
+      }),
+      status: Type.String({
+        description: "The status to set the server to",
+        enum: Object.keys(GameStatus)
+      })
+    })
+  }
 }

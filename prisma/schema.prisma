@@ -130,9 +130,8 @@ enum GameStatus {
 }
 
 model Game {
-  name      String @id
-  color     String @default("&7")
-  ludosGame String
+  name  String @id
+  color String @default("&7")
 
   menuMaterial    String
   menuDescription String @default("No description")

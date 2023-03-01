@@ -5,6 +5,7 @@ export default Type.Object(
   {
     serverName: Type.String({ description: "The server's name" }),
     game: Type.Optional(Type.Ref(GameSchema)),
+    requestedGame: Type.Optional(Type.Ref(GameSchema)),
     status: Type.String({ description: "The server's status" })
   },
   {
