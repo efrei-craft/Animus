@@ -71,7 +71,7 @@ export const ServerReadySchema: FastifySchema = {
   ],
   params: ServerInfoParamsSchema,
   response: {
-    200: Type.Array(Type.Ref(ServerSchema))
+    200: Type.Ref(ServerSchema)
   }
 }
 

@@ -96,6 +96,7 @@ export default class ServerService {
           select: {
             name: true,
             type: true,
+            repository: true,
             parentTemplates: {
               select: {
                 name: true
@@ -136,7 +137,7 @@ export default class ServerService {
       }
     }
 
-    return server
+    return this.filterNullProperties(server)
   }
 
   async updateGameServer(
