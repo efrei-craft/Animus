@@ -9,7 +9,8 @@ async function loadTemplates() {
     create: {
       name: "proxy",
       repository: "docker.nexus.jiveoff.fr/efrei-craft/templates/proxy",
-      type: ServerType.VELOCITY
+      type: ServerType.VELOCITY,
+      autoremove: true
     },
     select: {
       name: true,
@@ -18,11 +19,11 @@ async function loadTemplates() {
   })
 
   await prisma.template.upsert({
-    where: { name: "proxy.events" },
+    where: { name: "proxy.dev" },
     update: {},
     create: {
-      name: "proxy.events",
-      repository: "docker.nexus.jiveoff.fr/efrei-craft/templates/proxy",
+      name: "proxy.dev",
+      repository: "dev.efrei-craft/acv/templates/proxy",
       type: ServerType.VELOCITY,
       port: 25566
     }
@@ -35,6 +36,7 @@ async function loadTemplates() {
       name: "mini",
       repository: "docker.nexus.jiveoff.fr/efrei-craft/templates/mini",
       type: ServerType.PAPER,
+      autoremove: true,
       parentTemplates: {
         connect: [
           {
@@ -46,16 +48,33 @@ async function loadTemplates() {
   })
 
   await prisma.template.upsert({
-    where: { name: "mini.events" },
+    where: { name: "mini.dev" },
     update: {},
     create: {
-      name: "mini.events",
-      repository: "docker.nexus.jiveoff.fr/efrei-craft/templates/mini",
+      name: "mini.dev",
+      repository: "dev.efrei-craft/acp/templates/mini",
       type: ServerType.PAPER,
       parentTemplates: {
         connect: [
           {
-            name: "proxy.events"
+            name: "proxy.dev"
+          }
+        ]
+      }
+    }
+  })
+
+  await prisma.template.upsert({
+    where: { name: "lobby.dev" },
+    update: {},
+    create: {
+      name: "lobby.dev",
+      repository: "dev.efrei-craft/acp/templates/lobby",
+      type: ServerType.PAPER,
+      parentTemplates: {
+        connect: [
+          {
+            name: "proxy.dev"
           }
         ]
       }
@@ -69,13 +88,124 @@ async function loadTemplates() {
       name: "lobby",
       repository: "docker.nexus.jiveoff.fr/efrei-craft/templates/lobby",
       type: ServerType.PAPER,
+      autoremove: true,
       parentTemplates: {
         connect: [
           {
             name: "proxy"
           },
           {
-            name: "proxy.events"
+            name: "proxy.dev"
+          }
+        ]
+      }
+    }
+  })
+}
+
+async function loadGames() {
+  await prisma.game.upsert({
+    where: { name: "Arena" },
+    update: {},
+    create: {
+      name: "Arena",
+      maxPlayers: 8,
+      color: "&c",
+      available: true,
+      menuDescription:
+        "L'équipe avec le plus de kills à la fin du timer gagne !",
+      menuMaterial: "IRON_SWORD",
+      menuOrder: 1,
+      minQueueToStart: 2,
+      permissionToPlay: "efrei-craft.play.arena",
+      templates: {
+        connect: [
+          {
+            name: "mini"
+          },
+          {
+            name: "mini.dev"
+          }
+        ]
+      }
+    }
+  })
+
+  await prisma.game.upsert({
+    where: { name: "BlockParty" },
+    update: {},
+    create: {
+      name: "BlockParty",
+      maxPlayers: 10,
+      minQueueToStart: 2,
+      color: "&b",
+      available: true,
+      menuDescription:
+        "Tenez-vous sur la bonne couleur au bon moment, sinon vous mourrez !",
+      menuMaterial: "WOOL",
+      menuOrder: 2,
+      permissionToPlay: "efrei-craft.play.blockparty",
+      templates: {
+        connect: [
+          {
+            name: "mini"
+          },
+          {
+            name: "mini.dev"
+          }
+        ]
+      }
+    }
+  })
+
+  await prisma.game.upsert({
+    where: { name: "Rush" },
+    update: {},
+    create: {
+      name: "Rush",
+      maxPlayers: 16,
+      minQueueToStart: 2,
+      menuOrder: 0,
+      color: "&5",
+      available: true,
+      menuDescription:
+        "Détruisez le lit de l'équipe adversaire, puis tuez-les pour remporter la victoire !",
+      menuMaterial: "BED",
+      permissionToPlay: "efrei-craft.play.rush",
+      templates: {
+        connect: [
+          {
+            name: "mini"
+          },
+          {
+            name: "mini.dev"
+          }
+        ]
+      }
+    }
+  })
+
+  await prisma.game.upsert({
+    where: { name: "Sumo" },
+    update: {},
+    create: {
+      name: "Sumo",
+      maxPlayers: 2,
+      minQueueToStart: 2,
+      menuOrder: 3,
+      color: "&4",
+      available: true,
+      menuDescription:
+        "Poussez votre adversaire en dehors du ring pour gagner !",
+      menuMaterial: "STICK",
+      permissionToPlay: "efrei-craft.play.sumo",
+      templates: {
+        connect: [
+          {
+            name: "mini"
+          },
+          {
+            name: "mini.dev"
           }
         ]
       }
@@ -85,6 +215,7 @@ async function loadTemplates() {
 
 async function main() {
   await loadTemplates()
+  await loadGames()
 }
 
 main()

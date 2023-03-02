@@ -140,7 +140,7 @@ model Game {
   minQueueToStart Int @default(1)
   maxPlayers      Int @default(8)
 
-  template Template @relation(fields: [templateName], references: [name], onDelete: Cascade)
+  templates Template[]
 
   permissionToPlay String
 
@@ -148,7 +148,6 @@ model Game {
 
   gameServers          GameServer[] @relation("gameServers")
   requestedGameServers GameServer[] @relation("requestedGameServers")
-  templateName         String
 }
 
 // Server related models

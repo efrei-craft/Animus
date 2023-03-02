@@ -1,0 +1,132 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:12.2
+    volumes:
+      - pg:/data/postgres
+    networks:
+      net:
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      PGDATA: /data/postgres
+
+  rest:
+    image: docker.nexus.jiveoff.fr/efrei-craft/animus:stable
+    restart: always
+    tty: true
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.animus.rule=Host(`api.rezal.efreicraft.fr`)"
+        - "traefik.http.routers.animus.entrypoints=websecure"
+        - "traefik.http.services.animus.loadbalancer.server.port=3000"
+    depends_on:
+      - db
+      - redis
+    environment:
+      NODE_ENV: production
+
+      API_HOST: ${API_HOST}
+      SWAGGER_URL: ${SWAGGER_URL}
+
+      INFRASTRUCTURE_NAME: ${INFRASTRUCTURE_NAME}
+      SERVER_TYPE: rest
+
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    networks:
+      traefik_public:
+      net:
+
+  worker:
+    image: docker.nexus.jiveoff.fr/efrei-craft/animus:stable
+    restart: always
+    tty: true
+    deploy:
+      replicas: 2
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      NODE_ENV: production
+
+      API_HOST: ${API_HOST}
+      API_TOKEN: ${API_TOKEN}
+
+      SERVER_TYPE: worker
+      INFRASTRUCTURE_NAME: ${INFRASTRUCTURE_NAME}
+
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      REDIS_DB: ${REDIS_DB}
+    networks:
+      net:
+
+  redis:
+    image: bitnami/redis:latest
+    restart: always
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    networks:
+      net:
+
+  adminer:
+    image: adminer
+    restart: always
+    networks:
+      net:
+      traefik_public:
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.adminer.rule=Host(`toolkit.rezal.efreicraft.fr`) && Path(`/adminer`)"
+        - "traefik.http.routers.adminer.entrypoints=websecure"
+        - "traefik.http.services.adminer.loadbalancer.server.port=8080"
+
+  redis-commander:
+    container_name: redis-commander
+    hostname: redis-commander
+    image: rediscommander/redis-commander:latest
+    restart: always
+    environment:
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      URL_PREFIX: /commander
+    networks:
+      net:
+      traefik_public:
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.commander.rule=Host(`toolkit.rezal.efreicraft.fr`) && PathPrefix(`/commander`)"
+        - "traefik.http.routers.commander.entrypoints=websecure"
+        - "traefik.http.services.commander.loadbalancer.server.port=8081"
+
+volumes:
+  pg:
+    driver: local
+
+networks:
+  net:
+    name: ${INFRASTRUCTURE_NAME}
+    attachable: true
+  traefik_public:
+    external: true

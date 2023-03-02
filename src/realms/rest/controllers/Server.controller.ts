@@ -12,6 +12,7 @@ import {
 } from "./schemas/Server.schema"
 import ServerService from "../services/Server.service"
 import { HasSchemaScope } from "../decorators/HasSchemaScope"
+import { HasTableParams } from "../decorators/HasTableParams"
 
 @Controller({ route: "/servers" })
 export default class ServerController {
@@ -25,6 +26,7 @@ export default class ServerController {
   })
   @HasApiKey()
   @HasSchemaScope()
+  @HasTableParams()
   async getServers(
     req: RequestWithKey<{ Querystring: ServersQueryStringSchema }>,
     reply: FastifyReply

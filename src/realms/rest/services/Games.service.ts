@@ -16,7 +16,7 @@ export default class GamesService {
     menuOrder: true,
     minQueueToStart: true,
     maxPlayers: true,
-    template: true,
+    templates: true,
     available: true
   }
 
