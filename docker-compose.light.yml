@@ -50,7 +50,7 @@ services:
       - db
       - redis
     deploy:
-      replicas: 2
+      replicas: 0
       restart_policy:
         condition: on-failure
     environment:
