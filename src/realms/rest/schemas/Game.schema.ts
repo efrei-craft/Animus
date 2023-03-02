@@ -1,4 +1,5 @@
 import { Type } from "@sinclair/typebox"
+import TemplateSchema from "./Template.schema"
 
 export default Type.Object(
   {
@@ -23,9 +24,11 @@ export default Type.Object(
     maxPlayers: Type.Number({
       description: "The maximum amount of players for the game"
     }),
-    templateId: Type.Number({
-      description: "The template ID of the game"
-    }),
+    templates: Type.Array(
+      Type.Ref(TemplateSchema, {
+        description: "The template of the game"
+      })
+    ),
     available: Type.Boolean({
       description: "Whether the game is available"
     })

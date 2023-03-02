@@ -10,6 +10,7 @@ import prisma from "../../../clients/Prisma"
 import { ApiError } from "../helpers/Error"
 import RedisClient from "../../../clients/Redis"
 import { UpdateGameServerBodySchema } from "../controllers/schemas/Server.schema"
+import { removeNullUndefined } from "../helpers/NullUndefinedRemover"
 
 @Service()
 export default class ServerService {
@@ -23,7 +24,33 @@ export default class ServerService {
       }
     },
     maxPlayers: true,
-    gameServer: true,
+    gameServer: {
+      select: {
+        serverName: true,
+        game: {
+          select: {
+            name: true,
+            color: true,
+            menuMaterial: true,
+            menuDescription: true,
+            menuOrder: true,
+            minQueueToStart: true,
+            maxPlayers: true,
+            templates: {
+              select: {
+                name: true,
+                repository: true,
+                type: true
+              }
+            },
+            available: true,
+            permissionToPlay: true
+          }
+        },
+        status: true,
+        requestedGameName: true
+      }
+    },
     address: true,
     createdAt: true,
     updatedAt: true,
@@ -48,7 +75,7 @@ export default class ServerService {
       throw new ApiError("server-not-found", 404)
     }
 
-    server = this.filterNullProperties<Partial<Server>>(server)
+    server = removeNullUndefined(server)
 
     return server
   }
@@ -77,10 +104,9 @@ export default class ServerService {
       select: this.ServerPublicSelect
     })
 
-    servers = servers.map((server) =>
-      this.filterNullProperties<Partial<Server>>(server)
-    )
-
+    console.log(servers)
+    servers = servers.map((server) => removeNullUndefined(server))
+    console.log(servers)
     return servers
   }
 
@@ -137,7 +163,7 @@ export default class ServerService {
       }
     }
 
-    return this.filterNullProperties(server)
+    return removeNullUndefined(server)
   }
 
   async updateGameServer(
@@ -157,17 +183,24 @@ export default class ServerService {
       throw new ApiError("server-not-found", 404)
     }
 
-    const game = await prisma.game.findFirst({
-      where: {
-        name: newGameServer.gameName
-      },
-      select: {
-        name: true
-      }
-    })
+    let game: { name: string }
 
-    if (!game) {
-      throw new ApiError("game-not-found", 404)
+    newGameServer.gameName =
+      newGameServer.gameName.length > 0 ? newGameServer.gameName : null
+
+    if (newGameServer.gameName !== null) {
+      game = await prisma.game.findFirst({
+        where: {
+          name: newGameServer.gameName
+        },
+        select: {
+          name: true
+        }
+      })
+
+      if (!game) {
+        throw new ApiError("game-not-found", 404)
+      }
     }
 
     let result: Partial<GameServer>
@@ -202,7 +235,7 @@ export default class ServerService {
           serverName: serverId
         },
         data: {
-          gameName: newGameServer.gameName !== null ? game.name : undefined,
+          gameName: newGameServer.gameName !== null ? game.name : null,
           status:
             newGameServer.status !== null
               ? GameStatus[newGameServer.status]
@@ -216,12 +249,5 @@ export default class ServerService {
     }
 
     return result
-  }
-
-  private filterNullProperties<T>(obj: T): T {
-    return Object.fromEntries(
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      Object.entries(obj).filter(([_, v]) => v !== null)
-    ) as T
   }
 }

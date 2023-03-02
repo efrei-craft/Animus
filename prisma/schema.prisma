@@ -202,8 +202,8 @@ model GameServer {
   server     Server @relation(fields: [serverName], references: [name], onDelete: Cascade)
   serverName String @unique
 
-  game     Game   @relation("gameServers", fields: [gameName], references: [name])
-  gameName String
+  game     Game?   @relation("gameServers", fields: [gameName], references: [name])
+  gameName String?
 
   requestedGame     Game?   @relation("requestedGameServers", fields: [requestedGameName], references: [name])
   requestedGameName String?
