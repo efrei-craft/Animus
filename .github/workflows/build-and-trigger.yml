@@ -42,7 +42,11 @@ jobs:
     needs: build-and-push-image
 
     steps:
-      - name: Webhook Trigger
+      - name: Trigger Portainer on Dev
         uses: zzzze/webhook-trigger@v1.0.0
         with:
-          webhook_url: ${{ secrets.PORTAINER_WEBHOOK }}
+          webhook_url: ${{ secrets.PORTAINER_WEBHOOK_DEV }}
+      - name: Trigger Portainer on Rezal
+        uses: zzzze/webhook-trigger@v1.0.0
+        with:
+          webhook_url: ${{ secrets.PORTAINER_WEBHOOK_REZAL }}
