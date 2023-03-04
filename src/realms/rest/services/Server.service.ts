@@ -146,7 +146,7 @@ export default class ServerService {
       for (const parentTemplate of server.template.parentTemplates) {
         await RedisClient.getInstance().publishToPlugin(
           parentTemplate.name,
-          "ACV",
+          "Vicarius",
           "addServer",
           name
         )

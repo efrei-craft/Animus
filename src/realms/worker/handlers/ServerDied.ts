@@ -31,7 +31,7 @@ export const method: WorkerMethod = {
     for (const parentTemplate of serverTemplate.template.parentTemplates) {
       await RedisClient.getInstance().publishToPlugin(
         parentTemplate.name,
-        "ACV",
+        "Vicarius",
         "removeServer",
         arg
       )
