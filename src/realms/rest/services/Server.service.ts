@@ -108,7 +108,6 @@ export default class ServerService {
       },
       select: {
         ...this.ServerPublicSelect,
-        ready: true,
         template: {
           select: {
             name: true,

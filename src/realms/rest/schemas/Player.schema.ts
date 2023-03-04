@@ -1,14 +1,13 @@
 import { Type } from "@sinclair/typebox"
 import { ChatChannels } from "@prisma/client"
 import PermGroupPlayer from "./PermGroupPlayer.schema"
-import { TypeNullUnion } from "../helpers/TypeNullUnion"
 
 export default Type.Object(
   {
     uuid: Type.String({ description: "The player's Minecraft UUID" }),
     username: Type.String({ description: "The player's Minecraft username" }),
     permGroups: Type.Array(Type.Ref(PermGroupPlayer)),
-    discordUserId: TypeNullUnion(
+    discordUserId: Type.Optional(
       Type.String({ description: "The player's Discord user ID" })
     ),
     lastSeen: Type.String({
@@ -18,7 +17,7 @@ export default Type.Object(
       description: "The player's chat channel",
       enum: Object.keys(ChatChannels)
     }),
-    serverName: TypeNullUnion(
+    serverName: Type.Optional(
       Type.String({ description: "The player's server name" })
     )
   },

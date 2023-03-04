@@ -2,7 +2,6 @@ import { Type } from "@sinclair/typebox"
 import TemplateSchema from "./Template.schema"
 import PlayerSchema from "./Player.schema"
 import GameServerSchema from "./GameServer.schema"
-import { TypeNullUnion } from "../helpers/TypeNullUnion"
 
 export default Type.Object(
   {
@@ -10,7 +9,7 @@ export default Type.Object(
     template: Type.Ref(TemplateSchema, {
       description: "The server's template"
     }),
-    address: TypeNullUnion(
+    address: Type.Optional(
       Type.String({ description: "The server's address within the network" })
     ),
     players: Type.Array(Type.Ref(PlayerSchema), {
@@ -44,7 +43,7 @@ export default Type.Object(
       description: "The server's last update date (ISO 8601)",
       default: new Date().toISOString()
     }),
-    gameServer: TypeNullUnion(
+    gameServer: Type.Optional(
       Type.Ref(GameServerSchema, {
         description: "The server's game server"
       })
