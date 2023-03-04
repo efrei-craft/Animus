@@ -3,7 +3,6 @@ import { FastifyReply } from "fastify"
 import { HasApiKey, RequestWithKey } from "../decorators/HasApiKey"
 import PlayerService from "../services/Player.service"
 import {
-  PlayerAddPermissionGroupBodySchema,
   PlayerAddPermissionGroupSchema,
   PlayerAddPermissionsSchema,
   PlayerChangeChannelBodySchema,
@@ -16,8 +15,11 @@ import {
   PlayerGetPermissionsSchema,
   PlayerInfoParamsSchema,
   PlayerInfoSchema,
+  PlayerPermissionGroupBodySchema,
   PlayerPermissionsBodySchema,
-  PlayerRemovePermissionsSchema
+  PlayerRemovePermissionGroupSchema,
+  PlayerRemovePermissionsSchema,
+  PlayerSetPermissionGroupSchema
 } from "./schemas/Player.schema"
 import { HasSchemaScope } from "../decorators/HasSchemaScope"
 
@@ -167,7 +169,7 @@ export default class PlayerController {
     return reply.code(200).send(removedPermissions)
   }
 
-  @PUT({
+  @POST({
     url: "/:uuid/groups",
     options: {
       schema: PlayerAddPermissionGroupSchema
@@ -178,7 +180,7 @@ export default class PlayerController {
   async addPermissionGroup(
     req: RequestWithKey<{
       Params: PlayerInfoParamsSchema
-      Body: PlayerAddPermissionGroupBodySchema
+      Body: PlayerPermissionGroupBodySchema
     }>,
     reply: FastifyReply
   ) {
@@ -187,6 +189,51 @@ export default class PlayerController {
       req.body.groupName
     )
     return reply.code(200).send(addedPermissionGroup)
+  }
+
+  @PATCH({
+    url: "/:uuid/groups",
+    options: {
+      schema: PlayerSetPermissionGroupSchema
+    }
+  })
+  @HasApiKey()
+  @HasSchemaScope()
+  async setPermissionGroup(
+    req: RequestWithKey<{
+      Params: PlayerInfoParamsSchema
+      Body: PlayerPermissionGroupBodySchema
+    }>,
+    reply: FastifyReply
+  ) {
+    const setPermissionGroup = await this.playerService.setPermissionGroup(
+      req.params.uuid,
+      req.body.groupName
+    )
+    return reply.code(200).send(setPermissionGroup)
+  }
+
+  @DELETE({
+    url: "/:uuid/groups",
+    options: {
+      schema: PlayerRemovePermissionGroupSchema
+    }
+  })
+  @HasApiKey()
+  @HasSchemaScope()
+  async removePermissionGroup(
+    req: RequestWithKey<{
+      Params: PlayerInfoParamsSchema
+      Body: PlayerPermissionGroupBodySchema
+    }>,
+    reply: FastifyReply
+  ) {
+    const removedPermissionGroup =
+      await this.playerService.removePermissionGroup(
+        req.params.uuid,
+        req.body.groupName
+      )
+    return reply.code(200).send(removedPermissionGroup)
   }
 
   @PATCH({

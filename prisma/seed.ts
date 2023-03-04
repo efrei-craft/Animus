@@ -215,21 +215,186 @@ async function loadGames() {
 
 async function loadGroups() {
   await prisma.permGroup.upsert({
-    where: { name: "default" },
+    where: { name: "Visiteur" },
     update: {},
     create: {
-      name: "Joueur",
+      name: "Visiteur",
       prefix: "&7",
       color: "&7",
       priority: 0,
-      defaultGroup: true,
-      permissions: {
-        create: [
-          {
-            name: "efrei-craft.play.*"
-          }
-        ]
-      }
+      defaultGroup: true
+    }
+  })
+
+  await prisma.permGroup.upsert({
+    where: { name: "Membre" },
+    update: {},
+    create: {
+      name: "Membre",
+      prefix: "&f&l",
+      color: "&f",
+      priority: 1
+    }
+  })
+
+  await prisma.permGroup.upsert({
+    where: { name: "Beta Tester" },
+    update: {},
+    create: {
+      name: "Beta Tester",
+      prefix: "&1&l",
+      color: "&1",
+      priority: 2
+    }
+  })
+
+  await prisma.permGroup.upsert({
+    where: { name: "Designer" },
+    update: {},
+    create: {
+      name: "Designer",
+      prefix: "&e&l",
+      color: "&e",
+      priority: 3
+    }
+  })
+
+  await prisma.permGroup.upsert({
+    where: { name: "Développeur" },
+    update: {},
+    create: {
+      name: "Développeur",
+      prefix: "&5&l",
+      color: "&5",
+      priority: 4
+    }
+  })
+
+  await prisma.permGroup.upsert({
+    where: { name: "Builder" },
+    update: {},
+    create: {
+      name: "Builder",
+      prefix: "&a&l",
+      color: "&a",
+      priority: 5
+    }
+  })
+
+  await prisma.permGroup.upsert({
+    where: { name: "Bureau étendu" },
+    update: {},
+    create: {
+      name: "Bureau étendu",
+      prefix: "&c&l",
+      color: "&c",
+      priority: 7
+    }
+  })
+
+  await prisma.permGroup.upsert({
+    where: { name: "Bureau restreint" },
+    update: {},
+    create: {
+      name: "Bureau restreint",
+      prefix: "&4&l",
+      color: "&4",
+      priority: 8
+    }
+  })
+
+  await prisma.permGroup.upsert({
+    where: { name: "Resp. Dev" },
+    update: {},
+    create: {
+      name: "Resp. Dev",
+      prefix: "&c&l",
+      color: "&c",
+      priority: 9,
+      parentGroupName: "Bureau étendu"
+    }
+  })
+
+  await prisma.permGroup.upsert({
+    where: { name: "Resp. Design" },
+    update: {},
+    create: {
+      name: "Resp. Design",
+      prefix: "&c&l",
+      color: "&c",
+      priority: 10,
+      parentGroupName: "Bureau étendu"
+    }
+  })
+
+  await prisma.permGroup.upsert({
+    where: { name: "Resp. Build" },
+    update: {},
+    create: {
+      name: "Resp. Build",
+      prefix: "&c&l",
+      color: "&c",
+      priority: 11,
+      parentGroupName: "Bureau étendu"
+    }
+  })
+
+  await prisma.permGroup.upsert({
+    where: { name: "Secrétaire" },
+    update: {},
+    create: {
+      name: "Secrétaire",
+      prefix: "&4&l",
+      color: "&4",
+      priority: 12,
+      parentGroupName: "Bureau restreint"
+    }
+  })
+
+  await prisma.permGroup.upsert({
+    where: { name: "Trésorier" },
+    update: {},
+    create: {
+      name: "Trésorier",
+      prefix: "&4&l",
+      color: "&4",
+      priority: 13,
+      parentGroupName: "Bureau restreint"
+    }
+  })
+
+  await prisma.permGroup.upsert({
+    where: { name: "Vice-Président" },
+    update: {},
+    create: {
+      name: "Vice-Président",
+      prefix: "&4&l",
+      color: "&4",
+      priority: 14,
+      parentGroupName: "Bureau restreint"
+    }
+  })
+
+  await prisma.permGroup.upsert({
+    where: { name: "Président" },
+    update: {},
+    create: {
+      name: "Président",
+      prefix: "&4&l",
+      color: "&4",
+      priority: 15,
+      parentGroupName: "Bureau restreint"
+    }
+  })
+
+  await prisma.permGroup.upsert({
+    where: { name: "Resp. 1P" },
+    update: {},
+    create: {
+      name: "Resp. 1P",
+      prefix: "&9&l",
+      color: "&9",
+      priority: 6
     }
   })
 }

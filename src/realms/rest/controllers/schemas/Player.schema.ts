@@ -151,7 +151,7 @@ export const PlayerRemovePermissionsSchema: FastifySchema = {
 
 // Add Permission Group
 
-const PlayerAddPermissionGroupBodySchema = Type.Object({
+const PlayerPermissionGroupBodySchema = Type.Object({
   groupName: Type.String()
 })
 
@@ -165,15 +165,52 @@ export const PlayerAddPermissionGroupSchema: FastifySchema = {
     }
   ],
   params: PlayerInfoParamsSchema,
-  body: PlayerAddPermissionGroupBodySchema,
+  body: PlayerPermissionGroupBodySchema,
   response: {
     200: Type.Object({})
   }
 }
 
-export type PlayerAddPermissionGroupBodySchema = Static<
-  typeof PlayerAddPermissionGroupBodySchema
+export type PlayerPermissionGroupBodySchema = Static<
+  typeof PlayerPermissionGroupBodySchema
 >
+
+// Remove Permission Group
+
+export const PlayerRemovePermissionGroupSchema: FastifySchema = {
+  tags: ["players"],
+  summary: "Remove a permission group from a player",
+  operationId: "removePlayerPermissionGroup",
+  security: [
+    {
+      apiKey: [ApiScope.PLAYERS, ApiScope.GROUPS]
+    }
+  ],
+  params: PlayerInfoParamsSchema,
+  body: PlayerPermissionGroupBodySchema,
+  response: {
+    200: Type.Object({})
+  }
+}
+
+// Set Permission Groups
+
+export const PlayerSetPermissionGroupSchema: FastifySchema = {
+  tags: ["players"],
+  summary:
+    "Set a player's unique permission group (implies a removal of all other groups)",
+  operationId: "setPlayerPermissionGroup",
+  security: [
+    {
+      apiKey: [ApiScope.PLAYERS, ApiScope.GROUPS]
+    }
+  ],
+  params: PlayerInfoParamsSchema,
+  body: PlayerPermissionGroupBodySchema,
+  response: {
+    200: Type.Object({})
+  }
+}
 
 // Change Chat Channel
 

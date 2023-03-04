@@ -131,6 +131,15 @@ export default class PlayerService {
               select: {
                 name: true
               }
+            },
+            parentGroup: {
+              select: {
+                permissions: {
+                  select: {
+                    name: true
+                  }
+                }
+              }
             }
           }
         },
@@ -152,6 +161,11 @@ export default class PlayerService {
       group.permissions.forEach((permission) => {
         permissions.push(permission.name)
       })
+      if (group.parentGroup) {
+        group.parentGroup.permissions.forEach((permission) => {
+          permissions.push(permission.name)
+        })
+      }
     })
 
     playerPermissions.perms.forEach((permission) => {
@@ -293,6 +307,79 @@ export default class PlayerService {
         data: {
           permGroups: {
             connect: {
+              name: groupName
+            }
+          }
+        }
+      })
+    }
+  }
+
+  async setPermissionGroup(uuid: string, groupName: string): Promise<void> {
+    const player = await prisma.player.findUnique({
+      where: {
+        uuid: uuid
+      },
+      select: {
+        permGroups: {
+          select: {
+            name: true
+          }
+        }
+      }
+    })
+
+    if (!player) {
+      throw new ApiError("player-not-found", 404)
+    }
+
+    await prisma.player.update({
+      where: {
+        uuid: uuid
+      },
+      data: {
+        permGroups: {
+          disconnect: player.permGroups.map((group) => {
+            return {
+              name: group.name
+            }
+          }),
+          connect: {
+            name: groupName
+          }
+        }
+      }
+    })
+  }
+
+  async removePermissionGroup(uuid: string, groupName: string): Promise<void> {
+    const player = await prisma.player.findUnique({
+      where: {
+        uuid: uuid
+      },
+      select: {
+        permGroups: {
+          select: {
+            name: true
+          }
+        }
+      }
+    })
+
+    if (!player) {
+      throw new ApiError("player-not-found", 404)
+    }
+
+    const existingGroups = player.permGroups.map((group) => group.name)
+
+    if (existingGroups.includes(groupName)) {
+      await prisma.player.update({
+        where: {
+          uuid: uuid
+        },
+        data: {
+          permGroups: {
+            disconnect: {
               name: groupName
             }
           }
