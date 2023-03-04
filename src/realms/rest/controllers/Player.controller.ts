@@ -8,8 +8,11 @@ import {
   PlayerAddPermissionsSchema,
   PlayerChangeChannelBodySchema,
   PlayerChangeChannelSchema,
+  PlayerChangeServerBodySchema,
+  PlayerChangeServerSchema,
   PlayerConnectBodySchema,
   PlayerConnectSchema,
+  PlayerDisconnectSchema,
   PlayerGetPermissionsSchema,
   PlayerInfoParamsSchema,
   PlayerInfoSchema,
@@ -62,6 +65,46 @@ export default class PlayerController {
       req.body.username
     )
     return reply.code(200).send(fetchedPlayer)
+  }
+
+  @POST({
+    url: "/:uuid/disconnect",
+    options: {
+      schema: PlayerDisconnectSchema
+    }
+  })
+  @HasApiKey()
+  @HasSchemaScope()
+  async disconnect(
+    req: RequestWithKey<{ Params: PlayerInfoParamsSchema }>,
+    reply: FastifyReply
+  ) {
+    const fetchedPlayer = await this.playerService.disconnectPlayer(
+      req.params.uuid
+    )
+    return reply.code(200).send(fetchedPlayer)
+  }
+
+  @PATCH({
+    url: "/:uuid/server",
+    options: {
+      schema: PlayerChangeServerSchema
+    }
+  })
+  @HasApiKey()
+  @HasSchemaScope()
+  async changeServer(
+    req: RequestWithKey<{
+      Body: PlayerChangeServerBodySchema
+      Params: PlayerInfoParamsSchema
+    }>,
+    reply: FastifyReply
+  ) {
+    const serverPlayer = await this.playerService.changeServer(
+      req.params.uuid,
+      req.body.serverName
+    )
+    return reply.code(200).send(serverPlayer)
   }
 
   @GET({

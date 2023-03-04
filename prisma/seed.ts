@@ -213,9 +213,31 @@ async function loadGames() {
   })
 }
 
+async function loadGroups() {
+  await prisma.permGroup.upsert({
+    where: { name: "default" },
+    update: {},
+    create: {
+      name: "Joueur",
+      prefix: "&7",
+      color: "&7",
+      priority: 0,
+      defaultGroup: true,
+      permissions: {
+        create: [
+          {
+            name: "efrei-craft.play.*"
+          }
+        ]
+      }
+    }
+  })
+}
+
 async function main() {
   await loadTemplates()
   await loadGames()
+  await loadGroups()
 }
 
 main()

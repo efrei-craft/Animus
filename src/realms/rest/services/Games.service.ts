@@ -8,7 +8,7 @@ export default class GamesService {
    * The select object for public Game data.
    * @private
    */
-  private GamePublicSelect: Prisma.GameSelect = {
+  public static GamePublicSelect: Prisma.GameSelect = {
     name: true,
     color: true,
     menuMaterial: true,
@@ -16,8 +16,15 @@ export default class GamesService {
     menuOrder: true,
     minQueueToStart: true,
     maxPlayers: true,
-    templates: true,
-    available: true
+    templates: {
+      select: {
+        name: true,
+        repository: true,
+        type: true
+      }
+    },
+    available: true,
+    permissionToPlay: true
   }
 
   /**
@@ -32,7 +39,7 @@ export default class GamesService {
       orderBy: {
         menuOrder: "asc"
       },
-      select: this.GamePublicSelect
+      select: GamesService.GamePublicSelect
     })
   }
 }

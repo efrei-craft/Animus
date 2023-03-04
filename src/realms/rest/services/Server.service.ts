@@ -11,6 +11,8 @@ import { ApiError } from "../helpers/Error"
 import RedisClient from "../../../clients/Redis"
 import { UpdateGameServerBodySchema } from "../controllers/schemas/Server.schema"
 import { removeNullUndefined } from "../helpers/NullUndefinedRemover"
+import PlayerService from "./Player.service"
+import GamesService from "./Games.service"
 
 @Service()
 export default class ServerService {
@@ -29,22 +31,7 @@ export default class ServerService {
         serverName: true,
         game: {
           select: {
-            name: true,
-            color: true,
-            menuMaterial: true,
-            menuDescription: true,
-            menuOrder: true,
-            minQueueToStart: true,
-            maxPlayers: true,
-            templates: {
-              select: {
-                name: true,
-                repository: true,
-                type: true
-              }
-            },
-            available: true,
-            permissionToPlay: true
+            ...GamesService.GamePublicSelect
           }
         },
         status: true,
@@ -56,7 +43,11 @@ export default class ServerService {
     updatedAt: true,
     permanent: true,
     ready: true,
-    players: true,
+    players: {
+      select: {
+        ...PlayerService.PlayerPublicSelect
+      }
+    },
     permissionToJoin: true,
     lastHeartbeat: true
   }

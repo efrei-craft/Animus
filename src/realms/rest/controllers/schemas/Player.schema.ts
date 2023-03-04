@@ -39,6 +39,23 @@ export const PlayerConnectSchema: FastifySchema = {
 
 export type PlayerConnectBodySchema = Static<typeof PlayerConnectBodySchema>
 
+// Disconnect
+
+export const PlayerDisconnectSchema: FastifySchema = {
+  tags: ["players"],
+  summary: "A player disconnects from the server",
+  operationId: "playerDisconnect",
+  security: [
+    {
+      apiKey: [ApiScope.PLAYERS, ApiScope.SERVER]
+    }
+  ],
+  params: PlayerInfoParamsSchema,
+  response: {
+    200: Type.Ref(PlayerSchema)
+  }
+}
+
 // Get Player Info
 
 export const PlayerInfoSchema: FastifySchema = {
@@ -188,3 +205,29 @@ export const PlayerChangeChannelSchema: FastifySchema = {
 export type PlayerChangeChannelBodySchema = Static<
   typeof PlayerChangeChannelBodySchema
 >
+
+// Change Server
+
+const PlayerChangeServerBodySchema = Type.Object({
+  serverName: Type.String()
+})
+
+export type PlayerChangeServerBodySchema = Static<
+  typeof PlayerChangeServerBodySchema
+>
+
+export const PlayerChangeServerSchema: FastifySchema = {
+  tags: ["players"],
+  summary: "Change a player's server",
+  operationId: "changePlayerServer",
+  security: [
+    {
+      apiKey: [ApiScope.SERVER]
+    }
+  ],
+  params: PlayerInfoParamsSchema,
+  body: PlayerChangeServerBodySchema,
+  response: {
+    200: Type.Object({})
+  }
+}

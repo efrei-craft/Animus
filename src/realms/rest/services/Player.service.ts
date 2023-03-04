@@ -9,7 +9,7 @@ export default class PlayerService {
    * The select object for public player data.
    * @private
    */
-  private PlayerPublicSelect: Prisma.PlayerSelect = {
+  public static PlayerPublicSelect: Prisma.PlayerSelect = {
     uuid: true,
     username: true,
     permGroups: {
@@ -24,6 +24,7 @@ export default class PlayerService {
         priority: "desc"
       }
     },
+    serverName: true,
     chatChannel: true,
     lastSeen: true,
     discordUserId: true
@@ -46,7 +47,7 @@ export default class PlayerService {
         where: {
           uuid: uuid
         },
-        select: this.PlayerPublicSelect
+        select: PlayerService.PlayerPublicSelect
       })
       if (createOrUpdate) {
         if (player) {
@@ -64,6 +65,50 @@ export default class PlayerService {
         }
       }
       return player
+    } catch (e) {
+      throw new ApiError("player-fetch-failed", 500)
+    }
+  }
+
+  async disconnectPlayer(uuid: string): Promise<Partial<Player>> {
+    try {
+      const player = await prisma.player.findUnique({
+        where: {
+          uuid: uuid
+        },
+        select: PlayerService.PlayerPublicSelect
+      })
+      if (player) {
+        await prisma.player.update({
+          where: {
+            uuid: uuid
+          },
+          data: {
+            serverName: null
+          }
+        })
+      }
+      return player
+    } catch (e) {
+      throw new ApiError("player-fetch-failed", 500)
+    }
+  }
+
+  /**
+   * Changes the player's server
+   * @param uuid The player's UUID
+   * @param serverId The server's ID
+   */
+  async changeServer(uuid: string, serverId: string): Promise<void> {
+    try {
+      await prisma.player.update({
+        where: {
+          uuid: uuid
+        },
+        data: {
+          serverName: serverId
+        }
+      })
     } catch (e) {
       throw new ApiError("player-fetch-failed", 500)
     }
@@ -287,7 +332,7 @@ export default class PlayerService {
           })
         }
       },
-      select: this.PlayerPublicSelect
+      select: PlayerService.PlayerPublicSelect
     })
   }
 

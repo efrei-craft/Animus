@@ -1,10 +1,11 @@
 import { Type } from "@sinclair/typebox"
 import { ApiScope } from "@prisma/client"
+import { TypeNullUnion } from "../helpers/TypeNullUnion"
 
 export default Type.Object(
   {
     key: Type.String({ description: "The API key" }),
-    description: Type.Optional(
+    description: TypeNullUnion(
       Type.String({ description: "The API key's description" })
     ),
     scopes: Type.Array(Type.String(), {
