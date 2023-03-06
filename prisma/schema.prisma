@@ -113,11 +113,16 @@ model PermGroup {
 }
 
 model Permission {
-  name       String      @id
-  expires    DateTime?
-  serverType String[]
-  players    Player[]    @relation("playerHasPermission")
-  permGroups PermGroup[] @relation("groupHasPermission")
+  id          String    @id @default(cuid())
+  name        String
+  expires     DateTime?
+  serverTypes String[]
+
+  player     Player? @relation("playerHasPermission", fields: [playerUuid], references: [uuid])
+  playerUuid String?
+
+  group     PermGroup? @relation("groupHasPermission", fields: [groupName], references: [name])
+  groupName String?
 }
 
 // Game related models

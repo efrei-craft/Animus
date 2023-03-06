@@ -1,5 +1,5 @@
 import prisma from "../../../clients/Prisma"
-import { ChatChannels, Player, Prisma } from "@prisma/client"
+import { ChatChannels, Permission, Player, Prisma } from "@prisma/client"
 import { Service } from "fastify-decorators"
 import { ApiError } from "../helpers/Error"
 
@@ -28,6 +28,28 @@ export default class PlayerService {
     chatChannel: true,
     lastSeen: true,
     discordUserId: true
+  }
+
+  /**
+   * The select object for public permission data.
+   */
+  public static PermissionPublicSelect: Prisma.PermGroup$permissionsArgs = {
+    select: {
+      name: true,
+      serverTypes: true
+    },
+    where: {
+      OR: [
+        {
+          expires: {
+            gte: new Date()
+          }
+        },
+        {
+          expires: null
+        }
+      ]
+    }
   }
 
   /**
@@ -119,7 +141,7 @@ export default class PlayerService {
    * @param uuid The player's UUID
    * @return A promise that resolves to an array of permission names
    */
-  async getPermissions(uuid: string): Promise<string[]> {
+  async getPermissions(uuid: string): Promise<Partial<Permission>[]> {
     const playerPermissions = await prisma.player.findUnique({
       where: {
         uuid: uuid
@@ -128,25 +150,19 @@ export default class PlayerService {
         permGroups: {
           select: {
             permissions: {
-              select: {
-                name: true
-              }
+              ...PlayerService.PermissionPublicSelect
             },
             parentGroup: {
               select: {
                 permissions: {
-                  select: {
-                    name: true
-                  }
+                  ...PlayerService.PermissionPublicSelect
                 }
               }
             }
           }
         },
         perms: {
-          select: {
-            name: true
-          }
+          ...PlayerService.PermissionPublicSelect
         }
       }
     })
@@ -155,21 +171,21 @@ export default class PlayerService {
       throw new ApiError("player-not-found", 404)
     }
 
-    const permissions = []
+    const permissions: Permission[] = []
 
     playerPermissions.permGroups.forEach((group) => {
       group.permissions.forEach((permission) => {
-        permissions.push(permission.name)
+        permissions.push(permission)
       })
       if (group.parentGroup) {
         group.parentGroup.permissions.forEach((permission) => {
-          permissions.push(permission.name)
+          permissions.push(permission)
         })
       }
     })
 
     playerPermissions.perms.forEach((permission) => {
-      permissions.push(permission.name)
+      permissions.push(permission)
     })
 
     return permissions
@@ -181,16 +197,17 @@ export default class PlayerService {
    * @param permissions An array of permission names
    * @return A promise that resolves to an array of permission names that were added
    */
-  async addPermissions(uuid: string, permissions: string[]): Promise<string[]> {
+  async addPermissions(
+    uuid: string,
+    permissions: Partial<Permission>[]
+  ): Promise<Partial<Permission>[]> {
     const player = await prisma.player.findUnique({
       where: {
         uuid: uuid
       },
       select: {
         perms: {
-          select: {
-            name: true
-          }
+          ...PlayerService.PermissionPublicSelect
         }
       }
     })
@@ -199,10 +216,12 @@ export default class PlayerService {
       throw new ApiError("player-not-found", 404)
     }
 
+    console.log(player)
+
     const existingPermissions = player.perms.map((perm) => perm.name)
 
     const newPermissions = permissions.filter(
-      (permission) => !existingPermissions.includes(permission)
+      (permission) => !existingPermissions.includes(permission.name)
     )
 
     await prisma.player.update({
@@ -211,19 +230,20 @@ export default class PlayerService {
       },
       data: {
         perms: {
-          connectOrCreate: newPermissions.map((permission) => {
-            return {
-              where: {
-                name: permission
-              },
-              create: {
-                name: permission
+          createMany: {
+            data: newPermissions.map((permission) => {
+              return {
+                name: permission.name,
+                expires: permission.expires,
+                serverTypes: permission.serverTypes
               }
-            }
-          })
+            })
+          }
         }
       }
     })
+
+    console.log(newPermissions)
 
     return newPermissions
   }
@@ -245,6 +265,7 @@ export default class PlayerService {
       select: {
         perms: {
           select: {
+            id: true,
             name: true
           }
         }
@@ -261,17 +282,21 @@ export default class PlayerService {
       existingPermissions.includes(permission)
     )
 
+    const removePermissionIds = player.perms
+      .filter((perm) => removePermissions.includes(perm.name))
+      .map((perm) => perm.id)
+
     await prisma.player.update({
       where: {
         uuid: uuid
       },
       data: {
         perms: {
-          disconnect: removePermissions.map((permission) => {
-            return {
-              name: permission
+          deleteMany: {
+            id: {
+              in: removePermissionIds
             }
-          })
+          }
         }
       }
     })

@@ -2,6 +2,8 @@ import { FastifySchema } from "fastify"
 import { Static, Type } from "@sinclair/typebox"
 import PlayerSchema from "../../schemas/Player.schema"
 import { ApiScope, ChatChannels } from "@prisma/client"
+import PermissionSchema from "../../schemas/Permission.schema"
+import PermissionInputSchema from "../../schemas/PermissionInput.schema"
 
 const PlayerInfoParamsSchema = Type.Object({
   uuid: Type.String()
@@ -92,7 +94,7 @@ export const PlayerGetPermissionsSchema: FastifySchema = {
   ],
   params: PlayerInfoParamsSchema,
   response: {
-    200: Type.Array(Type.String({ description: "The player's permissions" })),
+    200: Type.Array(Type.Ref(PermissionSchema)),
     404: Type.Object({
       error: Type.String({ enum: ["player-not-found"] })
     })
@@ -102,7 +104,7 @@ export const PlayerGetPermissionsSchema: FastifySchema = {
 // Add Permission
 
 const PlayerPermissionsBodySchema = Type.Object({
-  permissions: Type.Array(Type.String())
+  permissions: Type.Array(Type.Ref(PermissionInputSchema))
 })
 
 export const PlayerAddPermissionsSchema: FastifySchema = {
@@ -117,7 +119,7 @@ export const PlayerAddPermissionsSchema: FastifySchema = {
   params: PlayerInfoParamsSchema,
   body: PlayerPermissionsBodySchema,
   response: {
-    200: Type.Array(Type.String({ description: "The added permissions" })),
+    200: Type.Array(Type.Ref(PermissionSchema)),
     404: Type.Object({
       error: Type.String({ enum: ["player-not-found"] })
     })
@@ -129,6 +131,14 @@ export type PlayerPermissionsBodySchema = Static<
 >
 
 // Remove Permissions
+
+const PlayerRemovePermissionsBodySchema = Type.Object({
+  permissions: Type.Array(Type.String())
+})
+
+export type PlayerRemovePermissionsBodySchema = Static<
+  typeof PlayerRemovePermissionsBodySchema
+>
 
 export const PlayerRemovePermissionsSchema: FastifySchema = {
   tags: ["players"],

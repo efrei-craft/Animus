@@ -18,10 +18,12 @@ import {
   PlayerPermissionGroupBodySchema,
   PlayerPermissionsBodySchema,
   PlayerRemovePermissionGroupSchema,
+  PlayerRemovePermissionsBodySchema,
   PlayerRemovePermissionsSchema,
   PlayerSetPermissionGroupSchema
 } from "./schemas/Player.schema"
 import { HasSchemaScope } from "../decorators/HasSchemaScope"
+import { Permission } from "@prisma/client"
 
 @Controller({ route: "/players" })
 export default class PlayerController {
@@ -140,9 +142,18 @@ export default class PlayerController {
     }>,
     reply: FastifyReply
   ) {
+    const permissions: Partial<Permission>[] = req.body.permissions.map(
+      (permission) => ({
+        name: permission.name,
+        expires: permission.expires
+          ? new Date(permission.expires as string)
+          : null,
+        serverTypes: permission.serverTypes
+      })
+    )
     const addedPermissions = await this.playerService.addPermissions(
       req.params.uuid,
-      req.body.permissions
+      permissions
     )
     return reply.code(200).send(addedPermissions)
   }
@@ -158,7 +169,7 @@ export default class PlayerController {
   async removePermissions(
     req: RequestWithKey<{
       Params: PlayerInfoParamsSchema
-      Body: PlayerPermissionsBodySchema
+      Body: PlayerRemovePermissionsBodySchema
     }>,
     reply: FastifyReply
   ) {

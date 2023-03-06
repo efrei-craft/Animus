@@ -1,5 +1,5 @@
 import { Type } from "@sinclair/typebox"
-import PermissionSchema from "./Permission.schema"
+import PermissionSchema from "./PermissionInput.schema"
 
 export default Type.Object(
   {

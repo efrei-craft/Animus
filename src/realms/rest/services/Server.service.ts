@@ -95,9 +95,7 @@ export default class ServerService {
       select: this.ServerPublicSelect
     })
 
-    console.log(servers)
     servers = servers.map((server) => removeNullUndefined(server))
-    console.log(servers)
     return servers
   }
 
