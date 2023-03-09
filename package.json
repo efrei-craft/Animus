@@ -11,6 +11,7 @@
     "docker:restart-db-consumers": "docker-compose restart rest && docker-compose restart worker",
     "prisma:dev:migrate": "cross-env DATABASE_URL=postgresql://postgres:postgres@localhost:5432/postgres prisma migrate dev && npm run docker:restart-db-consumers",
     "prisma:dev:seed": "cross-env DATABASE_URL=postgresql://postgres:postgres@localhost:5432/postgres prisma db seed",
+    "prisma:dev:apply": "cross-env DATABASE_URL=postgresql://postgres:postgres@localhost:5432/postgres prisma migrate deploy",
     "lint": "eslint --ext .js,.ts .",
     "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\""
   },

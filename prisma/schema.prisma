@@ -93,7 +93,8 @@ model Punishment {
 // Permission related models
 
 model PermGroup {
-  name        String       @id @default("Unnamed group")
+  id          Int          @id @default(autoincrement())
+  name        String       @unique @default("Unnamed group")
   permissions Permission[] @relation("groupHasPermission")
 
   prefix String  @default("")
@@ -104,8 +105,8 @@ model PermGroup {
 
   defaultGroup Boolean @default(false)
 
-  parentGroup     PermGroup? @relation("groupHasParent", fields: [parentGroupName], references: [name])
-  parentGroupName String?
+  parentGroup   PermGroup? @relation("groupHasParent", fields: [parentGroupId], references: [id])
+  parentGroupId Int?
 
   childGroups PermGroup[] @relation("groupHasParent")
 
@@ -121,8 +122,8 @@ model Permission {
   player     Player? @relation("playerHasPermission", fields: [playerUuid], references: [uuid])
   playerUuid String?
 
-  group     PermGroup? @relation("groupHasPermission", fields: [groupName], references: [name])
-  groupName String?
+  group   PermGroup? @relation("groupHasPermission", fields: [groupId], references: [id])
+  groupId Int?
 }
 
 // Game related models

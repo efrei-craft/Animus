@@ -215,6 +215,17 @@ async function loadGroups() {
   })
 
   await prisma.permGroup.upsert({
+    where: { name: "WEI"},
+    update: {},
+    create: {
+      name: "WEI",
+      prefix: "&6&lWEI ",
+      color: "&6",
+      priority: 1
+    }
+  })
+
+  await prisma.permGroup.upsert({
     where: { name: "Beta Tester" },
     update: {},
     create: {
@@ -259,6 +270,17 @@ async function loadGroups() {
   })
 
   await prisma.permGroup.upsert({
+    where: { name: "Resp. 1P" },
+    update: {},
+    create: {
+      name: "Resp. 1P",
+      prefix: "&9&lResp. 1P ",
+      color: "&9",
+      priority: 6
+    }
+  })
+
+  const be = await prisma.permGroup.upsert({
     where: { name: "Bureau étendu" },
     update: {},
     create: {
@@ -266,10 +288,13 @@ async function loadGroups() {
       prefix: "&c&l",
       color: "&c",
       priority: 7
+    },
+    select: {
+      id: true
     }
   })
 
-  await prisma.permGroup.upsert({
+  const br = await prisma.permGroup.upsert({
     where: { name: "Bureau restreint" },
     update: {},
     create: {
@@ -277,6 +302,9 @@ async function loadGroups() {
       prefix: "&4&l",
       color: "&4",
       priority: 8
+    },
+    select: {
+      id: true
     }
   })
 
@@ -288,7 +316,7 @@ async function loadGroups() {
       prefix: "&c&lResp. Dev ",
       color: "&c",
       priority: 9,
-      parentGroupName: "Bureau étendu"
+      parentGroupId: be.id
     }
   })
 
@@ -300,7 +328,7 @@ async function loadGroups() {
       prefix: "&c&lResp. Design ",
       color: "&c",
       priority: 10,
-      parentGroupName: "Bureau étendu"
+      parentGroupId: be.id
     }
   })
 
@@ -312,7 +340,7 @@ async function loadGroups() {
       prefix: "&c&lResp. Build ",
       color: "&c",
       priority: 11,
-      parentGroupName: "Bureau étendu"
+      parentGroupId: be.id
     }
   })
 
@@ -324,7 +352,7 @@ async function loadGroups() {
       prefix: "&4&lSecrétaire ",
       color: "&4",
       priority: 12,
-      parentGroupName: "Bureau restreint"
+      parentGroupId: br.id
     }
   })
 
@@ -336,7 +364,7 @@ async function loadGroups() {
       prefix: "&4&lTrésorier ",
       color: "&4",
       priority: 13,
-      parentGroupName: "Bureau restreint"
+      parentGroupId: br.id
     }
   })
 
@@ -348,7 +376,7 @@ async function loadGroups() {
       prefix: "&4&lVice-Président ",
       color: "&4",
       priority: 14,
-      parentGroupName: "Bureau restreint"
+      parentGroupId: br.id
     }
   })
 
@@ -360,20 +388,10 @@ async function loadGroups() {
       prefix: "&4&lPrésident ",
       color: "&4",
       priority: 15,
-      parentGroupName: "Bureau restreint"
+      parentGroupId: br.id
     }
   })
 
-  await prisma.permGroup.upsert({
-    where: { name: "Resp. 1P" },
-    update: {},
-    create: {
-      name: "Resp. 1P",
-      prefix: "&9&lResp. 1P ",
-      color: "&9",
-      priority: 6
-    }
-  })
 }
 
 async function main() {

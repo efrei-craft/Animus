@@ -1,8 +1,10 @@
-import { Controller, GET, POST } from "fastify-decorators"
+import { Controller, DELETE, GET, POST } from "fastify-decorators"
 import { HasApiKey, RequestWithKey } from "../../helpers/decorators/HasApiKey"
 import {
   CreateGroupBodySchema,
   CreateGroupSchema,
+  DeleteGroupSchema,
+  DeleteGroupSchemaParams,
   GetGroupSchema
 } from "../schemas/Permissions.schema"
 import { FastifyReply } from "fastify"
@@ -40,5 +42,18 @@ export default class PermissionsController {
   async getGroups(req: RequestWithKey, reply: FastifyReply) {
     const groups = await this.permissionsService.getGroups()
     return reply.code(200).send(groups)
+  }
+
+  @DELETE({
+    url: "/groups/:id",
+    options: {
+      schema: DeleteGroupSchema
+    }
+  })
+  @HasApiKey()
+  @HasSchemaScope()
+  async deleteGroup(req: RequestWithKey<{Params: DeleteGroupSchemaParams}>, reply: FastifyReply) {
+    await this.permissionsService.deleteGroup(req.params.id)
+    return reply.code(200).send({})
   }
 }

@@ -42,3 +42,27 @@ export const GetGroupSchema: FastifySchema = {
     200: Type.Array(Type.Ref(PermGroupSchema))
   }
 }
+
+const DeleteGroupSchemaParams = Type.Object({
+  id: Type.Integer({
+    description: "ID of the group"
+  })
+})
+
+export type DeleteGroupSchemaParams = Static<typeof DeleteGroupSchemaParams>
+
+
+export const DeleteGroupSchema: FastifySchema = {
+  tags: ["permissions"],
+  summary: "Deletes a permission group",
+  operationId: "deleteGroup",
+  security: [
+    {
+      apiKey: [ApiScope.GROUPS]
+    }
+  ],
+  params: DeleteGroupSchemaParams,
+  response: {
+    200: Type.Object({})
+  }
+}

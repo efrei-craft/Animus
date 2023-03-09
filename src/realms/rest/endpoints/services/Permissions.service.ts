@@ -10,6 +10,7 @@ export default class PermissionsService {
    * @private
    */
   private PermGroupPublicSelect: Prisma.PermGroupSelect = {
+    id: true,
     name: true,
     prefix: true,
     color: true,
@@ -21,7 +22,7 @@ export default class PermissionsService {
     },
     priority: true,
     defaultGroup: true,
-    parentGroupName: true
+    parentGroupId: true
   }
 
   async createGroup(group: CreateGroupBodySchema): Promise<Partial<PermGroup>> {
@@ -36,6 +37,12 @@ export default class PermissionsService {
   async getGroups(): Promise<Partial<PermGroup>[]> {
     return prisma.permGroup.findMany({
       select: this.PermGroupPublicSelect
+    })
+  }
+
+  async deleteGroup(groupId: number) {
+    return prisma.permGroup.delete({
+      where: {id: groupId}
     })
   }
 }

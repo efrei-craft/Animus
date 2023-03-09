@@ -3,7 +3,7 @@ import PermGroupSchema from "./PermGroup.schema"
 
 const PermGroupPlayer = Type.Omit(PermGroupSchema, [
   "permissions",
-  "parentGroupName",
+  "parentGroupId",
   "defaultGroup"
 ])
 PermGroupPlayer.$id = "PermGroupPlayer"
