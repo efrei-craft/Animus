@@ -138,6 +138,8 @@ model Game {
   name  String @id
   color String @default("&7")
 
+  displayName String? @default("Unnamed game")
+
   menuMaterial    String
   menuDescription String @default("No description")
   menuOrder       Int    @default(0)

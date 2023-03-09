@@ -174,7 +174,11 @@ export default class ServerService {
     let game: { name: string }
 
     newGameServer.gameName =
-      newGameServer.gameName.length > 0 ? newGameServer.gameName : null
+      newGameServer.gameName && newGameServer.gameName.length > 0
+        ? newGameServer.gameName
+        : null
+
+    console.log(newGameServer.gameName)
 
     if (newGameServer.gameName !== null) {
       game = await prisma.game.findFirst({
@@ -201,8 +205,11 @@ export default class ServerService {
         data: {
           gameServer: {
             create: {
-              gameName: game.name,
-              status: GameStatus[newGameServer.status]
+              gameName: newGameServer.gameName || undefined,
+              status:
+                newGameServer.status !== null
+                  ? GameStatus[newGameServer.status]
+                  : undefined
             }
           }
         },
@@ -223,7 +230,7 @@ export default class ServerService {
           serverName: serverId
         },
         data: {
-          gameName: newGameServer.gameName !== null ? game.name : null,
+          gameName: newGameServer.gameName || undefined,
           status:
             newGameServer.status !== null
               ? GameStatus[newGameServer.status]

@@ -4,6 +4,7 @@ import { resolve } from "path"
 import * as fs from "fs"
 import docker from "../../clients/Docker"
 import { WorkerMethod } from "./types"
+import { PlayerQueueManager } from "./player-queues"
 
 export class AnimusWorker {
   private logger: Consola
@@ -125,6 +126,12 @@ export class AnimusWorker {
     })
   }
 
+  private async initPlayerQueues() {
+    const playerQueueHandler = new PlayerQueueManager()
+    await playerQueueHandler.initHandlers()
+    await playerQueueHandler.intervalQueueHandler()
+  }
+
   public async start() {
     if (this.workerRegistered) {
       throw new Error("Worker already registered")
@@ -133,6 +140,8 @@ export class AnimusWorker {
     await this.initDockerEvents()
     await this.registerWorkerMethods()
     this.getLogger().ready(`Worker now listening for Redis queue events...`)
+
+    await this.initPlayerQueues()
 
     while (true) {
       await this.handleQueues()

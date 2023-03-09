@@ -76,9 +76,11 @@ export const ServerReadySchema: FastifySchema = {
 }
 
 const UpdateGameServerBodySchema = Type.Object({
-  gameName: Type.String({
-    description: "The game to set the server to"
-  }),
+  gameName: Type.Optional(
+    Type.String({
+      description: "The game to set the server to"
+    })
+  ),
   status: Type.String({
     description: "The status to set the server to",
     enum: Object.keys(GameStatus)

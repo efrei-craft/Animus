@@ -39,6 +39,17 @@ export const method: WorkerMethod = {
 
     const serverName = serverNameGenerator(template.name)
 
+    await prisma.server.create({
+      data: {
+        name: serverName,
+        template: {
+          connect: {
+            name: template.name
+          }
+        }
+      }
+    })
+
     await docker.createContainer({
       name: serverName,
       Hostname: serverName,
@@ -73,17 +84,14 @@ export const method: WorkerMethod = {
 
     const inspection = await container.inspect()
 
-    await prisma.server.create({
+    await prisma.server.update({
+      where: {
+        name: serverName
+      },
       data: {
-        name: serverName,
         address:
           inspection.NetworkSettings.Networks[process.env.INFRASTRUCTURE_NAME]
-            .IPAddress,
-        template: {
-          connect: {
-            name: template.name
-          }
-        }
+            .IPAddress
       }
     })
 
@@ -97,6 +105,6 @@ export const method: WorkerMethod = {
       )
   },
   meta: {
-    queueType: "list"
+    queueType: "set"
   }
 }

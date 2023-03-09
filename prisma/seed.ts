@@ -105,13 +105,14 @@ async function loadTemplates() {
 
 async function loadGames() {
   await prisma.game.upsert({
-    where: { name: "Arena" },
+    where: { name: "LudosArena" },
     update: {},
     create: {
-      name: "Arena",
+      name: "LudosArena",
       maxPlayers: 8,
       color: "&c",
       available: true,
+      displayName: "Arena",
       menuDescription:
         "L'équipe avec le plus de kills à la fin du timer gagne !",
       menuMaterial: "IRON_SWORD",
@@ -132,14 +133,15 @@ async function loadGames() {
   })
 
   await prisma.game.upsert({
-    where: { name: "BlockParty" },
+    where: { name: "LudosBlockParty" },
     update: {},
     create: {
-      name: "BlockParty",
+      name: "LudosBlockParty",
       maxPlayers: 10,
       minQueueToStart: 2,
       color: "&b",
       available: true,
+      displayName: "Block Party",
       menuDescription:
         "Tenez-vous sur la bonne couleur au bon moment, sinon vous mourrez !",
       menuMaterial: "WOOL",
@@ -159,15 +161,16 @@ async function loadGames() {
   })
 
   await prisma.game.upsert({
-    where: { name: "Rush" },
+    where: { name: "LudosRush" },
     update: {},
     create: {
-      name: "Rush",
+      name: "LudosRush",
       maxPlayers: 16,
       minQueueToStart: 2,
       menuOrder: 0,
       color: "&5",
       available: true,
+      displayName: "Rush",
       menuDescription:
         "Détruisez le lit de l'équipe adversaire, puis tuez-les pour remporter la victoire !",
       menuMaterial: "BED",
@@ -186,15 +189,16 @@ async function loadGames() {
   })
 
   await prisma.game.upsert({
-    where: { name: "Sumo" },
+    where: { name: "LudosSumo" },
     update: {},
     create: {
-      name: "Sumo",
+      name: "LudosSumo",
       maxPlayers: 2,
       minQueueToStart: 2,
       menuOrder: 3,
       color: "&4",
       available: true,
+      displayName: "Sumo",
       menuDescription:
         "Poussez votre adversaire en dehors du ring pour gagner !",
       menuMaterial: "STICK",
@@ -231,7 +235,7 @@ async function loadGroups() {
     update: {},
     create: {
       name: "Membre",
-      prefix: "&f&l",
+      prefix: "&f&lMembre ",
       color: "&f",
       priority: 1
     }
@@ -242,7 +246,7 @@ async function loadGroups() {
     update: {},
     create: {
       name: "Beta Tester",
-      prefix: "&1&l",
+      prefix: "&1&lBeta Tester ",
       color: "&1",
       priority: 2
     }
@@ -253,7 +257,7 @@ async function loadGroups() {
     update: {},
     create: {
       name: "Designer",
-      prefix: "&e&l",
+      prefix: "&e&lDesigner ",
       color: "&e",
       priority: 3
     }
@@ -264,7 +268,7 @@ async function loadGroups() {
     update: {},
     create: {
       name: "Développeur",
-      prefix: "&5&l",
+      prefix: "&5&lDéveloppeur ",
       color: "&5",
       priority: 4
     }
@@ -275,7 +279,7 @@ async function loadGroups() {
     update: {},
     create: {
       name: "Builder",
-      prefix: "&a&l",
+      prefix: "&a&lBuilder ",
       color: "&a",
       priority: 5
     }
@@ -308,7 +312,7 @@ async function loadGroups() {
     update: {},
     create: {
       name: "Resp. Dev",
-      prefix: "&c&l",
+      prefix: "&c&lResp. Dev ",
       color: "&c",
       priority: 9,
       parentGroupName: "Bureau étendu"
@@ -320,7 +324,7 @@ async function loadGroups() {
     update: {},
     create: {
       name: "Resp. Design",
-      prefix: "&c&l",
+      prefix: "&c&lResp. Design ",
       color: "&c",
       priority: 10,
       parentGroupName: "Bureau étendu"
@@ -332,7 +336,7 @@ async function loadGroups() {
     update: {},
     create: {
       name: "Resp. Build",
-      prefix: "&c&l",
+      prefix: "&c&lResp. Build ",
       color: "&c",
       priority: 11,
       parentGroupName: "Bureau étendu"
@@ -344,7 +348,7 @@ async function loadGroups() {
     update: {},
     create: {
       name: "Secrétaire",
-      prefix: "&4&l",
+      prefix: "&4&lSecrétaire ",
       color: "&4",
       priority: 12,
       parentGroupName: "Bureau restreint"
@@ -356,7 +360,7 @@ async function loadGroups() {
     update: {},
     create: {
       name: "Trésorier",
-      prefix: "&4&l",
+      prefix: "&4&lTrésorier ",
       color: "&4",
       priority: 13,
       parentGroupName: "Bureau restreint"
@@ -368,7 +372,7 @@ async function loadGroups() {
     update: {},
     create: {
       name: "Vice-Président",
-      prefix: "&4&l",
+      prefix: "&4&lVice-Président ",
       color: "&4",
       priority: 14,
       parentGroupName: "Bureau restreint"
@@ -380,7 +384,7 @@ async function loadGroups() {
     update: {},
     create: {
       name: "Président",
-      prefix: "&4&l",
+      prefix: "&4&lPrésident ",
       color: "&4",
       priority: 15,
       parentGroupName: "Bureau restreint"
@@ -392,7 +396,7 @@ async function loadGroups() {
     update: {},
     create: {
       name: "Resp. 1P",
-      prefix: "&9&l",
+      prefix: "&9&lResp. 1P ",
       color: "&9",
       priority: 6
     }
