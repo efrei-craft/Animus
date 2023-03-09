@@ -37,13 +37,7 @@ async function loadTemplates() {
       repository: "docker.nexus.jiveoff.fr/efrei-craft/templates/mini",
       type: ServerType.PAPER,
       autoremove: true,
-      parentTemplates: {
-        connect: [
-          {
-            name: "proxy"
-          }
-        ]
-      }
+      parentTemplateName: "proxy"
     }
   })
 
@@ -54,13 +48,7 @@ async function loadTemplates() {
       name: "mini.dev",
       repository: "dev.efrei-craft/acp/templates/mini",
       type: ServerType.PAPER,
-      parentTemplates: {
-        connect: [
-          {
-            name: "proxy.dev"
-          }
-        ]
-      }
+      parentTemplateName: "proxy.dev"
     }
   })
 
@@ -71,13 +59,7 @@ async function loadTemplates() {
       name: "lobby.dev",
       repository: "dev.efrei-craft/acp/templates/lobby",
       type: ServerType.PAPER,
-      parentTemplates: {
-        connect: [
-          {
-            name: "proxy.dev"
-          }
-        ]
-      }
+      parentTemplateName: "proxy.dev"
     }
   })
 
@@ -89,16 +71,7 @@ async function loadTemplates() {
       repository: "docker.nexus.jiveoff.fr/efrei-craft/templates/lobby",
       type: ServerType.PAPER,
       autoremove: true,
-      parentTemplates: {
-        connect: [
-          {
-            name: "proxy"
-          },
-          {
-            name: "proxy.dev"
-          }
-        ]
-      }
+      parentTemplateName: "proxy"
     }
   })
 }

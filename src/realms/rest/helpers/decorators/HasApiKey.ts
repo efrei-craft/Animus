@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify"
 import { RouteGenericInterface } from "fastify/types/route"
-import { ApiKey, fetchApiKey } from "../helpers/Auth"
+import { ApiKey, fetchApiKey } from "../Auth"
 
 export type RequestWithKey<
   RouteGeneric extends RouteGenericInterface = object

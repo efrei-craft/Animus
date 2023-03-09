@@ -1,8 +1,8 @@
 import { Controller, GET } from "fastify-decorators"
 import GamesService from "../services/Games.service"
-import { AvailableGamesSchema } from "./schemas/Games.schema"
-import { HasApiKey, RequestWithKey } from "../decorators/HasApiKey"
-import { HasSchemaScope } from "../decorators/HasSchemaScope"
+import { AvailableGamesSchema } from "../schemas/Games.schema"
+import { HasApiKey, RequestWithKey } from "../../helpers/decorators/HasApiKey"
+import { HasSchemaScope } from "../../helpers/decorators/HasSchemaScope"
 import { FastifyReply } from "fastify"
 
 @Controller({ route: "/games" })

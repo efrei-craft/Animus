@@ -1,6 +1,6 @@
 import { QueueHandler } from "./index"
 import prisma from "../../../clients/Prisma"
-import { GameStatus, ServerType } from "@prisma/client"
+import { GameStatus } from "@prisma/client"
 import RedisClient from "../../../clients/Redis"
 import { AnimusWorker } from "../index"
 
@@ -21,7 +21,7 @@ type GameData = {
   maxPlayers: number
   templates: Array<{
     name: string
-    parentTemplates: Array<{ name: string }>
+    parentTemplate: { name: string }
     servers: Array<ServerData>
   }>
 }
@@ -83,6 +83,17 @@ const dispatchPlayersInServer = async (
   await RedisClient.getInstance().publishToPlugin(
     parent,
     "Vicarius",
+    "sendMessage",
+    "QUEUE",
+    "&7Un serveur a été &atrouvé&7 ! &7Transfert sur &a" +
+      server.name +
+      "&7...",
+    dispatchedPlayers.join(",")
+  )
+
+  await RedisClient.getInstance().publishToPlugin(
+    parent,
+    "Vicarius",
     "transferPlayers",
     server.name,
     dispatchedPlayers.join(",")
@@ -123,7 +134,7 @@ const getBestServer = (
   return server.sort((a, b) => a.players.length - b.players.length)[0]
 }
 
-const GamesQueue: QueueHandler = {
+const GamesQueue: Partial<QueueHandler> = {
   pattern: "games:queue:*",
   handle: async (data: Map<string, string[]>): Promise<void> => {
     const keysArray = Array.from(data.keys()).map((key) =>
@@ -140,10 +151,14 @@ const GamesQueue: QueueHandler = {
         name: true,
         minQueueToStart: true,
         maxPlayers: true,
+        displayName: true,
+        color: true,
         templates: {
           select: {
             name: true,
-            parentTemplates: {
+            minimumServers: true,
+            maximumServers: true,
+            parentTemplate: {
               select: {
                 name: true,
                 type: true
@@ -193,10 +208,8 @@ const GamesQueue: QueueHandler = {
       const groupByTemplate: Map<string, string[]> = new Map()
       for (const item of value) {
         const [parentTemplateName, uuid] = item.split(":")
-        const template = game.templates.find((template) =>
-          template.parentTemplates.find(
-            (parent) => parent.name === parentTemplateName
-          )
+        const template = game.templates.find(
+          (template) => template.parentTemplate.name === parentTemplateName
         )
         if (template) {
           if (groupByTemplate.has(template.name)) {
@@ -211,11 +224,9 @@ const GamesQueue: QueueHandler = {
       }
 
       for (const [templateName, uuids] of groupByTemplate) {
-        const proxyParent = game.templates
-          .find((template) => template.name === templateName)
-          ?.parentTemplates.find(
-            (parent) => parent.type === ServerType.VELOCITY
-          )
+        const proxyParent = game.templates.find(
+          (template) => template.name === templateName
+        )?.parentTemplate
 
         if (!proxyParent) {
           continue
@@ -290,6 +301,21 @@ const GamesQueue: QueueHandler = {
                 serversToDeploy.set(templateName, 1)
               }
             }
+
+            await RedisClient.getInstance().publishToPlugin(
+              proxyParent.name,
+              "Vicarius",
+              "sendActionBar",
+              "&bFile d'attente " +
+                game.color +
+                game.displayName +
+                " &r &8• &a" +
+                allPlayers.length +
+                "&7/" +
+                game.minQueueToStart +
+                " joueurs &8• &6En attente d'un serveur...",
+              allPlayers.join(",")
+            )
           } else {
             if (
               bestServer !== null &&
@@ -302,6 +328,21 @@ const GamesQueue: QueueHandler = {
                 game,
                 bestServer,
                 uuids
+              )
+            } else {
+              await RedisClient.getInstance().publishToPlugin(
+                proxyParent.name,
+                "Vicarius",
+                "sendActionBar",
+                "&bFile d'attente " +
+                  game.color +
+                  game.displayName +
+                  " &r&8• &c" +
+                  allPlayers.length +
+                  "&7/" +
+                  game.minQueueToStart +
+                  " joueurs &8• &eEn attente de joueurs...",
+                allPlayers.join(",")
               )
             }
           }
@@ -320,12 +361,25 @@ const GamesQueue: QueueHandler = {
       })
 
       for (const [templateName, count] of serversToDeploy) {
-        const serversToCreate =
-          count -
-          servers.filter((server) => server.templateName === templateName)
-            .length
+        const template = game.templates.find(
+          (template) => template.name === templateName
+        )
+        const existingServers = servers.filter(
+          (server) => server.templateName === templateName
+        )
+
+        let serversToCreate
+        if (existingServers.length < template.minimumServers) {
+          serversToCreate = template.minimumServers - existingServers.length
+        }
+        if (existingServers.length > template.maximumServers) {
+          continue
+        }
+        if (count > serversToCreate) {
+          serversToCreate = count - serversToCreate
+        }
+
         for (let i = 0; i < serversToCreate; i++) {
-          console.log("create server")
           await AnimusWorker.getInstance().insertIntoQueue(
             "CreateServer",
             templateName

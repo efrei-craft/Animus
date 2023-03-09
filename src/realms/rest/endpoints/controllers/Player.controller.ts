@@ -1,6 +1,6 @@
 import { Controller, DELETE, GET, PATCH, POST, PUT } from "fastify-decorators"
 import { FastifyReply } from "fastify"
-import { HasApiKey, RequestWithKey } from "../decorators/HasApiKey"
+import { HasApiKey, RequestWithKey } from "../../helpers/decorators/HasApiKey"
 import PlayerService from "../services/Player.service"
 import {
   PlayerAddPermissionGroupSchema,
@@ -21,13 +21,17 @@ import {
   PlayerRemovePermissionsBodySchema,
   PlayerRemovePermissionsSchema,
   PlayerSetPermissionGroupSchema
-} from "./schemas/Player.schema"
-import { HasSchemaScope } from "../decorators/HasSchemaScope"
+} from "../schemas/Player.schema"
+import { HasSchemaScope } from "../../helpers/decorators/HasSchemaScope"
 import { Permission } from "@prisma/client"
+import QueueService from "../services/Queue.service"
 
 @Controller({ route: "/players" })
 export default class PlayerController {
-  constructor(readonly playerService: PlayerService) {}
+  constructor(
+    readonly playerService: PlayerService,
+    readonly queueService: QueueService
+  ) {}
 
   @GET({
     url: "/:uuid",
@@ -83,6 +87,7 @@ export default class PlayerController {
     req: RequestWithKey<{ Params: PlayerInfoParamsSchema }>,
     reply: FastifyReply
   ) {
+    await this.queueService.removePlayerFromGameQueue(req.params.uuid)
     const fetchedPlayer = await this.playerService.disconnectPlayer(
       req.params.uuid
     )

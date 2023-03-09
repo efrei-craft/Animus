@@ -1,5 +1,5 @@
 import { Controller, GET, PATCH, PUT } from "fastify-decorators"
-import { HasApiKey, RequestWithKey } from "../decorators/HasApiKey"
+import { HasApiKey, RequestWithKey } from "../../helpers/decorators/HasApiKey"
 import { FastifyReply } from "fastify"
 import {
   ServerInfoParamsSchema,
@@ -7,12 +7,14 @@ import {
   ServerReadySchema,
   ServersQueryStringSchema,
   ServersSchema,
+  TransferPlayersBodySchema,
+  TransferPlayersSchema,
   UpdateGameServerBodySchema,
   UpdateGameServerSchema
-} from "./schemas/Server.schema"
+} from "../schemas/Server.schema"
 import ServerService from "../services/Server.service"
-import { HasSchemaScope } from "../decorators/HasSchemaScope"
-import { HasTableParams } from "../decorators/HasTableParams"
+import { HasSchemaScope } from "../../helpers/decorators/HasSchemaScope"
+import { HasTableParams } from "../../helpers/decorators/HasTableParams"
 
 @Controller({ route: "/servers" })
 export default class ServerController {
@@ -93,6 +95,28 @@ export default class ServerController {
     const updatedServer = await this.serverService.updateGameServer(
       req.params.serverId,
       req.body
+    )
+    return reply.code(200).send(updatedServer)
+  }
+
+  @PATCH({
+    url: "/:serverId/transfer-players",
+    options: {
+      schema: TransferPlayersSchema
+    }
+  })
+  @HasApiKey()
+  @HasSchemaScope()
+  async transferPlayers(
+    req: RequestWithKey<{
+      Params: ServerInfoParamsSchema
+      Body: TransferPlayersBodySchema
+    }>,
+    reply: FastifyReply
+  ) {
+    const updatedServer = await this.serverService.transferPlayers(
+      req.params.serverId,
+      req.body.playerUuids
     )
     return reply.code(200).send(updatedServer)
   }

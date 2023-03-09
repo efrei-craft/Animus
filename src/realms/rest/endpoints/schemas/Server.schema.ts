@@ -114,3 +114,29 @@ export const UpdateGameServerSchema: FastifySchema = {
     })
   }
 }
+
+// Transfer Players
+
+const TransferPlayersBodySchema = Type.Object({
+  playerUuids: Type.Array(Type.String(), {
+    description: "The players to transfer (UUIDs)"
+  })
+})
+
+export type TransferPlayersBodySchema = Static<typeof TransferPlayersBodySchema>
+
+export const TransferPlayersSchema: FastifySchema = {
+  tags: ["servers"],
+  summary: "Transfers players to another server",
+  operationId: "transferPlayers",
+  security: [
+    {
+      apiKey: [ApiScope.SERVER]
+    }
+  ],
+  params: ServerInfoParamsSchema,
+  body: TransferPlayersBodySchema,
+  response: {
+    200: Type.Object({})
+  }
+}

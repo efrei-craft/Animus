@@ -3,7 +3,7 @@ import {
   CreateAPIKeyBodySchema,
   CreateAPIKeySchema,
   HelloSchema
-} from "./schemas/Misc.schema"
+} from "../schemas/Misc.schema"
 import { FastifyReply, FastifyRequest } from "fastify"
 import MiscService from "../services/Misc.service"
 

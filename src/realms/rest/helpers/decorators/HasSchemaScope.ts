@@ -1,7 +1,7 @@
-import {hasAuthorization} from "../helpers/Auth"
-import {RequestWithKey} from "./HasApiKey"
-import {FastifyReply} from "fastify"
-import {ApiScope} from "@prisma/client"
+import { hasAuthorization } from "../Auth"
+import { RequestWithKey } from "./HasApiKey"
+import { FastifyReply } from "fastify"
+import { ApiScope } from "@prisma/client"
 
 /**
  * Decorator to check if the bearer token has the required scope.<br/>

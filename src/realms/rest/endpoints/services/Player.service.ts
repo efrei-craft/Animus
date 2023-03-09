@@ -1,7 +1,7 @@
-import prisma from "../../../clients/Prisma"
+import prisma from "../../../../clients/Prisma"
 import { ChatChannels, Permission, Player, Prisma } from "@prisma/client"
 import { Service } from "fastify-decorators"
-import { ApiError } from "../helpers/Error"
+import { ApiError } from "../../helpers/Error"
 
 @Service()
 export default class PlayerService {
@@ -129,6 +129,15 @@ export default class PlayerService {
         },
         data: {
           serverName: serverId
+        }
+      })
+
+      await prisma.server.update({
+        where: {
+          name: serverId
+        },
+        data: {
+          lastPlayerUpdate: new Date()
         }
       })
     } catch (e) {

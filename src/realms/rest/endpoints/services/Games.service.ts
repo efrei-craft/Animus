@@ -1,5 +1,5 @@
 import { Service } from "fastify-decorators"
-import prisma from "../../../clients/Prisma"
+import prisma from "../../../../clients/Prisma"
 import { Game, Prisma } from "@prisma/client"
 
 @Service()
@@ -10,6 +10,7 @@ export default class GamesService {
    */
   public static GamePublicSelect: Prisma.GameSelect = {
     name: true,
+    displayName: true,
     color: true,
     menuMaterial: true,
     menuDescription: true,

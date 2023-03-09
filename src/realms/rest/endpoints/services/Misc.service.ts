@@ -1,7 +1,7 @@
 import { Service } from "fastify-decorators"
 import { ApiKey, ApiScope } from "@prisma/client"
-import prisma from "../../../clients/Prisma"
-import { ApiError } from "../helpers/Error"
+import prisma from "../../../../clients/Prisma"
+import { ApiError } from "../../helpers/Error"
 
 @Service()
 export default class MiscService {

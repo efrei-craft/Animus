@@ -44,7 +44,7 @@ export class AnimusRestServer {
     })
 
     this.getServer().register(bootstrap, {
-      directory: resolve(__dirname, `controllers`),
+      directory: resolve(__dirname, `endpoints/controllers`),
       mask: /\.controller\./
     })
 

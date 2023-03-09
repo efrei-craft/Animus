@@ -6,11 +6,11 @@ import {
   Server,
   ServerType
 } from "@prisma/client"
-import prisma from "../../../clients/Prisma"
-import { ApiError } from "../helpers/Error"
-import RedisClient from "../../../clients/Redis"
-import { UpdateGameServerBodySchema } from "../controllers/schemas/Server.schema"
-import { removeNullUndefined } from "../helpers/NullUndefinedRemover"
+import prisma from "../../../../clients/Prisma"
+import { ApiError } from "../../helpers/Error"
+import RedisClient from "../../../../clients/Redis"
+import { UpdateGameServerBodySchema } from "../schemas/Server.schema"
+import { removeNullUndefined } from "../../helpers/NullUndefinedRemover"
 import PlayerService from "./Player.service"
 import GamesService from "./Games.service"
 
@@ -49,7 +49,7 @@ export default class ServerService {
       }
     },
     permissionToJoin: true,
-    lastHeartbeat: true
+    lastPlayerUpdate: true
   }
 
   async fetchServer(name: string): Promise<Partial<Server>> {
@@ -83,12 +83,8 @@ export default class ServerService {
             in: hasTemplate,
             notIn: hasNotTemplate
           },
-          parentTemplates: {
-            some: {
-              name: {
-                in: deployedUnder
-              }
-            }
+          parentTemplateName: {
+            in: deployedUnder
           }
         }
       },
@@ -111,7 +107,7 @@ export default class ServerService {
             name: true,
             type: true,
             repository: true,
-            parentTemplates: {
+            parentTemplate: {
               select: {
                 name: true
               }
@@ -141,14 +137,12 @@ export default class ServerService {
     server.ready = true
 
     if (server.template.type !== ServerType.VELOCITY) {
-      for (const parentTemplate of server.template.parentTemplates) {
-        await RedisClient.getInstance().publishToPlugin(
-          parentTemplate.name,
-          "Vicarius",
-          "addServer",
-          name
-        )
-      }
+      await RedisClient.getInstance().publishToPlugin(
+        server.template.parentTemplate.name,
+        "Vicarius",
+        "addServer",
+        name
+      )
     }
 
     return removeNullUndefined(server)
@@ -244,5 +238,43 @@ export default class ServerService {
     }
 
     return result
+  }
+
+  /**
+   * Transfer players to another server
+   * @param serverId The server's ID
+   * @param uuids The players' UUIDs
+   */
+  async transferPlayers(serverId: string, uuids: string[]): Promise<void> {
+    const server = await prisma.server.findUnique({
+      where: {
+        name: serverId
+      },
+      select: {
+        name: true,
+        template: {
+          select: {
+            name: true,
+            parentTemplate: {
+              select: {
+                name: true
+              }
+            }
+          }
+        }
+      }
+    })
+
+    if (!server) {
+      throw new ApiError("server-not-found", 404)
+    }
+
+    await RedisClient.getInstance().publishToPlugin(
+      server.template.parentTemplate.name,
+      "Vicarius",
+      "transferPlayers",
+      server.name,
+      uuids.join(",")
+    )
   }
 }

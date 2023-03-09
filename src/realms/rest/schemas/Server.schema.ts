@@ -31,8 +31,8 @@ export default Type.Object(
       description: "Whether the server is permanent",
       default: false
     }),
-    lastHeartbeat: Type.String({
-      description: "The server's last heartbeat (ISO 8601)",
+    lastPlayerUpdate: Type.String({
+      description: "The server's last player update (ISO 8601)",
       default: new Date().toISOString()
     }),
     createdAt: Type.String({

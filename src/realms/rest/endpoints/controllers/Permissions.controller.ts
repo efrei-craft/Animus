@@ -1,12 +1,12 @@
 import { Controller, GET, POST } from "fastify-decorators"
-import { HasApiKey, RequestWithKey } from "../decorators/HasApiKey"
+import { HasApiKey, RequestWithKey } from "../../helpers/decorators/HasApiKey"
 import {
   CreateGroupBodySchema,
   CreateGroupSchema,
   GetGroupSchema
-} from "./schemas/Permissions.schema"
+} from "../schemas/Permissions.schema"
 import { FastifyReply } from "fastify"
-import { HasSchemaScope } from "../decorators/HasSchemaScope"
+import { HasSchemaScope } from "../../helpers/decorators/HasSchemaScope"
 import PermissionsService from "../services/Permissions.service"
 
 @Controller({ route: "/permissions" })

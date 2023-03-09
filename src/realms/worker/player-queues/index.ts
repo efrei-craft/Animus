@@ -4,6 +4,8 @@ import RedisClient from "../../../clients/Redis"
 import { AnimusWorker } from "../index"
 
 type QueueHandler = {
+  name: string
+
   pattern: string
 
   /**
@@ -29,22 +31,57 @@ class PlayerQueueManager {
 
       // handlers are classes, so we need to import them
       const handlerName = handler.split(".")[0]
-      const handlerContent: QueueHandler = (await import(`./${handler}`))
-        .default
+      const handlerContent: Partial<QueueHandler> = (
+        await import(`./${handler}`)
+      ).default
 
-      this.queueHandlers = [...this.queueHandlers, handlerContent]
+      this.queueHandlers = [
+        ...this.queueHandlers,
+        {
+          name: handlerName,
+          ...handlerContent
+        } as QueueHandler
+      ]
 
       AnimusWorker.getInstance()
         .getLogger()
         .debug(`Registered ${handlerName} player queue handler`)
+
+      await RedisClient.getInstance().client.sadd(
+        "handlers:player-queues",
+        handlerName
+      )
     }
+
     AnimusWorker.getInstance()
       .getLogger()
       .success(`Registered ${this.queueHandlers.length} player queue handlers`)
   }
 
   private async handleQueues() {
-    for (const queueHandler of this.queueHandlers) {
+    const handlersToCheck = await RedisClient.getInstance().client.smembers(
+      "handlers:player-queues"
+    )
+    for (const handler of handlersToCheck) {
+      if (handler === "") {
+        continue
+      }
+
+      const queueHandler = this.queueHandlers.find((qh) => qh.name === handler)
+      if (!queueHandler) {
+        AnimusWorker.getInstance()
+          .getLogger()
+          .error(
+            `Handler ${handler} is registered but not found in the handlers array`
+          )
+        continue
+      }
+
+      await RedisClient.getInstance().client.srem(
+        "handlers:player-queues",
+        handler
+      )
+
       const keys = await RedisClient.getInstance().client.keys(
         queueHandler.pattern
       )
@@ -64,13 +101,19 @@ class PlayerQueueManager {
         }
       }
       await queueHandler.handle(data)
+
+      await RedisClient.getInstance().client.sadd(
+        "handlers:player-queues",
+        handler
+      )
     }
   }
 
   public intervalQueueHandler() {
+    const interval = Math.floor(Math.random() * 1000) + 1000
     setInterval(() => {
       this.handleQueues()
-    }, 1000)
+    }, interval)
   }
 }
 

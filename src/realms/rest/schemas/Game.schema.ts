@@ -6,6 +6,9 @@ export default Type.Object(
     name: Type.String({
       description: "The name of the game"
     }),
+    displayName: Type.String({
+      description: "The display name of the game"
+    }),
     color: Type.String({
       description: "The color of the game (amp color code)"
     }),

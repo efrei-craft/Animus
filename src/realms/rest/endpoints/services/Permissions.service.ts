@@ -1,6 +1,6 @@
 import { Service } from "fastify-decorators"
-import { CreateGroupBodySchema } from "../controllers/schemas/Permissions.schema"
-import prisma from "../../../clients/Prisma"
+import { CreateGroupBodySchema } from "../schemas/Permissions.schema"
+import prisma from "../../../../clients/Prisma"
 import { PermGroup, Prisma } from "@prisma/client"
 
 @Service()

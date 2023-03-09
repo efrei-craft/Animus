@@ -174,11 +174,16 @@ model Template {
 
   autoremove Boolean @default(false)
 
-  parentTemplates Template[] @relation("parentTemplates")
-  childTemplates  Template[] @relation("parentTemplates")
+  parentTemplate     Template? @relation("parentTemplates", fields: [parentTemplateName], references: [name])
+  parentTemplateName String?
+
+  childTemplates Template[] @relation("parentTemplates")
 
   games   Game[]
   servers Server[]
+
+  minimumServers Int  @default(0)
+  maximumServers Int?
 }
 
 model Server {
@@ -196,7 +201,7 @@ model Server {
   ready     Boolean @default(false)
   permanent Boolean @default(false)
 
-  lastHeartbeat DateTime @default(now())
+  lastPlayerUpdate DateTime @default(now())
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
