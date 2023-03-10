@@ -1,11 +1,13 @@
 import { Type } from "@sinclair/typebox"
 import { ChatChannels } from "@prisma/client"
 import PermGroupPlayer from "./PermGroupPlayer.schema"
+import PermissionSchema from "./Permission.schema";
 
 export default Type.Object(
   {
     uuid: Type.String({ description: "The player's Minecraft UUID" }),
     username: Type.String({ description: "The player's Minecraft username" }),
+    perms: Type.Array(Type.Ref(PermissionSchema)),
     permGroups: Type.Array(Type.Ref(PermGroupPlayer)),
     discordUserId: Type.Optional(
       Type.String({ description: "The player's Discord user ID" })
