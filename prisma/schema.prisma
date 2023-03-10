@@ -33,9 +33,6 @@ model Player {
 
   chatChannel ChatChannels @default(SERVER)
 
-  discordUser   DiscordUser? @relation(fields: [discordUserId], references: [id])
-  discordUserId String?
-
   lastSeen  DateTime  @default(now())
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
@@ -48,13 +45,17 @@ model Player {
 
   memberOfParty   Party? @relation(fields: [memberOfPartyId], references: [id])
   memberOfPartyId Int?
+
+  member          Member? @relation(fields: [memberDiscordId], references: [discordId])
+  memberDiscordId String? @unique
 }
 
-model DiscordUser {
-  id          String   @id
-  discordId   String
-  discordRole String   @default("Visiteur")
-  Player      Player[]
+model Member {
+  discordId String  @id
+  firstName String?
+  lastName  String?
+  promo     Int?
+  player    Player?
 }
 
 model Party {
