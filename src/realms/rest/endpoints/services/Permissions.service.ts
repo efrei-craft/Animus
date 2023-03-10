@@ -1,7 +1,8 @@
-import { Service } from "fastify-decorators"
-import { CreateGroupBodySchema } from "../schemas/Permissions.schema"
+import {Service} from "fastify-decorators"
+import {CreateGroupBodySchema, UpdateGroupBodyParams} from "../schemas/Permissions.schema"
 import prisma from "../../../../clients/Prisma"
-import { PermGroup, Prisma } from "@prisma/client"
+import {PermGroup, Prisma} from "@prisma/client"
+import {ApiError} from "../../helpers/Error";
 
 @Service()
 export default class PermissionsService {
@@ -38,6 +39,43 @@ export default class PermissionsService {
     return prisma.permGroup.findMany({
       select: this.PermGroupPublicSelect
     })
+  }
+
+  async updateGroup(groupId: number, body: UpdateGroupBodyParams): Promise<Partial<PermGroup>> {
+    const groupData = await prisma.permGroup.findFirst({
+        where: {id: groupId},
+    })
+
+    if (!groupData) throw new ApiError("Group to update not found", 404)
+    if (groupData.defaultGroup) {
+      const defaultGroup = await prisma.permGroup.findFirst({
+        where: {
+            defaultGroup: true,
+        }
+      })
+      if (defaultGroup)
+        if (!body.forceReplace) {
+          throw new ApiError(`${defaultGroup.name} is already default group`, 409)
+        } else {
+          await prisma.permGroup.update({
+              where: {id: defaultGroup.id},
+              data: {
+                defaultGroup: false
+              }
+          })
+        }
+    }
+
+    delete body.forceReplace
+    return prisma.permGroup.update({
+      where: {id: groupId},
+      data: {
+        ...body
+      },
+      select: {
+        ...this.PermGroupPublicSelect
+      }
+    });
   }
 
   async deleteGroup(groupId: number) {

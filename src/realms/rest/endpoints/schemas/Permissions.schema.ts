@@ -9,7 +9,7 @@ const CreateGroupBodySchema = Type.Object({
   color: Type.String(),
   bold: Type.Boolean(),
   defaultGroup: Type.Boolean(),
-  parentGroupName: Type.Optional(Type.String())
+  parentGroupName: Type.Optional(Type.String()),
 })
 
 export const CreateGroupSchema: FastifySchema = {
@@ -42,6 +42,45 @@ export const GetGroupSchema: FastifySchema = {
     200: Type.Array(Type.Ref(PermGroupSchema))
   }
 }
+
+const UpdateGroupSchemaParams = Type.Object({
+    id: Type.Integer({
+      description: "ID of the group"
+    })
+})
+
+const UpdateGroupBodySchema = Type.Object({
+    name: Type.Optional(Type.String()),
+    prefix: Type.Optional(Type.String()),
+    color: Type.Optional(Type.String()),
+    bold: Type.Optional(Type.Boolean()),
+    defaultGroup: Type.Optional(Type.Boolean()),
+    parentGroupName: Type.Optional(Type.String()),
+    forceReplace: Type.Boolean({
+        default: false,
+        description: "If true, replaces the default group if it exists"
+    })
+  }
+)
+
+export const UpdateGroupSchema: FastifySchema = {
+    tags: ["permissions"],
+    summary: "Updates a permission group",
+    operationId: "updateGroup",
+    security: [
+        {
+            apiKey: [ApiScope.GROUPS]
+        }
+    ],
+    params: UpdateGroupSchemaParams,
+    body: UpdateGroupBodySchema,
+    response: {
+        200: Type.Ref(PermGroupSchema)
+    }
+}
+
+export type UpdateGroupSchemaParams = Static<typeof UpdateGroupSchemaParams>
+export type UpdateGroupBodyParams = Static<typeof UpdateGroupBodySchema>
 
 const DeleteGroupSchemaParams = Type.Object({
   id: Type.Integer({
