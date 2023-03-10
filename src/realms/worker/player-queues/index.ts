@@ -25,7 +25,7 @@ class PlayerQueueManager {
   public async initHandlers() {
     const handlers = await fs.promises.readdir(resolve(__dirname))
     for (const handler of handlers) {
-      if (handler === "index.ts") {
+      if (handler === "index.ts" || handler === "index.js") {
         continue
       }
 
