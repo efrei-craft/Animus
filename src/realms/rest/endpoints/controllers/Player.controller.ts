@@ -11,7 +11,7 @@ import {
   PlayerChangeServerBodySchema,
   PlayerChangeServerSchema,
   PlayerConnectBodySchema,
-  PlayerConnectSchema,
+  PlayerConnectSchema, PlayerCreateSchema,
   PlayerDisconnectSchema,
   PlayerGetOnlineSchema,
   PlayerGetPermissionsSchema,
@@ -34,6 +34,18 @@ export default class PlayerController {
     readonly playerService: PlayerService,
     readonly queueService: QueueService
   ) {}
+
+  @POST({
+    url: "",
+    options: {
+      schema: PlayerCreateSchema
+    }
+  })
+  @HasApiKey()
+  @HasSchemaScope()
+  async createPlayer(req: RequestWithKey<{ Body: PlayerConnectBodySchema}>, reply: FastifyReply) {
+    this.playerService.create
+  }
 
   @GET({
     url: "",
