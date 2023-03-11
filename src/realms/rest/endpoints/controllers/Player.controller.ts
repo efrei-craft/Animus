@@ -11,7 +11,9 @@ import {
   PlayerChangeServerBodySchema,
   PlayerChangeServerSchema,
   PlayerConnectBodySchema,
-  PlayerConnectSchema, PlayerCreateSchema,
+  PlayerConnectSchema,
+  PlayerCreateBodySchema,
+  PlayerCreateSchema,
   PlayerDisconnectSchema,
   PlayerGetOnlineSchema,
   PlayerGetPermissionsSchema,
@@ -43,8 +45,12 @@ export default class PlayerController {
   })
   @HasApiKey()
   @HasSchemaScope()
-  async createPlayer(req: RequestWithKey<{ Body: PlayerConnectBodySchema}>, reply: FastifyReply) {
-    this.playerService.create
+  async createPlayer(
+    req: RequestWithKey<{ Body: PlayerCreateBodySchema }>,
+    reply: FastifyReply
+  ) {
+    const createdPlayer = await this.playerService.createPlayer(req.body)
+    return reply.code(200).send(createdPlayer)
   }
 
   @GET({

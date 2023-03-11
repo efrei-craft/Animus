@@ -4,13 +4,12 @@ import PlayerSchema from "../../schemas/Player.schema"
 import { ApiScope, ChatChannels } from "@prisma/client"
 import PermissionSchema from "../../schemas/Permission.schema"
 import PermissionInputSchema from "../../schemas/PermissionInput.schema"
-import PermGroupSchema from "../../schemas/PermGroup.schema"
 
 const PlayerCreateBodySchema = Type.Object({
   memberDiscordId: Type.String(),
   uuid: Type.String(),
   username: Type.String(),
-  permGroups: Type.Array(Type.Ref(PermGroupSchema))
+  permGroups: Type.Array(Type.String())
 })
 
 export type PlayerCreateBodySchema = Static<typeof PlayerCreateBodySchema>
@@ -26,7 +25,7 @@ export const PlayerCreateSchema: FastifySchema = {
   ],
   body: PlayerCreateBodySchema,
   response: {
-    200: Type.Ref(PlayerSchema),
+    200: Type.Ref(PlayerSchema)
   }
 }
 

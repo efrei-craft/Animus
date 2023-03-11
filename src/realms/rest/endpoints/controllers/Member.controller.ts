@@ -6,10 +6,10 @@ import {
   MemberCreateBodySchema,
   MemberCreateSchema,
   MemberGetParamsSchema,
-  MemberGetSchema, MemberRemoveParamsSchema,
+  MemberGetPlayerSchema,
+  MemberGetSchema,
   MemberRemoveSchema,
   MemberUpdateBodySchema,
-  MemberUpdateParamsSchema,
   MemberUpdateSchema
 } from "../schemas/Member.schema"
 import { FastifyReply } from "fastify"
@@ -26,9 +26,12 @@ export default class MemberController {
   })
   @HasApiKey()
   @HasSchemaScope()
-  async createMember(req: RequestWithKey< {
+  async createMember(
+    req: RequestWithKey<{
       Body: MemberCreateBodySchema
-    }>, reply: FastifyReply) {
+    }>,
+    reply: FastifyReply
+  ) {
     const createdMember = await this.memberService.createMember(req.body)
     return reply.code(200).send(createdMember)
   }
@@ -41,9 +44,31 @@ export default class MemberController {
   })
   @HasApiKey()
   @HasSchemaScope()
-  async getMember(req: RequestWithKey<
-    { Params: MemberGetParamsSchema }>, reply: FastifyReply) {
-    const fetchedMember = await this.memberService.getMember(req.params.discordId)
+  async getMember(
+    req: RequestWithKey<{ Params: MemberGetParamsSchema }>,
+    reply: FastifyReply
+  ) {
+    const fetchedMember = await this.memberService.getMember(
+      req.params.discordId
+    )
+    return reply.code(200).send(fetchedMember)
+  }
+
+  @GET({
+    url: "/:discordId/player",
+    options: {
+      schema: MemberGetPlayerSchema
+    }
+  })
+  @HasApiKey()
+  @HasSchemaScope()
+  async getMembersPlayer(
+    req: RequestWithKey<{ Params: MemberGetParamsSchema }>,
+    reply: FastifyReply
+  ) {
+    const fetchedMember = await this.memberService.getMember(
+      req.params.discordId
+    )
     return reply.code(200).send(fetchedMember)
   }
 
@@ -55,11 +80,17 @@ export default class MemberController {
   })
   @HasApiKey()
   @HasSchemaScope()
-  async updateMember(req: RequestWithKey< {
-      Params: MemberUpdateParamsSchema,
+  async updateMember(
+    req: RequestWithKey<{
+      Params: MemberGetParamsSchema
       Body: MemberUpdateBodySchema
-    }>, reply: FastifyReply) {
-    const updatedMember = await this.memberService.updateMember(req.params.discordId, req.body)
+    }>,
+    reply: FastifyReply
+  ) {
+    const updatedMember = await this.memberService.updateMember(
+      req.params.discordId,
+      req.body
+    )
     return reply.code(200).send(updatedMember)
   }
 
@@ -71,11 +102,13 @@ export default class MemberController {
   })
   @HasApiKey()
   @HasSchemaScope()
-  async removePlayer(req: RequestWithKey<
-    { Params: MemberRemoveParamsSchema }>, reply: FastifyReply) {
-    const removedMember = await this.memberService.removeMember(req.params.discordId)
+  async removePlayer(
+    req: RequestWithKey<{ Params: MemberGetParamsSchema }>,
+    reply: FastifyReply
+  ) {
+    const removedMember = await this.memberService.removeMember(
+      req.params.discordId
+    )
     return reply.code(200).send(removedMember)
   }
-
-
 }

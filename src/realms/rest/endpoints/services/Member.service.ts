@@ -1,8 +1,12 @@
 import { Service } from "fastify-decorators"
-import { Member, Prisma } from "@prisma/client"
+import { Member, Player, Prisma } from "@prisma/client"
 import prisma from "../../../../clients/Prisma"
-import { MemberCreateBodySchema, MemberUpdateBodySchema } from "../schemas/Member.schema"
+import {
+  MemberCreateBodySchema,
+  MemberUpdateBodySchema
+} from "../schemas/Member.schema"
 import { ApiError } from "../../helpers/Error"
+import PlayerService from "./Player.service"
 
 @Service()
 export default class MemberService {
@@ -14,7 +18,7 @@ export default class MemberService {
     discordId: true,
     firstName: true,
     lastName: true,
-    promo: true,
+    promo: true
   }
 
   createMember(body: MemberCreateBodySchema): Promise<Partial<Member>> {
@@ -37,7 +41,26 @@ export default class MemberService {
     return result
   }
 
-  async updateMember(discordId: string, body: MemberUpdateBodySchema): Promise<Partial<Member>> {
+  async getMembersPlayer(discordId: string): Promise<Partial<Player>> {
+    const result = await prisma.member.findUnique({
+      where: {
+        discordId: discordId
+      },
+      select: {
+        player: {
+          select: PlayerService.PlayerPublicSelect
+        }
+      }
+    })
+
+    if (!result) throw new ApiError("no-such-member", 404)
+    return result.player
+  }
+
+  async updateMember(
+    discordId: string,
+    body: MemberUpdateBodySchema
+  ): Promise<Partial<Member>> {
     const updated = await prisma.member.update({
       where: {
         discordId: discordId

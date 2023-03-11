@@ -34,7 +34,7 @@ export default class PlayerService {
     },
     serverName: true,
     chatChannel: true,
-    lastSeen: true,
+    lastSeen: true
   }
 
   /**
@@ -60,11 +60,47 @@ export default class PlayerService {
   }
 
   async createPlayer(body: PlayerCreateBodySchema): Promise<Partial<Player>> {
-    return prisma.player.create({
-      data: {
-        ...body,
+    const groupsToAssign = await prisma.permGroup.findMany({
+      where: {
+        name: {
+          in: body.permGroups
+        }
+      },
+      select: {
+        name: true
       }
     })
+
+    const res = await prisma.member.update({
+      where: {
+        discordId: body.memberDiscordId
+      },
+      data: {
+        player: {
+          create: {
+            uuid: body.uuid,
+            username: body.username,
+
+            permGroups: {
+              connect: groupsToAssign.map((group) => {
+                return {
+                  name: group.name
+                }
+              })
+            }
+          }
+        }
+      },
+      select: {
+        player: {
+          select: PlayerService.PlayerPublicSelect
+        }
+      }
+    })
+
+    if (!res.player) throw new ApiError("player-creation-failed", 500)
+
+    return res.player
   }
 
   async fetchAllPlayers(): Promise<Partial<Player>[]> {
@@ -104,7 +140,7 @@ export default class PlayerService {
             }
           })
         } else {
-          return this.createPlayer(uuid, username)
+          throw new ApiError("unknown-player", 500)
         }
       }
       return player
@@ -445,41 +481,6 @@ export default class PlayerService {
         }
       })
     }
-  }
-
-  /**
-   * Creates a new player
-   * @param uuid The player's UUID
-   * @param username The player's username
-   * @return A promise that resolves to the created player
-   */
-  private async createPlayer(
-    uuid: string,
-    username: string
-  ): Promise<Partial<Player>> {
-    const defaultGroups = await prisma.permGroup.findMany({
-      where: {
-        defaultGroup: true
-      },
-      select: {
-        name: true
-      }
-    })
-
-    return prisma.player.create({
-      data: {
-        uuid,
-        username,
-        permGroups: {
-          connect: defaultGroups.map((group) => {
-            return {
-              name: group.name
-            }
-          })
-        }
-      },
-      select: PlayerService.PlayerPublicSelect
-    })
   }
 
   /**
