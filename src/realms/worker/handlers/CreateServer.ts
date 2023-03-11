@@ -77,6 +77,8 @@ export const method: WorkerMethod = {
       AttachStdin: true,
       AttachStdout: true,
       AttachStderr: true,
+      OpenStdin: true,
+      StdinOnce: true,
       HostConfig: {
         NetworkMode: process.env.INFRASTRUCTURE_NAME,
         PortBindings:
