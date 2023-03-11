@@ -121,56 +121,48 @@ export default class PlayerService {
     createOrUpdate: boolean,
     username = ""
   ): Promise<Partial<Player>> {
-    try {
-      const player = await prisma.player.findUnique({
-        where: {
-          uuid: uuid
-        },
-        select: PlayerService.PlayerPublicSelect
-      })
-      if (createOrUpdate) {
-        if (player) {
-          await prisma.player.update({
-            where: {
-              uuid: uuid
-            },
-            data: {
-              lastSeen: new Date(),
-              username
-            }
-          })
-        } else {
-          throw new ApiError("unknown-player", 500)
-        }
-      }
-      return player
-    } catch (e) {
-      throw new ApiError("player-fetch-failed", 500)
-    }
-  }
-
-  async disconnectPlayer(uuid: string): Promise<Partial<Player>> {
-    try {
-      const player = await prisma.player.findUnique({
-        where: {
-          uuid: uuid
-        },
-        select: PlayerService.PlayerPublicSelect
-      })
+    const player = await prisma.player.findUnique({
+      where: {
+        uuid: uuid
+      },
+      select: PlayerService.PlayerPublicSelect
+    })
+    if (createOrUpdate) {
       if (player) {
         await prisma.player.update({
           where: {
             uuid: uuid
           },
           data: {
-            serverName: null
+            lastSeen: new Date(),
+            username
           }
         })
+      } else {
+        throw new ApiError("unknown-player", 404)
       }
-      return player
-    } catch (e) {
-      throw new ApiError("player-fetch-failed", 500)
     }
+    return player
+  }
+
+  async disconnectPlayer(uuid: string): Promise<Partial<Player>> {
+    const player = await prisma.player.findUnique({
+      where: {
+        uuid: uuid
+      },
+      select: PlayerService.PlayerPublicSelect
+    })
+    if (player) {
+      await prisma.player.update({
+        where: {
+          uuid: uuid
+        },
+        data: {
+          serverName: null
+        }
+      })
+    }
+    return player
   }
 
   /**

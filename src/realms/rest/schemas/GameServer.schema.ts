@@ -1,11 +1,10 @@
 import { Type } from "@sinclair/typebox"
 import GameSchema from "./Game.schema"
-import { TypeNullUnion } from "../helpers/TypeNullUnion"
 
 export default Type.Object(
   {
     serverName: Type.String({ description: "The server's name" }),
-    game: TypeNullUnion(Type.Ref(GameSchema)),
+    game: Type.Optional(Type.Ref(GameSchema)),
     requestedGameName: Type.Optional(
       Type.String({ description: "The default game for the server" })
     ),
