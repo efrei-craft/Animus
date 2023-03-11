@@ -1,4 +1,4 @@
-import { Controller, DELETE, GET, PATCH, POST } from "fastify-decorators"
+import { Controller, DELETE, GET, PATCH, POST, PUT } from "fastify-decorators"
 import { HasApiKey, RequestWithKey } from "../../helpers/decorators/HasApiKey"
 import {
   AddGroupPermissionSchema,
@@ -89,7 +89,7 @@ export default class PermissionsController {
     return reply.code(200).send({})
   }
 
-  @POST({
+  @PUT({
     url: "/groups/:id/permissions",
     options: {
       schema: AddGroupPermissionSchema
