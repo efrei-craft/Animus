@@ -82,12 +82,12 @@ enum PunishmentType {
 }
 
 model Punishment {
-  id         Int            @id @default(autoincrement())
-  type       PunishmentType
-  reason     String?
-  punisher   Player?        @relation(fields: [playerUuid], references: [uuid])
-  expires    DateTime?
-  playerUuid String?
+  id           Int            @id @default(autoincrement())
+  type         PunishmentType
+  reason       String?
+  punisher     Player?        @relation(fields: [punisherUuid], references: [uuid])
+  punisherUuid String?
+  expires      DateTime?
 }
 
 // Permission related models

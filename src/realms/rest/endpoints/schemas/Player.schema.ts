@@ -58,6 +58,22 @@ export const PlayerDisconnectSchema: FastifySchema = {
   }
 }
 
+// Get All Players
+
+export const GetAllPlayersSchema: FastifySchema = {
+  tags: ["players"],
+  summary: "Get all players",
+  operationId: "getAllPlayers",
+  security: [
+    {
+      apiKey: [ApiScope.PLAYERS]
+    }
+  ],
+  response: {
+    200: Type.Array(Type.Ref(PlayerSchema))
+  }
+}
+
 // Get Player Info
 
 export const PlayerInfoSchema: FastifySchema = {
@@ -276,5 +292,21 @@ export const PlayerChangeServerSchema: FastifySchema = {
   body: PlayerChangeServerBodySchema,
   response: {
     200: Type.Object({})
+  }
+}
+
+// Get Online Players
+
+export const PlayerGetOnlineSchema: FastifySchema = {
+  tags: ["players"],
+  summary: "Get a list of online players",
+  operationId: "getOnlinePlayers",
+  security: [
+    {
+      apiKey: [ApiScope.PLAYERS]
+    }
+  ],
+  response: {
+    200: Type.Array(Type.Ref(PlayerSchema))
   }
 }

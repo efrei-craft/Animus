@@ -25,12 +25,31 @@ export const method: WorkerMethod = {
         name: true,
         repository: true,
         port: true,
-        type: true
+        type: true,
+        maximumServers: true,
+        _count: {
+          select: {
+            servers: true
+          }
+        }
       }
     })
 
     if (!template) {
-      throw new Error("Template not found")
+      AnimusWorker.getInstance()
+        .getLogger()
+        .error(`Template ${templateName} does not exist.`)
+      return
+    }
+
+    if (
+      template.maximumServers &&
+      template._count.servers >= template.maximumServers
+    ) {
+      AnimusWorker.getInstance()
+        .getLogger()
+        .warn(`Template ${template.name} has reached its maximum server count.`)
+      return
     }
 
     AnimusWorker.getInstance()

@@ -3,6 +3,7 @@ import { FastifyReply } from "fastify"
 import { HasApiKey, RequestWithKey } from "../../helpers/decorators/HasApiKey"
 import PlayerService from "../services/Player.service"
 import {
+  GetAllPlayersSchema,
   PlayerAddPermissionGroupSchema,
   PlayerAddPermissionsSchema,
   PlayerChangeChannelBodySchema,
@@ -12,6 +13,7 @@ import {
   PlayerConnectBodySchema,
   PlayerConnectSchema,
   PlayerDisconnectSchema,
+  PlayerGetOnlineSchema,
   PlayerGetPermissionsSchema,
   PlayerInfoParamsSchema,
   PlayerInfoSchema,
@@ -32,6 +34,19 @@ export default class PlayerController {
     readonly playerService: PlayerService,
     readonly queueService: QueueService
   ) {}
+
+  @GET({
+    url: "",
+    options: {
+      schema: GetAllPlayersSchema
+    }
+  })
+  @HasApiKey()
+  @HasSchemaScope()
+  async getAllPlayers(req: RequestWithKey, reply: FastifyReply) {
+    const fetchedPlayers = await this.playerService.fetchAllPlayers()
+    return reply.code(200).send(fetchedPlayers)
+  }
 
   @GET({
     url: "/:uuid",
@@ -87,7 +102,11 @@ export default class PlayerController {
     req: RequestWithKey<{ Params: PlayerInfoParamsSchema }>,
     reply: FastifyReply
   ) {
-    await this.queueService.removePlayerFromGameQueue(req.params.uuid)
+    try {
+      await this.queueService.removePlayerFromGameQueue(req.params.uuid)
+    } catch (_) {
+      /* empty */
+    }
     const fetchedPlayer = await this.playerService.disconnectPlayer(
       req.params.uuid
     )
@@ -272,5 +291,18 @@ export default class PlayerController {
       req.body.channel
     )
     return reply.code(200).send(changedChannel)
+  }
+
+  @GET({
+    url: "/online",
+    options: {
+      schema: PlayerGetOnlineSchema
+    }
+  })
+  @HasApiKey()
+  @HasSchemaScope()
+  async getOnlinePlayers(req: RequestWithKey, reply: FastifyReply) {
+    const onlinePlayers = await this.playerService.getOnlinePlayers()
+    return reply.code(200).send(onlinePlayers)
   }
 }

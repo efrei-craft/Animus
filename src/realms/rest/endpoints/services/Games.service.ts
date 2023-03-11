@@ -1,6 +1,8 @@
 import { Service } from "fastify-decorators"
 import prisma from "../../../../clients/Prisma"
 import { Game, Prisma } from "@prisma/client"
+import PlayerCountSchema from "../../schemas/PlayerCount.schema"
+import { Static } from "@sinclair/typebox"
 
 @Service()
 export default class GamesService {
@@ -25,7 +27,12 @@ export default class GamesService {
       }
     },
     available: true,
-    permissionToPlay: true
+    permissionToPlay: true,
+    _count: {
+      select: {
+        gameServers: true
+      }
+    }
   }
 
   /**
@@ -41,6 +48,47 @@ export default class GamesService {
         menuOrder: "asc"
       },
       select: GamesService.GamePublicSelect
+    })
+  }
+
+  /**
+   * Get all player counts for all games.
+   * @returns The player counts for all games.
+   */
+  async getGamePlayerCounts(): Promise<
+    Array<Static<typeof PlayerCountSchema>>
+  > {
+    const games = await prisma.game.findMany({
+      where: {
+        available: true
+      },
+      select: {
+        name: true,
+        gameServers: {
+          select: {
+            server: {
+              select: {
+                _count: {
+                  select: {
+                    players: true
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    })
+
+    return games.map((game) => {
+      const playerCount = game.gameServers.reduce(
+        (total, gameServer) => total + gameServer.server._count.players,
+        0
+      )
+      return {
+        name: game.name,
+        online: playerCount
+      }
     })
   }
 }

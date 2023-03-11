@@ -1,11 +1,5 @@
 import { Service } from "fastify-decorators"
-import {
-  GameServer,
-  GameStatus,
-  Prisma,
-  Server,
-  ServerType
-} from "@prisma/client"
+import { GameStatus, Prisma, Server, ServerType } from "@prisma/client"
 import prisma from "../../../../clients/Prisma"
 import { ApiError } from "../../helpers/Error"
 import RedisClient from "../../../../clients/Redis"
@@ -165,79 +159,54 @@ export default class ServerService {
       throw new ApiError("server-not-found", 404)
     }
 
-    let game: { name: string }
-
     newGameServer.gameName =
       newGameServer.gameName && newGameServer.gameName.length > 0
         ? newGameServer.gameName
         : null
 
-    console.log(newGameServer.gameName)
+    newGameServer.requestedGameName =
+      newGameServer.requestedGameName &&
+      newGameServer.requestedGameName.length > 0
+        ? newGameServer.requestedGameName
+        : null
 
-    if (newGameServer.gameName !== null) {
-      game = await prisma.game.findFirst({
-        where: {
-          name: newGameServer.gameName
+    const res = await prisma.server.update({
+      where: {
+        name: serverId
+      },
+      data: {
+        gameServer: {
+          update: {
+            gameName: newGameServer.gameName || undefined,
+            requestedGameName: newGameServer.requestedGameName || undefined,
+            status:
+              newGameServer.status !== null
+                ? GameStatus[newGameServer.status]
+                : undefined
+          },
+          create: {
+            gameName: newGameServer.gameName || undefined,
+            requestedGameName: newGameServer.requestedGameName || undefined,
+            status:
+              newGameServer.status !== null
+                ? GameStatus[newGameServer.status]
+                : undefined
+          }
         },
-        select: {
-          name: true
+        lastPlayerUpdate:
+          newGameServer.requestedGameName !== null ? new Date() : undefined
+      },
+      select: {
+        gameServer: {
+          select: {
+            gameName: true,
+            status: true
+          }
         }
-      })
-
-      if (!game) {
-        throw new ApiError("game-not-found", 404)
       }
-    }
+    })
 
-    let result: Partial<GameServer>
-
-    if (server.gameServer === null) {
-      const res = await prisma.server.update({
-        where: {
-          name: serverId
-        },
-        data: {
-          gameServer: {
-            create: {
-              gameName: newGameServer.gameName || undefined,
-              status:
-                newGameServer.status !== null
-                  ? GameStatus[newGameServer.status]
-                  : undefined
-            }
-          }
-        },
-        select: {
-          gameServer: {
-            select: {
-              gameName: true,
-              status: true
-            }
-          }
-        }
-      })
-
-      result = res.gameServer
-    } else {
-      result = await prisma.gameServer.update({
-        where: {
-          serverName: serverId
-        },
-        data: {
-          gameName: newGameServer.gameName || undefined,
-          status:
-            newGameServer.status !== null
-              ? GameStatus[newGameServer.status]
-              : undefined
-        },
-        select: {
-          gameName: true,
-          status: true
-        }
-      })
-    }
-
-    return result
+    return res.gameServer
   }
 
   /**
@@ -251,13 +220,32 @@ export default class ServerService {
         name: serverId
       },
       select: {
-        name: true,
-        template: {
+        name: true
+      }
+    })
+
+    if (!server && serverId !== "lobby") {
+      throw new ApiError("server-not-found", 404)
+    }
+
+    const players = await prisma.player.findMany({
+      where: {
+        uuid: {
+          in: uuids
+        }
+      },
+      select: {
+        uuid: true,
+        server: {
           select: {
-            name: true,
-            parentTemplate: {
+            template: {
               select: {
-                name: true
+                name: true,
+                parentTemplate: {
+                  select: {
+                    name: true
+                  }
+                }
               }
             }
           }
@@ -265,16 +253,30 @@ export default class ServerService {
       }
     })
 
-    if (!server) {
-      throw new ApiError("server-not-found", 404)
+    const playersGroupedByParentTemplate: Record<string, string[]> = {}
+    for (const player of players) {
+      if (
+        !playersGroupedByParentTemplate[
+          player.server.template.parentTemplate.name
+        ]
+      ) {
+        playersGroupedByParentTemplate[
+          player.server.template.parentTemplate.name
+        ] = []
+      }
+      playersGroupedByParentTemplate[
+        player.server.template.parentTemplate.name
+      ].push(player.uuid)
     }
 
-    await RedisClient.getInstance().publishToPlugin(
-      server.template.parentTemplate.name,
-      "Vicarius",
-      "transferPlayers",
-      server.name,
-      uuids.join(",")
-    )
+    for (const parentTemplateName in playersGroupedByParentTemplate) {
+      await RedisClient.getInstance().publishToPlugin(
+        parentTemplateName,
+        "Vicarius",
+        "transferPlayers",
+        serverId,
+        playersGroupedByParentTemplate[parentTemplateName].join(",")
+      )
+    }
   }
 }

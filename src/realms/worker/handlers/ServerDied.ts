@@ -3,6 +3,7 @@ import prisma from "../../../clients/Prisma"
 import RedisClient from "../../../clients/Redis"
 import docker from "../../../clients/Docker"
 import { AnimusWorker } from "../index"
+import { ServerType } from "@prisma/client"
 
 export const method: WorkerMethod = {
   exec: async (arg: string) => {
@@ -13,6 +14,7 @@ export const method: WorkerMethod = {
       select: {
         template: {
           select: {
+            type: true,
             autoremove: true,
             parentTemplate: {
               select: {
@@ -28,12 +30,14 @@ export const method: WorkerMethod = {
       return
     }
 
-    await RedisClient.getInstance().publishToPlugin(
-      serverTemplate.template.parentTemplate.name,
-      "Vicarius",
-      "removeServer",
-      arg
-    )
+    if (serverTemplate.template.type !== ServerType.VELOCITY) {
+      await RedisClient.getInstance().publishToPlugin(
+        serverTemplate.template.parentTemplate.name,
+        "Vicarius",
+        "removeServer",
+        arg
+      )
+    }
 
     if (serverTemplate?.template.autoremove) {
       try {

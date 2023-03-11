@@ -14,6 +14,7 @@ export default class PlayerService {
     username: true,
     permGroups: {
       select: {
+        id: true,
         name: true,
         prefix: true,
         color: true,
@@ -22,6 +23,12 @@ export default class PlayerService {
       },
       orderBy: {
         priority: "desc"
+      }
+    },
+    perms: {
+      select: {
+        name: true,
+        serverTypes: true
       }
     },
     serverName: true,
@@ -50,6 +57,12 @@ export default class PlayerService {
         }
       ]
     }
+  }
+
+  async fetchAllPlayers(): Promise<Partial<Player>[]> {
+    return prisma.player.findMany({
+      select: PlayerService.PlayerPublicSelect
+    })
   }
 
   /**
@@ -128,21 +141,25 @@ export default class PlayerService {
           uuid: uuid
         },
         data: {
-          serverName: serverId
+          server: {
+            update: {
+              lastPlayerUpdate: new Date()
+            }
+          }
         }
       })
-
-      await prisma.server.update({
-        where: {
-          name: serverId
-        },
-        data: {
-          lastPlayerUpdate: new Date()
-        }
-      })
-    } catch (e) {
-      throw new ApiError("player-fetch-failed", 500)
+    } catch (_) {
+      /* empty */
     }
+
+    await prisma.player.update({
+      where: {
+        uuid: uuid
+      },
+      data: {
+        serverName: serverId
+      }
+    })
   }
 
   /**
@@ -484,6 +501,21 @@ export default class PlayerService {
       data: {
         chatChannel: ChatChannels[channel]
       }
+    })
+  }
+
+  /**
+   * Gets all online players
+   * @return A promise that resolves to an array of online players
+   */
+  async getOnlinePlayers(): Promise<Partial<Player>[]> {
+    return prisma.player.findMany({
+      where: {
+        serverName: {
+          not: null
+        }
+      },
+      select: PlayerService.PlayerPublicSelect
     })
   }
 }

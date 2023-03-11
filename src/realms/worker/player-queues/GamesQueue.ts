@@ -292,7 +292,7 @@ const GamesQueue: Partial<QueueHandler> = {
                 )
               }
             } else {
-              const serversCountToDeploy = Math.floor(
+              const serversCountToDeploy = Math.ceil(
                 uuids.length / game.maxPlayers
               )
               if (serversCountToDeploy > 0) {
@@ -368,15 +368,19 @@ const GamesQueue: Partial<QueueHandler> = {
           (server) => server.templateName === templateName
         )
 
-        let serversToCreate
-        if (existingServers.length < template.minimumServers) {
-          serversToCreate = template.minimumServers - existingServers.length
-        }
-        if (existingServers.length > template.maximumServers) {
+        let serversToCreate = 0
+
+        if (
+          template.maximumServers &&
+          existingServers.length > template.maximumServers
+        ) {
           continue
         }
-        if (count > serversToCreate) {
-          serversToCreate = count - serversToCreate
+
+        if (existingServers.length < count) {
+          serversToCreate = count - existingServers.length
+        } else if (existingServers.length > count) {
+          continue
         }
 
         for (let i = 0; i < serversToCreate; i++) {

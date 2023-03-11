@@ -10,7 +10,9 @@ async function loadTemplates() {
       name: "proxy",
       repository: "docker.nexus.jiveoff.fr/efrei-craft/templates/proxy",
       type: ServerType.VELOCITY,
-      autoremove: true
+      autoremove: true,
+      minimumServers: 0,
+      maximumServers: 0
     },
     select: {
       name: true,
@@ -25,7 +27,9 @@ async function loadTemplates() {
       name: "proxy.dev",
       repository: "dev.efrei-craft/acv/templates/proxy",
       type: ServerType.VELOCITY,
-      port: 25566
+      port: 25566,
+      minimumServers: 1,
+      maximumServers: 1
     }
   })
 
@@ -59,7 +63,8 @@ async function loadTemplates() {
       name: "lobby.dev",
       repository: "dev.efrei-craft/acp/templates/lobby",
       type: ServerType.PAPER,
-      parentTemplateName: "proxy.dev"
+      parentTemplateName: "proxy.dev",
+      minimumServers: 1
     }
   })
 
@@ -71,7 +76,8 @@ async function loadTemplates() {
       repository: "docker.nexus.jiveoff.fr/efrei-craft/templates/lobby",
       type: ServerType.PAPER,
       autoremove: true,
-      parentTemplateName: "proxy"
+      parentTemplateName: "proxy",
+      minimumServers: 0
     }
   })
 }
@@ -87,7 +93,7 @@ async function loadGames() {
       available: true,
       displayName: "Arena",
       menuDescription:
-        "L'équipe avec le plus de kills à la fin du timer gagne !",
+        "&7L'équipe avec le plus de &ckills&7 à la\\n&7fin du timer gagne !",
       menuMaterial: "IRON_SWORD",
       menuOrder: 1,
       minQueueToStart: 2,
@@ -113,11 +119,11 @@ async function loadGames() {
       maxPlayers: 10,
       minQueueToStart: 2,
       color: "&b",
-      available: true,
+      available: false,
       displayName: "Block Party",
       menuDescription:
         "Tenez-vous sur la bonne couleur au bon moment, sinon vous mourrez !",
-      menuMaterial: "WOOL",
+      menuMaterial: "WHITE_WOOL",
       menuOrder: 2,
       permissionToPlay: "efrei-craft.play.blockparty",
       templates: {
@@ -145,8 +151,8 @@ async function loadGames() {
       available: true,
       displayName: "Rush",
       menuDescription:
-        "Détruisez le lit de l'équipe adversaire, puis tuez-les pour remporter la victoire !",
-      menuMaterial: "BED",
+        "&7Détruisez le &5lit&7 de l'équipe adversaire,\\n&7puis tuez-les pour remporter la victoire !",
+      menuMaterial: "PURPLE_BED",
       permissionToPlay: "efrei-craft.play.rush",
       templates: {
         connect: [
@@ -173,7 +179,7 @@ async function loadGames() {
       available: true,
       displayName: "Sumo",
       menuDescription:
-        "Poussez votre adversaire en dehors du ring pour gagner !",
+        "&7Poussez votre adversaire en dehors\\n&7du &4ring&7 pour gagner !",
       menuMaterial: "STICK",
       permissionToPlay: "efrei-craft.play.sumo",
       templates: {
@@ -215,7 +221,7 @@ async function loadGroups() {
   })
 
   await prisma.permGroup.upsert({
-    where: { name: "WEI"},
+    where: { name: "WEI" },
     update: {},
     create: {
       name: "WEI",
@@ -259,23 +265,23 @@ async function loadGroups() {
   })
 
   await prisma.permGroup.upsert({
+    where: { name: "1Panthéon" },
+    update: {},
+    create: {
+      name: "1Panthéon",
+      prefix: "&9&lResp. 1P ",
+      color: "&9",
+      priority: 5
+    }
+  })
+
+  await prisma.permGroup.upsert({
     where: { name: "Builder" },
     update: {},
     create: {
       name: "Builder",
       prefix: "&a&lBuilder ",
       color: "&a",
-      priority: 5
-    }
-  })
-
-  await prisma.permGroup.upsert({
-    where: { name: "Resp. 1P" },
-    update: {},
-    create: {
-      name: "Resp. 1P",
-      prefix: "&9&lResp. 1P ",
-      color: "&9",
       priority: 6
     }
   })
@@ -391,7 +397,6 @@ async function loadGroups() {
       parentGroupId: br.id
     }
   })
-
 }
 
 async function main() {

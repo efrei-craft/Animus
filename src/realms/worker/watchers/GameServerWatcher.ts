@@ -14,7 +14,7 @@ export default class GameServerWatcher {
           }
         },
         lastPlayerUpdate: {
-          lt: new Date(Date.now() - 1000 * 60 * 5)
+          lt: new Date(Date.now() - 1000 * 60)
         }
       },
       select: {
@@ -49,6 +49,16 @@ export default class GameServerWatcher {
       },
       select: {
         name: true,
+        template: {
+          select: {
+            minimumServers: true,
+            _count: {
+              select: {
+                servers: true
+              }
+            }
+          }
+        },
         _count: {
           select: {
             players: true
@@ -57,7 +67,49 @@ export default class GameServerWatcher {
       }
     })
 
-    return servers.filter((server) => server._count.players === 0)
+    let serversToKill = servers.filter((server) => server._count.players === 0)
+
+    for (const server of serversToKill) {
+      if (
+        server.template.minimumServers &&
+        server.template._count.servers <= server.template.minimumServers
+      ) {
+        serversToKill = serversToKill.filter((s) => s.name !== server.name)
+      }
+    }
+
+    return serversToKill
+  }
+
+  private async getServersToCreate() {
+    const templates = await prisma.template.findMany({
+      where: {
+        minimumServers: {
+          gt: 0
+        }
+      },
+      select: {
+        name: true,
+        minimumServers: true,
+        _count: {
+          select: {
+            servers: true
+          }
+        }
+      }
+    })
+
+    const serversToCreatePerTemplate: Array<string> = []
+    for (const template of templates) {
+      const serversToCreate = template.minimumServers - template._count.servers
+      if (serversToCreate > 0) {
+        for (let i = 0; i < serversToCreate; i++) {
+          serversToCreatePerTemplate.push(template.name)
+        }
+      }
+    }
+
+    return serversToCreatePerTemplate
   }
 
   public async watch() {
@@ -67,11 +119,12 @@ export default class GameServerWatcher {
     setInterval(async () => {
       const serversToReset = await this.getServersToReset()
       const serversToKill = await this.getServersToKill()
+      const serversToCreate = await this.getServersToCreate()
 
       for (const server of serversToReset) {
         AnimusWorker.getInstance()
           .getLogger()
-          .info(`Resetting server ${server.name}`)
+          .info(`Watcher: Resetting server ${server.name}`)
 
         await RedisClient.getInstance().publishToPlugin(
           server.name,
@@ -97,10 +150,20 @@ export default class GameServerWatcher {
       for (const server of serversToKill) {
         AnimusWorker.getInstance()
           .getLogger()
-          .info(`Killing server ${server.name}`)
+          .info(`Watcher: Killing server ${server.name}`)
         await AnimusWorker.getInstance().insertIntoQueue(
           "StopServer",
           server.name
+        )
+      }
+
+      for (const template of serversToCreate) {
+        AnimusWorker.getInstance()
+          .getLogger()
+          .info(`Watcher: Creating server with the ${template} template`)
+        await AnimusWorker.getInstance().insertIntoQueue(
+          "CreateServer",
+          template
         )
       }
     }, 10e3)
