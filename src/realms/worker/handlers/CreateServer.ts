@@ -74,6 +74,9 @@ export const method: WorkerMethod = {
       Hostname: serverName,
       Image: template.repository,
       Tty: true,
+      AttachStdin: true,
+      AttachStdout: true,
+      AttachStderr: true,
       HostConfig: {
         NetworkMode: process.env.INFRASTRUCTURE_NAME,
         PortBindings:
