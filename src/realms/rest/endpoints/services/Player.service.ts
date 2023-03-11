@@ -2,6 +2,7 @@ import prisma from "../../../../clients/Prisma"
 import { ChatChannels, Permission, Player, Prisma } from "@prisma/client"
 import { Service } from "fastify-decorators"
 import { ApiError } from "../../helpers/Error"
+import { PlayerCreateBodySchema } from "../schemas/Player.schema"
 
 @Service()
 export default class PlayerService {
@@ -27,7 +28,6 @@ export default class PlayerService {
     serverName: true,
     chatChannel: true,
     lastSeen: true,
-    discordUserId: true
   }
 
   /**
@@ -50,6 +50,14 @@ export default class PlayerService {
         }
       ]
     }
+  }
+
+  async createPlayer(body: PlayerCreateBodySchema): Promise<Partial<Player>> {
+    return prisma.player.create({
+      data: {
+        ...body,
+      }
+    })
   }
 
   /**

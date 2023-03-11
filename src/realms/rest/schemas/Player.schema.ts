@@ -9,9 +9,6 @@ export default Type.Object(
     username: Type.String({ description: "The player's Minecraft username" }),
     perms: Type.Array(Type.Ref(PermissionSchema)),
     permGroups: Type.Array(Type.Ref(PermGroupPlayer)),
-    discordUserId: Type.Optional(
-      Type.String({ description: "The player's Discord user ID" })
-    ),
     lastSeen: Type.String({
       description: "The date the player was last seen in game (ISO 8601)"
     }),
