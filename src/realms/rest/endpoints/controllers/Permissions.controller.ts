@@ -110,7 +110,7 @@ export default class PermissionsController {
         expires: permission.expires
           ? new Date(permission.expires as string)
           : null,
-        serverTypes: permission.serverTypes
+        serverTypes: permission.serverTypes ? permission.serverTypes : []
       })
     )
     const group = await this.permissionsService.addGroupPermissions(

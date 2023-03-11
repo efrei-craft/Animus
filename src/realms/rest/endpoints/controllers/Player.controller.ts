@@ -190,7 +190,7 @@ export default class PlayerController {
         expires: permission.expires
           ? new Date(permission.expires as string)
           : null,
-        serverTypes: permission.serverTypes
+        serverTypes: permission.serverTypes ? permission.serverTypes : []
       })
     )
     const addedPermissions = await this.playerService.addPermissions(

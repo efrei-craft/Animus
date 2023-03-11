@@ -10,10 +10,12 @@ export default Type.Object(
         description: "The date the permission expires (ISO 8601)"
       })
     ),
-    serverTypes: Type.Array(
-      Type.String({
-        description: "The server types the permission is valid for"
-      })
+    serverTypes: Type.Optional(
+      Type.Array(
+        Type.String({
+          description: "The server types the permission is valid for"
+        })
+      )
     )
   },
   {
