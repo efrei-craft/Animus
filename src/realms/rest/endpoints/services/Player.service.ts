@@ -101,6 +101,14 @@ export default class PlayerService {
       }
     })
 
+    console.log(
+      groupsToAssign.map((group) => {
+        return {
+          name: group.name
+        }
+      })
+    )
+
     const res = await prisma.member.update({
       where: {
         discordId: body.memberDiscordId
@@ -160,9 +168,12 @@ export default class PlayerService {
     if (createOrUpdate) {
       if (player) {
         if (player.permGroups.length === 0) {
-          const defaultGroup = await prisma.permGroup.findUnique({
+          const defaultGroup = await prisma.permGroup.findFirst({
             where: {
-              name: "default"
+              defaultGroup: true
+            },
+            select: {
+              id: true
             }
           })
           if (defaultGroup) {
@@ -173,7 +184,7 @@ export default class PlayerService {
               data: {
                 permGroups: {
                   connect: {
-                    name: "default"
+                    id: defaultGroup.id
                   }
                 },
                 lastSeen: new Date(),
