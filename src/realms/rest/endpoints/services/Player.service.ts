@@ -6,6 +6,7 @@ import {
   PlayerCreateBodySchema,
   PlayerMigrateBodySchema
 } from "../schemas/Player.schema"
+import { AnimusWorker } from "../../../worker"
 
 @Service()
 export default class PlayerService {
@@ -90,6 +91,10 @@ export default class PlayerService {
   }
 
   async createPlayer(body: PlayerCreateBodySchema): Promise<Partial<Player>> {
+    AnimusWorker.getInstance()
+      .getLogger()
+      .info("Creating player with payload " + JSON.stringify(body, null, 2))
+
     const groupsToAssign = await prisma.permGroup.findMany({
       where: {
         name: {
@@ -100,14 +105,6 @@ export default class PlayerService {
         name: true
       }
     })
-
-    console.log(
-      groupsToAssign.map((group) => {
-        return {
-          name: group.name
-        }
-      })
-    )
 
     const res = await prisma.member.update({
       where: {
