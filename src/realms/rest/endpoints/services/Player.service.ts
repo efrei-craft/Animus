@@ -129,15 +129,41 @@ export default class PlayerService {
     })
     if (createOrUpdate) {
       if (player) {
-        await prisma.player.update({
-          where: {
-            uuid: uuid
-          },
-          data: {
-            lastSeen: new Date(),
-            username
+        if (player.permGroups.length === 0) {
+          const defaultGroup = await prisma.permGroup.findUnique({
+            where: {
+              name: "default"
+            }
+          })
+          if (defaultGroup) {
+            await prisma.player.update({
+              where: {
+                uuid: uuid
+              },
+              data: {
+                permGroups: {
+                  connect: {
+                    name: "default"
+                  }
+                },
+                lastSeen: new Date(),
+                username
+              }
+            })
+          } else {
+            throw new ApiError("default-group-not-found", 500)
           }
-        })
+        } else {
+          await prisma.player.update({
+            where: {
+              uuid: uuid
+            },
+            data: {
+              lastSeen: new Date(),
+              username
+            }
+          })
+        }
       } else {
         throw new ApiError("unknown-player", 404)
       }
