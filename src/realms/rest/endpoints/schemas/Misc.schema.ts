@@ -1,6 +1,7 @@
 import { Static, Type } from "@sinclair/typebox"
 import { FastifySchema } from "fastify"
 import ApiKeySchema from "../../schemas/ApiKey.schema"
+import {ApiScope} from "@prisma/client";
 
 // scopes must check if the value is in Object.keys(ApiScope)
 const CreateAPIKeyBodySchema = Type.Object({
@@ -12,6 +13,11 @@ const CreateAPIKeyBodySchema = Type.Object({
 export const CreateAPIKeySchema: FastifySchema = {
   tags: ["misc"],
   summary: "Creates a new API key - temporarily public",
+  security: [
+    {
+      apiKey: [ApiScope.MISC]
+    }
+  ],
   operationId: "createAPIKey",
   body: CreateAPIKeyBodySchema,
   response: {
