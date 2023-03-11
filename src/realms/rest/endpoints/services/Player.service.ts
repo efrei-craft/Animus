@@ -2,7 +2,10 @@ import prisma from "../../../../clients/Prisma"
 import { ChatChannels, Permission, Player, Prisma } from "@prisma/client"
 import { Service } from "fastify-decorators"
 import { ApiError } from "../../helpers/Error"
-import { PlayerCreateBodySchema } from "../schemas/Player.schema"
+import {
+  PlayerCreateBodySchema,
+  PlayerMigrateBodySchema
+} from "../schemas/Player.schema"
 
 @Service()
 export default class PlayerService {
@@ -57,6 +60,33 @@ export default class PlayerService {
         }
       ]
     }
+  }
+
+  async migratePlayer(
+    uuid: string,
+    body: PlayerMigrateBodySchema
+  ): Promise<Partial<Player>> {
+    const player = await prisma.player.findUnique({
+      where: {
+        uuid: uuid
+      },
+      select: {
+        uuid: true
+      }
+    })
+
+    if (!player) throw new ApiError("player-not-found", 404)
+
+    return prisma.player.update({
+      where: {
+        uuid: uuid
+      },
+      data: {
+        uuid: body.uuid,
+        username: body.username
+      },
+      select: PlayerService.PlayerPublicSelect
+    })
   }
 
   async createPlayer(body: PlayerCreateBodySchema): Promise<Partial<Player>> {
@@ -424,7 +454,10 @@ export default class PlayerService {
     }
   }
 
-  async setPermissionGroup(uuid: string, groupName: string): Promise<void> {
+  async setPermissionGroups(
+    uuid: string,
+    groupNames: Array<string>
+  ): Promise<void> {
     const player = await prisma.player.findUnique({
       where: {
         uuid: uuid
@@ -452,10 +485,22 @@ export default class PlayerService {
             return {
               name: group.name
             }
-          }),
-          connect: {
-            name: groupName
-          }
+          })
+        }
+      }
+    })
+
+    await prisma.player.update({
+      where: {
+        uuid: uuid
+      },
+      data: {
+        permGroups: {
+          connect: groupNames.map((groupName) => {
+            return {
+              name: groupName
+            }
+          })
         }
       }
     })

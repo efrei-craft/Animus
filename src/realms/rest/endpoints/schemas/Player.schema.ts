@@ -245,18 +245,26 @@ export const PlayerRemovePermissionGroupSchema: FastifySchema = {
 
 // Set Permission Groups
 
-export const PlayerSetPermissionGroupSchema: FastifySchema = {
+const PlayerPermissionGroupsBodySchema = Type.Object({
+  groupNames: Type.Array(Type.String())
+})
+
+export type PlayerPermissionGroupsBodySchema = Static<
+  typeof PlayerPermissionGroupsBodySchema
+>
+
+export const PlayerSetPermissionGroupsSchema: FastifySchema = {
   tags: ["players"],
   summary:
-    "Set a player's unique permission group (implies a removal of all other groups)",
-  operationId: "setPlayerPermissionGroup",
+    "Set a player's permission groups (implies a removal of all unlisted groups)",
+  operationId: "setPlayerPermissionGroups",
   security: [
     {
       apiKey: [ApiScope.PLAYERS, ApiScope.GROUPS]
     }
   ],
   params: PlayerInfoParamsSchema,
-  body: PlayerPermissionGroupBodySchema,
+  body: PlayerPermissionGroupsBodySchema,
   response: {
     200: Type.Object({})
   }
@@ -332,5 +340,30 @@ export const PlayerGetOnlineSchema: FastifySchema = {
   ],
   response: {
     200: Type.Array(Type.Ref(PlayerSchema))
+  }
+}
+
+// Migrate Player
+
+const PlayerMigrateBodySchema = Type.Object({
+  uuid: Type.String(),
+  username: Type.String()
+})
+
+export type PlayerMigrateBodySchema = Static<typeof PlayerMigrateBodySchema>
+
+export const PlayerMigrateSchema: FastifySchema = {
+  tags: ["players"],
+  summary: "Migrate a player to a new UUID",
+  operationId: "migratePlayer",
+  security: [
+    {
+      apiKey: [ApiScope.PLAYERS]
+    }
+  ],
+  body: PlayerMigrateBodySchema,
+  params: PlayerInfoParamsSchema,
+  response: {
+    200: Type.Ref(PlayerSchema)
   }
 }

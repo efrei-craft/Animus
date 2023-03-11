@@ -19,12 +19,15 @@ import {
   PlayerGetPermissionsSchema,
   PlayerInfoParamsSchema,
   PlayerInfoSchema,
+  PlayerMigrateBodySchema,
+  PlayerMigrateSchema,
   PlayerPermissionGroupBodySchema,
+  PlayerPermissionGroupsBodySchema,
   PlayerPermissionsBodySchema,
   PlayerRemovePermissionGroupSchema,
   PlayerRemovePermissionsBodySchema,
   PlayerRemovePermissionsSchema,
-  PlayerSetPermissionGroupSchema
+  PlayerSetPermissionGroupsSchema
 } from "../schemas/Player.schema"
 import { HasSchemaScope } from "../../helpers/decorators/HasSchemaScope"
 import { Permission } from "@prisma/client"
@@ -83,6 +86,28 @@ export default class PlayerController {
       false
     )
     return reply.code(200).send(fetchedPlayer)
+  }
+
+  @PATCH({
+    url: "/:uuid/migrate",
+    options: {
+      schema: PlayerMigrateSchema
+    }
+  })
+  @HasApiKey()
+  @HasSchemaScope()
+  async migratePlayer(
+    req: RequestWithKey<{
+      Body: PlayerMigrateBodySchema
+      Params: PlayerInfoParamsSchema
+    }>,
+    reply: FastifyReply
+  ) {
+    const migratedPlayer = await this.playerService.migratePlayer(
+      req.params.uuid,
+      req.body
+    )
+    return reply.code(200).send(migratedPlayer)
   }
 
   @POST({
@@ -247,7 +272,7 @@ export default class PlayerController {
   @PATCH({
     url: "/:uuid/groups",
     options: {
-      schema: PlayerSetPermissionGroupSchema
+      schema: PlayerSetPermissionGroupsSchema
     }
   })
   @HasApiKey()
@@ -255,13 +280,13 @@ export default class PlayerController {
   async setPermissionGroup(
     req: RequestWithKey<{
       Params: PlayerInfoParamsSchema
-      Body: PlayerPermissionGroupBodySchema
+      Body: PlayerPermissionGroupsBodySchema
     }>,
     reply: FastifyReply
   ) {
-    const setPermissionGroup = await this.playerService.setPermissionGroup(
+    const setPermissionGroup = await this.playerService.setPermissionGroups(
       req.params.uuid,
-      req.body.groupName
+      req.body.groupNames
     )
     return reply.code(200).send(setPermissionGroup)
   }

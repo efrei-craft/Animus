@@ -73,6 +73,7 @@ export const method: WorkerMethod = {
       name: serverName,
       Hostname: serverName,
       Image: template.repository,
+      Tty: true,
       HostConfig: {
         NetworkMode: process.env.INFRASTRUCTURE_NAME,
         PortBindings:
