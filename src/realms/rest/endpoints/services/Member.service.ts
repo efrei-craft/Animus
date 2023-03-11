@@ -54,6 +54,7 @@ export default class MemberService {
     })
 
     if (!result) throw new ApiError("no-such-member", 404)
+    if (!result.player) throw new ApiError("no-player-linked", 404)
     return result.player
   }
 
