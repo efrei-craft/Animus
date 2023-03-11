@@ -278,8 +278,6 @@ export default class PlayerService {
       throw new ApiError("player-not-found", 404)
     }
 
-    console.log(player)
-
     const existingPermissions = player.perms.map((perm) => perm.name)
 
     const newPermissions = permissions.filter(
@@ -304,8 +302,6 @@ export default class PlayerService {
         }
       }
     })
-
-    console.log(newPermissions)
 
     return newPermissions
   }
