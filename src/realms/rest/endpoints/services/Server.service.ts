@@ -1,5 +1,11 @@
 import { Service } from "fastify-decorators"
-import { GameStatus, Prisma, Server, ServerType } from "@prisma/client"
+import {
+  GameServer,
+  GameStatus,
+  Prisma,
+  Server,
+  ServerType
+} from "@prisma/client"
 import prisma from "../../../../clients/Prisma"
 import { ApiError } from "../../helpers/Error"
 import RedisClient from "../../../../clients/Redis"
@@ -170,43 +176,71 @@ export default class ServerService {
         ? newGameServer.requestedGameName
         : null
 
-    const res = await prisma.server.update({
-      where: {
-        name: serverId
-      },
-      data: {
-        gameServer: {
-          update: {
-            gameName: newGameServer.gameName || undefined,
-            requestedGameName: newGameServer.requestedGameName || undefined,
-            status:
-              newGameServer.status !== null
-                ? GameStatus[newGameServer.status]
-                : undefined
-          },
-          create: {
-            gameName: newGameServer.gameName || undefined,
-            requestedGameName: newGameServer.requestedGameName || undefined,
-            status:
-              newGameServer.status !== null
-                ? GameStatus[newGameServer.status]
-                : undefined
-          }
+    let result: Partial<GameServer>
+
+    if (server.gameServer === null) {
+      const res = await prisma.server.update({
+        where: {
+          name: serverId
         },
-        lastPlayerUpdate:
-          newGameServer.requestedGameName !== null ? new Date() : undefined
-      },
-      select: {
-        gameServer: {
-          select: {
-            gameName: true,
-            status: true
+        data: {
+          gameServer: {
+            create: {
+              gameName: newGameServer.gameName || undefined,
+              requestedGameName: newGameServer.requestedGameName || undefined,
+              status:
+                newGameServer.status !== null
+                  ? GameStatus[newGameServer.status]
+                  : undefined
+            }
+          },
+          lastPlayerUpdate:
+            newGameServer.requestedGameName !== null ? new Date() : undefined
+        },
+        select: {
+          gameServer: {
+            select: {
+              gameName: true,
+              status: true
+            }
           }
         }
-      }
-    })
+      })
 
-    return res.gameServer
+      result = res.gameServer
+    } else {
+      const res = await prisma.server.update({
+        where: {
+          name: serverId
+        },
+        data: {
+          gameServer: {
+            update: {
+              gameName: newGameServer.gameName || undefined,
+              requestedGameName: newGameServer.requestedGameName || undefined,
+              status:
+                newGameServer.status !== null
+                  ? GameStatus[newGameServer.status]
+                  : undefined
+            }
+          },
+          lastPlayerUpdate:
+            newGameServer.requestedGameName !== null ? new Date() : undefined
+        },
+        select: {
+          gameServer: {
+            select: {
+              gameName: true,
+              status: true
+            }
+          }
+        }
+      })
+
+      result = res.gameServer
+    }
+
+    return result
   }
 
   /**

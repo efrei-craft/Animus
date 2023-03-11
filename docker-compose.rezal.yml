@@ -30,7 +30,7 @@ services:
       - db
       - redis
     environment:
-      NODE_ENV: production
+      NODE_ENV: ${NODE_ENV}
 
       API_HOST: ${API_HOST}
       SWAGGER_URL: ${SWAGGER_URL}
@@ -63,7 +63,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
-      NODE_ENV: production
+      NODE_ENV: ${NODE_ENV}
 
       API_HOST: ${API_HOST}
       API_TOKEN: ${API_TOKEN}
