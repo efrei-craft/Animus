@@ -119,6 +119,7 @@ const getBestServer = (
     }
     const gameServerGame = gameServer.game
     const gameServerRequestedGame = gameServer.requestedGame
+
     return (
       server.ready &&
       (gameServerRequestedGame === null ||
@@ -128,9 +129,24 @@ const getBestServer = (
       (gameServerGame || server.players.length < game.maxPlayers)
     )
   })
+
   if (server.length === 0) {
     return null
   }
+
+  const serverWithGame = server.find((server) => {
+    const gameServer = server.gameServer
+    if (!gameServer) {
+      return false
+    }
+    const gameServerGame = gameServer.game
+    return gameServerGame && gameServerGame.name === game.name
+  })
+
+  if (serverWithGame) {
+    return serverWithGame
+  }
+
   return server.sort((a, b) => a.players.length - b.players.length)[0]
 }
 
@@ -267,6 +283,7 @@ const GamesQueue: Partial<QueueHandler> = {
 
           const enoughPlayers = allPlayers.length >= game.minQueueToStart
           const bestServer = getBestServer(game, templateName)
+          console.log(game.name, bestServer)
 
           if (enoughPlayers) {
             if (bestServer !== null) {
@@ -284,12 +301,22 @@ const GamesQueue: Partial<QueueHandler> = {
                 bestServer.gameServer.requestedGame === null &&
                 bestServer.gameServer.game === null
               ) {
+                await prisma.gameServer.update({
+                  where: {
+                    serverName: bestServer.name
+                  },
+                  data: {
+                    requestedGameName: game.name
+                  }
+                })
+
                 await RedisClient.getInstance().publishToPlugin(
                   bestServer.name,
                   "LudosCore",
                   "changeRequestedGame",
                   game.name
                 )
+                console.log("changeRequestedGame", bestServer.name, game.name)
               }
             } else {
               const serversCountToDeploy = Math.ceil(
@@ -317,6 +344,7 @@ const GamesQueue: Partial<QueueHandler> = {
               allPlayers.join(",")
             )
           } else {
+            console.log("bestServer", bestServer)
             if (
               bestServer !== null &&
               bestServer.gameServer.game !== null &&
