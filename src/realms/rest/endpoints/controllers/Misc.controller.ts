@@ -6,6 +6,8 @@ import {
 } from "../schemas/Misc.schema"
 import { FastifyReply, FastifyRequest } from "fastify"
 import MiscService from "../services/Misc.service"
+import {HasSchemaScope} from "../../helpers/decorators/HasSchemaScope";
+import {HasApiKey} from "../../helpers/decorators/HasApiKey";
 
 @Controller({ route: "/misc" })
 export default class MiscController {
@@ -17,6 +19,8 @@ export default class MiscController {
       schema: CreateAPIKeySchema
     }
   })
+  @HasApiKey()
+  @HasSchemaScope()
   async createAPIKey(
     request: FastifyRequest<{ Body: CreateAPIKeyBodySchema }>,
     reply: FastifyReply
