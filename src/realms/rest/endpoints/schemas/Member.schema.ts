@@ -69,7 +69,7 @@ export const MemberGetPlayerSchema: FastifySchema = {
   ],
   params: MemberGetParamsSchema,
   response: {
-    200: Type.Object(Type.Ref(PlayerSchema))
+    200: Type.Ref(PlayerSchema)
   }
 }
 

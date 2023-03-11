@@ -66,7 +66,7 @@ export default class MemberController {
     req: RequestWithKey<{ Params: MemberGetParamsSchema }>,
     reply: FastifyReply
   ) {
-    const fetchedMember = await this.memberService.getMember(
+    const fetchedMember = await this.memberService.getMembersPlayer(
       req.params.discordId
     )
     return reply.code(200).send(fetchedMember)
