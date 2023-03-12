@@ -32,12 +32,14 @@ import {
 import { HasSchemaScope } from "../../helpers/decorators/HasSchemaScope"
 import { Permission } from "@prisma/client"
 import QueueService from "../services/Queue.service"
+import PartyService from "../services/Party.service"
 
 @Controller({ route: "/players" })
 export default class PlayerController {
   constructor(
     readonly playerService: PlayerService,
-    readonly queueService: QueueService
+    readonly queueService: QueueService,
+    readonly partyService: PartyService
   ) {}
 
   @POST({
@@ -147,7 +149,12 @@ export default class PlayerController {
   ) {
     try {
       await this.queueService.removePlayerFromGameQueue(req.params.uuid)
-    } catch (_) {
+    } catch (e) {
+      /* empty */
+    }
+    try {
+      await this.partyService.leaveParty(req.params.uuid)
+    } catch (e) {
       /* empty */
     }
     const fetchedPlayer = await this.playerService.disconnectPlayer(
@@ -175,6 +182,14 @@ export default class PlayerController {
       req.params.uuid,
       req.body.serverName
     )
+    try {
+      await this.partyService.transferServerParty(
+        req.params.uuid,
+        req.body.serverName
+      )
+    } catch (_) {
+      /* empty */
+    }
     return reply.code(200).send(serverPlayer)
   }
 

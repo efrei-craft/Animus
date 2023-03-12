@@ -55,10 +55,10 @@ const dispatchPlayersInServer = async (
   const uuidsMap = new Map<string, Array<string>>()
   for (const player of playersWithMembers) {
     if (player.party) {
-      uuidsMap.set(
+      uuidsMap.set(player.uuid, [
         player.uuid,
-        player.party.members.map((member) => member.uuid)
-      )
+        ...player.party.members.map((member) => member.uuid)
+      ])
     } else {
       uuidsMap.set(player.uuid, [player.uuid])
     }
@@ -77,7 +77,7 @@ const dispatchPlayersInServer = async (
     if (dispatchedPlayers.length + partyMembers.length > game.maxPlayers) {
       break
     }
-    dispatchedPlayers.push(...partyMembers.map((uuid) => uuid))
+    dispatchedPlayers.push(...partyMembers)
   }
 
   await RedisClient.getInstance().publishToPlugin(
@@ -99,10 +99,14 @@ const dispatchPlayersInServer = async (
     dispatchedPlayers.join(",")
   )
 
-  await RedisClient.getInstance().client.srem(
-    `games:queue:${game.name}`,
-    ...dispatchedPlayers.map((uuid) => parent + ":" + uuid)
-  )
+  try {
+    await RedisClient.getInstance().client.srem(
+      `games:queue:${game.name}`,
+      ...dispatchedPlayers.map((uuid) => parent + ":" + uuid)
+    )
+  } catch (e) {
+    /* ignore */
+  }
 }
 
 const getBestServer = (
@@ -126,7 +130,7 @@ const getBestServer = (
         gameServerRequestedGame.name === game.name ||
         (gameServerGame && gameServerGame.name === game.name)) &&
       gameServer.status === GameStatus.WAITING &&
-      (gameServerGame || server.players.length < game.maxPlayers)
+      server.players.length < game.maxPlayers
     )
   })
 
@@ -271,7 +275,7 @@ const GamesQueue: Partial<QueueHandler> = {
             }
           })
 
-          const allPlayers = players.map((player) => {
+          let allPlayers = players.map((player) => {
             if (player.party) {
               return [
                 ...player.party.members.map((member) => member.uuid),
@@ -280,6 +284,7 @@ const GamesQueue: Partial<QueueHandler> = {
             }
             return player.uuid
           })
+          allPlayers = allPlayers.flat()
 
           const enoughPlayers = allPlayers.length >= game.minQueueToStart
           const bestServer = getBestServer(game, templateName)
