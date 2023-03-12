@@ -157,16 +157,16 @@ export default class PartyService {
       throw new ApiError("player-already-in-party", 409)
     }
 
+    if (ownerId === playerUuid) {
+      throw new ApiError("cannot-invite-yourself", 410)
+    }
+
     if (!party && !playerParty) {
       party = await this.createParty(ownerId)
     }
 
     if (party.owner.uuid !== ownerId) {
       throw new ApiError("not-owner", 403)
-    }
-
-    if (ownerId === playerUuid) {
-      throw new ApiError("cannot-invite-yourself", 410)
     }
 
     if (party.invited.some((p) => p.uuid === playerUuid)) {
