@@ -15,10 +15,7 @@ const SwaggerConfig: RegisterOptions & FastifyDynamicSwaggerOptions = {
     tags: [
       {name: "players", description: "Player related end-points"},
       {name: "punishments", description: "Punishment related end-points"},
-      {
-        name: "permissions",
-        description: "Permissions related end-points"
-      },
+      {name: "permissions", description: "Permission groups related end-points"},
       {name: "party", description: "Party related end-points"},
       {name: "members", description: "Member related end-points"},
       {name: "games", description: "Games related end-points"},
