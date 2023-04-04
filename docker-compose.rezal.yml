@@ -3,6 +3,7 @@ version: "3.8"
 services:
   db:
     image: postgres:12.2
+    container_name: db
     volumes:
       - pg:/data/postgres
     networks:
