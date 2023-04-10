@@ -7,6 +7,13 @@ services:
       - pg:/data/postgres
     networks:
       net:
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.role == manager
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -51,10 +58,10 @@ services:
     restart: always
     tty: true
     deploy:
-      replicas: 2
+      replicas: 1
       placement:
         constraints:
-          - node.role == manager
+          - node.role == worker
       restart_policy:
         condition: on-failure
     depends_on:
@@ -82,6 +89,13 @@ services:
   redis:
     image: bitnami/redis:latest
     restart: always
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.role == manager
     environment:
       REDIS_PASSWORD: ${REDIS_PASSWORD}
     networks:
