@@ -9,6 +9,7 @@ services:
     networks:
       net:
     deploy:
+      endpoint_mode: dnsrr
       replicas: 1
       restart_policy:
         condition: on-failure
@@ -26,6 +27,7 @@ services:
     restart: always
     tty: true
     deploy:
+      endpoint_mode: dnsrr
       replicas: 2
       restart_policy:
         condition: on-failure
@@ -59,6 +61,7 @@ services:
     restart: always
     tty: true
     deploy:
+      endpoint_mode: dnsrr
       replicas: 1
       placement:
         constraints:
@@ -91,6 +94,7 @@ services:
     image: bitnami/redis:latest
     restart: always
     deploy:
+      endpoint_mode: dnsrr
       replicas: 1
       restart_policy:
         condition: on-failure
@@ -109,6 +113,7 @@ services:
       net:
       traefik_public:
     deploy:
+      endpoint_mode: dnsrr
       labels:
         - "traefik.enable=true"
         - "traefik.http.routers.adminer.rule=Host(`toolkit.efreicraft.fr`) && Path(`/adminer`)"
@@ -129,6 +134,7 @@ services:
       net:
       traefik_public:
     deploy:
+      endpoint_mode: dnsrr
       labels:
         - "traefik.enable=true"
         - "traefik.http.routers.commander.rule=Host(`toolkit.efreicraft.fr`) && PathPrefix(`/commander`)"
