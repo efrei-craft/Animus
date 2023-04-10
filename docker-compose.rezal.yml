@@ -134,7 +134,6 @@ services:
       net:
       traefik_public:
     deploy:
-      endpoint_mode: dnsrr
       labels:
         - "traefik.enable=true"
         - "traefik.http.routers.commander.rule=Host(`toolkit.efreicraft.fr`) && PathPrefix(`/commander`)"
@@ -149,5 +148,7 @@ networks:
   net:
     name: ${INFRASTRUCTURE_NAME}
     attachable: true
+    driver_opts:
+      com.docker.network.driver.mtu: 1280
   traefik_public:
     external: true
