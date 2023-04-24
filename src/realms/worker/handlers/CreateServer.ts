@@ -7,6 +7,7 @@ import * as crypto from "crypto"
 import { WorkerMethod } from "../types"
 import { AnimusWorker } from "../index"
 import { ServerType } from "@prisma/client"
+import Dockerode from "dockerode"
 
 function getForwardingSecret() {
   return crypto
@@ -27,6 +28,7 @@ export const method: WorkerMethod = {
         port: true,
         type: true,
         maximumServers: true,
+        static: true,
         _count: {
           select: {
             servers: true
@@ -56,7 +58,27 @@ export const method: WorkerMethod = {
       .getLogger()
       .info(`Creating server with the ${template.name} template...`)
 
-    const serverName = serverNameGenerator(template.name)
+    let serverName = serverNameGenerator(template.name)
+
+    if (template.static) {
+      const server = await prisma.server.findFirst({
+        where: {
+          template: {
+            name: template.name
+          }
+        }
+      })
+
+      if (server) {
+        AnimusWorker.getInstance()
+          .getLogger()
+          .warn(`Server ${server.name} already exists.`)
+        return
+      }
+
+      const infrastructure = process.env.INFRASTRUCTURE_NAME
+      serverName = `${infrastructure}.${template.name}`
+    }
 
     await prisma.server.create({
       data: {
@@ -65,11 +87,12 @@ export const method: WorkerMethod = {
           connect: {
             name: template.name
           }
-        }
+        },
+        permanent: template.static
       }
     })
 
-    await docker.createContainer({
+    const containerInfo: Dockerode.ContainerCreateOptions = {
       name: serverName,
       Hostname: serverName,
       Image: template.repository,
@@ -102,7 +125,24 @@ export const method: WorkerMethod = {
         `ENV_FORWARDING_SECRET=${getForwardingSecret()}`,
         ...getNeededVars()
       ]
-    })
+    }
+
+    if (template.static) {
+      const volumes = await docker.listVolumes()
+      const volume = volumes.Volumes.find(
+        (volume) => volume.Name === serverName
+      )
+
+      if (!volume) {
+        await docker.createVolume({
+          Name: serverName
+        })
+      }
+
+      containerInfo.HostConfig.Binds = [`${serverName}:/data:rw`]
+    }
+
+    await docker.createContainer(containerInfo)
 
     const container = await docker.getContainer(serverName)
     await container.start()

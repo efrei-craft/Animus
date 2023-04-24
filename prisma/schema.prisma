@@ -187,6 +187,8 @@ model Template {
   games   Game[]
   servers Server[]
 
+  static Boolean @default(false)
+
   minimumServers Int  @default(0)
   maximumServers Int?
 }
