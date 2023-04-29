@@ -37,16 +37,12 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-  notify-portainer:
+  update-stack:
     runs-on: ubuntu-latest
     needs: build-and-push-image
 
     steps:
-      - name: Trigger Portainer on Dev
+      - name: Update Portainer Stack
         uses: zzzze/webhook-trigger@v1.0.0
         with:
-          webhook_url: ${{ secrets.PORTAINER_WEBHOOK_DEV }}
-      - name: Trigger Portainer on Rezal
-        uses: zzzze/webhook-trigger@v1.0.0
-        with:
-          webhook_url: ${{ secrets.PORTAINER_WEBHOOK_REZAL }}
+          webhook_url: ${{ github.ref == 'refs/heads/stable' && secrets.PORTAINER_WEBHOOK_PROD || secrets.PORTAINER_WEBHOOK_DEV }}
