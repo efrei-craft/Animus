@@ -43,6 +43,5 @@ jobs:
 
     steps:
       - name: Update Portainer Stack
-        uses: zzzze/webhook-trigger@v1.0.0
-        with:
-          webhook_url: ${{ github.ref == 'refs/heads/stable' && secrets.PORTAINER_WEBHOOK_PROD || secrets.PORTAINER_WEBHOOK_DEV }}
+        run: |
+          curl -X POST ${{ github.ref == 'refs/heads/stable' && secrets.PORTAINER_WEBHOOK_PROD || secrets.PORTAINER_WEBHOOK_DEV }}
