@@ -178,6 +178,7 @@ const GamesQueue: Partial<QueueHandler> = {
             name: true,
             minimumServers: true,
             maximumServers: true,
+            static: true,
             parentTemplate: {
               select: {
                 name: true,

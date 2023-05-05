@@ -46,13 +46,23 @@ export const method: WorkerMethod = {
       } catch (e) {
         AnimusWorker.getInstance().getLogger().error(e)
       }
-    }
 
-    await prisma.server.delete({
-      where: {
-        name: arg
-      }
-    })
+      await prisma.server.delete({
+        where: {
+          name: arg
+        }
+      })
+    } else {
+      await prisma.server.update({
+        where: {
+          name: arg
+        },
+        data: {
+          ready: false,
+          address: null
+        }
+      })
+    }
   },
   meta: {
     queueType: "set",
