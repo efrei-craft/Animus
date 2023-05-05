@@ -15,9 +15,6 @@ export default class GameServerWatcher {
         },
         lastPlayerUpdate: {
           lt: new Date(Date.now() - 1000 * 60)
-        },
-        template: {
-          static: false
         }
       },
       select: {
@@ -48,9 +45,6 @@ export default class GameServerWatcher {
         },
         lastPlayerUpdate: {
           lt: new Date(Date.now() - 1000 * 60 * 2)
-        },
-        template: {
-          static: false
         }
       },
       select: {
