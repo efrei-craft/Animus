@@ -6,7 +6,7 @@ import { getNeededVars } from "../helpers/EnvGetter"
 import * as crypto from "crypto"
 import { WorkerMethod } from "../types"
 import { AnimusWorker } from "../index"
-import { ServerType } from "@prisma/client"
+import { ServerType, StorageMode } from "@prisma/client"
 import Dockerode from "dockerode"
 
 function getForwardingSecret() {
@@ -25,6 +25,7 @@ export const method: WorkerMethod = {
       select: {
         name: true,
         repository: true,
+        storageMode: true,
         port: true,
         type: true,
         maximumServers: true,
@@ -128,18 +129,24 @@ export const method: WorkerMethod = {
     }
 
     if (template.static) {
-      const volumes = await docker.listVolumes()
-      const volume = volumes.Volumes.find(
-        (volume) => volume.Name === serverName
-      )
+      if (template.storageMode === StorageMode.HOST) {
+        containerInfo.HostConfig.Binds = [
+          `${process.env.STORAGE_PATH}/${serverName}:/data:rw`
+        ]
+      } else if (template.storageMode === StorageMode.VOLUME) {
+        const volumes = await docker.listVolumes()
+        const volume = volumes.Volumes.find(
+          (volume) => volume.Name === serverName
+        )
 
-      if (!volume) {
-        await docker.createVolume({
-          Name: serverName
-        })
+        if (!volume) {
+          await docker.createVolume({
+            Name: serverName
+          })
+        }
+
+        containerInfo.HostConfig.Binds = [`${serverName}:/data:rw`]
       }
-
-      containerInfo.HostConfig.Binds = [`${serverName}:/data:rw`]
     }
 
     await docker.createContainer(containerInfo)

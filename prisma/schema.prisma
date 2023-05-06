@@ -169,6 +169,11 @@ enum ServerType {
   PAPER
 }
 
+enum StorageMode {
+  VOLUME
+  HOST
+}
+
 model Template {
   name       String @id
   repository String
@@ -187,7 +192,8 @@ model Template {
   games   Game[]
   servers Server[]
 
-  static Boolean @default(false)
+  static      Boolean     @default(false)
+  storageMode StorageMode @default(VOLUME)
 
   minimumServers Int  @default(0)
   maximumServers Int?
