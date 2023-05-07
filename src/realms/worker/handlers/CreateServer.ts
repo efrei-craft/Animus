@@ -124,6 +124,7 @@ export const method: WorkerMethod = {
       Env: [
         `TEMPLATE_NAME=${template.name}`,
         `ENV_FORWARDING_SECRET=${getForwardingSecret()}`,
+        `INFRASTRUCTURE_NAME=${process.env.INFRASTRUCTURE_NAME}`,
         ...getNeededVars()
       ]
     }
