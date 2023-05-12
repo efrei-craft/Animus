@@ -22,7 +22,8 @@ export default class ServerService {
       select: {
         name: true,
         repository: true,
-        type: true
+        type: true,
+        motd: true
       }
     },
     maxPlayers: true,

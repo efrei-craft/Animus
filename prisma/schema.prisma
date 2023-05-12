@@ -197,6 +197,8 @@ model Template {
 
   minimumServers Int  @default(0)
   maximumServers Int?
+
+  motd String? @default("                 &e&lEFREI CRAFT &8• &61.19.3\n                        &bBienvenue !")
 }
 
 model Server {
