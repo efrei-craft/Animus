@@ -13,17 +13,15 @@ import { UpdateGameServerBodySchema } from "../schemas/Server.schema"
 import { removeNullUndefined } from "../../helpers/NullUndefinedRemover"
 import PlayerService from "./Player.service"
 import GamesService from "./Games.service"
+import TemplateService from "./Template.service"
 
 @Service()
 export default class ServerService {
-  private ServerPublicSelect: Prisma.ServerSelect = {
+  public static ServerPublicSelect: Prisma.ServerSelect = {
     name: true,
     template: {
       select: {
-        name: true,
-        repository: true,
-        type: true,
-        motd: true
+        ...TemplateService.TemplatePublicSelect
       }
     },
     maxPlayers: true,
@@ -59,7 +57,7 @@ export default class ServerService {
         name
       },
       select: {
-        ...this.ServerPublicSelect
+        ...ServerService.ServerPublicSelect
       }
     })
 
@@ -89,7 +87,7 @@ export default class ServerService {
           }
         }
       },
-      select: this.ServerPublicSelect
+      select: ServerService.ServerPublicSelect
     })
 
     servers = servers.map((server) => removeNullUndefined(server))
@@ -102,7 +100,7 @@ export default class ServerService {
         name
       },
       select: {
-        ...this.ServerPublicSelect,
+        ...ServerService.ServerPublicSelect,
         template: {
           select: {
             name: true,
@@ -158,7 +156,7 @@ export default class ServerService {
         name: serverId
       },
       select: {
-        ...this.ServerPublicSelect
+        ...ServerService.ServerPublicSelect
       }
     })
 
