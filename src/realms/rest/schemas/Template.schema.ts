@@ -8,7 +8,8 @@ export default Type.Object(
     type: Type.String({
       description: "The template's type",
       enum: Object.keys(ServerType)
-    })
+    }),
+    motd: Type.Optional(Type.String({ description: "The template's motd. As of now, only used for proxy servers" }))
   },
   {
     $id: "Template",

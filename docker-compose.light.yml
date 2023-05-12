@@ -50,7 +50,7 @@ services:
       - db
       - redis
     deploy:
-      replicas: 0
+      replicas: 1
       restart_policy:
         condition: on-failure
     environment:
@@ -70,5 +70,6 @@ volumes:
 networks:
   realm:
     name: infradev
-    driver: bridge
     attachable: true
+    driver_opts:
+      com.docker.network.driver.mtu: 1280
