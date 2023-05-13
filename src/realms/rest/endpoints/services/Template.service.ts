@@ -46,4 +46,8 @@ export default class TemplateService {
 
     return fetched
   }
+
+  async fetchTemplates(){
+    return (await prisma.template.findMany()) || []
+  }
 }

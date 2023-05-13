@@ -48,3 +48,17 @@ export const TemplateGetSchema: FastifySchema = {
     })
   }
 }
+
+export const TemplateGetAllSchema: FastifySchema = {
+  tags: ["templates"],
+  summary: "Get all templates",
+  operationId: "getTemplates",
+  security: [
+    {
+      apiKey: [ApiScope.TEMPLATES]
+    }
+  ],
+  response: {
+    200: Type.Array(Type.Ref(TemplateSchema)),
+  }
+}

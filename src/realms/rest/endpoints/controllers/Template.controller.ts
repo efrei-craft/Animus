@@ -5,7 +5,7 @@ import { FastifyReply } from "fastify"
 import TemplateService from "../services/Template.service"
 import {
   MOTDUpdateBodySchema,
-  MOTDUpdateSchema,
+  MOTDUpdateSchema, TemplateGetAllSchema,
   TemplateGetSchema,
   TemplateParamsSchema
 } from "../schemas/Template.schema"
@@ -55,5 +55,21 @@ export default class TemplateController {
       req.params.name
     )
     return reply.code(200).send(fetchedTemplate)
+  }
+
+  @GET({
+    url: "/templates",
+    options: {
+      schema: TemplateGetAllSchema
+    }
+  })
+  @HasApiKey()
+  @HasSchemaScope()
+  async getTemplates(
+    req: RequestWithKey,
+    reply: FastifyReply
+  ) {
+    const fetchedTemplates = await this.templateService.fetchTemplates()
+    return reply.code(200).send(fetchedTemplates)
   }
 }
