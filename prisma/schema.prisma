@@ -198,6 +198,8 @@ model Template {
   minimumServers Int  @default(0)
   maximumServers Int?
 
+  permissionToJoin String @default("")
+
   motd String? @default("                 &e&lEFREI CRAFT &8• &61.19.3\n                        &bBienvenue !")
 }
 
@@ -210,8 +212,6 @@ model Server {
 
   players    Player[]
   maxPlayers Int      @default(16)
-
-  permissionToJoin String @default("")
 
   ready     Boolean @default(false)
   permanent Boolean @default(false)

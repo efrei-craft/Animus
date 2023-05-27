@@ -47,7 +47,6 @@ export default class ServerService {
         ...PlayerService.PlayerPublicSelect
       }
     },
-    permissionToJoin: true,
     lastPlayerUpdate: true
   }
 
