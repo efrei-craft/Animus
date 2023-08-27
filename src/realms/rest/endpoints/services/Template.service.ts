@@ -19,7 +19,9 @@ export default class TemplateService {
     static: true,
     storageMode: true,
 
-    motd: true
+    motd: true,
+
+    permissionToJoin: true
   }
 
   async setMOTD(motd: string) {
@@ -34,7 +36,7 @@ export default class TemplateService {
     })
   }
 
-  async fetchTemplate(name: string){
+  async fetchTemplate(name: string) {
     const fetched = await prisma.template.findFirst({
       where: {
         name
@@ -45,5 +47,9 @@ export default class TemplateService {
     if (!fetched) throw new ApiError("not-found", 404)
 
     return fetched
+  }
+
+  async fetchTemplates() {
+    return (await prisma.template.findMany()) || []
   }
 }

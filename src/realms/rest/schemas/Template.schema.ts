@@ -9,7 +9,16 @@ export default Type.Object(
       description: "The template's type",
       enum: Object.keys(ServerType)
     }),
-    motd: Type.Optional(Type.String({ description: "The template's motd. As of now, only used for proxy servers" }))
+    motd: Type.Optional(
+      Type.String({
+        description:
+          "The template's motd. As of now, only used for proxy servers"
+      })
+    ),
+    permissionToJoin: Type.String({
+      description: "The server's permission to join",
+      default: ""
+    })
   },
   {
     $id: "Template",
