@@ -18,7 +18,10 @@ export default Type.Object(
     }),
     serverName: Type.Optional(
       Type.String({ description: "The player's server name" })
-    )
+    ),
+    memberDiscordId: Type.Optional(
+      Type.String({ description: "The player's Discord ID" })
+    ),
   },
   {
     $id: "Player",
