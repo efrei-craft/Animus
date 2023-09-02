@@ -262,4 +262,18 @@ model ApiKey {
   description String     @default("No description")
   scopes      ApiScope[]
   expires     DateTime?
+
+  adminAccess AdminAccess?
+}
+
+model AdminAccess {
+  id String @id @default(uuid())
+
+  name String
+  nickname String
+  email String @unique
+  groups String[]
+
+  apiKey ApiKey @relation(fields: [key], references: [key], onDelete: Cascade)
+  key    String @unique
 }

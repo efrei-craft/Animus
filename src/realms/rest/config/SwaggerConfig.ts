@@ -31,6 +31,7 @@ const SwaggerConfig: RegisterOptions & FastifyDynamicSwaggerOptions = {
       {name: "templates", description: "Templates related end-points"},
       {name: "queues", description: "Queues related end-points"},
       {name: "chat", description: "Chat related end-points"},
+      {name: "auth", description: "Authentication related end-points"},
       {name: "misc", description: "Miscellaneous api related end-points"}
     ],
     securityDefinitions: {

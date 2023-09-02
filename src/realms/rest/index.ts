@@ -5,6 +5,7 @@ import Fastify, { FastifyInstance } from "fastify"
 import { bootstrap } from "fastify-decorators"
 import FastifySwagger from "@fastify/swagger"
 import FastifySwaggerUI from "@fastify/swagger-ui"
+import FastifyCors from "@fastify/cors"
 import * as fs from "fs"
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox"
 import SwaggerConfig from "./config/SwaggerConfig"
@@ -37,6 +38,10 @@ export class AnimusRestServer {
         },
         deepLinking: true
       }
+    })
+
+    this.getServer().register(FastifyCors, {
+      origin: "*"
     })
 
     this.getServer().get("/", async (request, reply) => {
