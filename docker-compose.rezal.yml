@@ -52,6 +52,10 @@ services:
       REDIS_HOST: ${REDIS_HOST}
       REDIS_PORT: ${REDIS_PORT}
       REDIS_PASSWORD: ${REDIS_PASSWORD}
+
+      OAUTH2_CLIENT_ID: ${OAUTH2_CLIENT_ID}
+      OAUTH2_CLIENT_SECRET: ${OAUTH2_CLIENT_SECRET}
+      OAUTH2_REDIRECT_URI: ${OAUTH2_REDIRECT_URI}
     networks:
       traefik_public:
       net:
@@ -137,6 +141,20 @@ services:
         - "traefik.http.routers.commander.rule=Host(`toolkit.efreicraft.fr`) && PathPrefix(`/commander`)"
         - "traefik.http.routers.commander.entrypoints=websecure"
         - "traefik.http.services.commander.loadbalancer.server.port=8081"
+
+  tower:
+    image: ghcr.io/efrei-craft/controltower:stable
+    restart: always
+    tty: true
+    networks:
+      net:
+      traefik_public:
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.tower.rule=Host(`tower.efreicraft.fr`)"
+        - "traefik.http.routers.tower.entrypoints=websecure"
+        - "traefik.http.services.tower.loadbalancer.server.port=3000"
 
 volumes:
   pg:
