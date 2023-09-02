@@ -5,7 +5,8 @@ import { FastifyReply } from "fastify"
 import TemplateService from "../services/Template.service"
 import {
   MOTDUpdateBodySchema,
-  MOTDUpdateSchema, TemplateGetAllSchema,
+  MOTDUpdateSchema,
+  TemplateGetAllSchema,
   TemplateGetSchema,
   TemplateParamsSchema
 } from "../schemas/Template.schema"
@@ -13,7 +14,6 @@ import {
 @Controller({ route: "/templates" })
 export default class TemplateController {
   constructor(readonly templateService: TemplateService) {}
-
 
   @PATCH({
     url: "/motd",
@@ -31,9 +31,7 @@ export default class TemplateController {
     }>,
     reply: FastifyReply
   ) {
-    const updatedTemplate = await this.templateService.setMOTD(
-      req.body.motd
-    )
+    const updatedTemplate = await this.templateService.setMOTD(req.body.motd)
     return reply.code(200).send(updatedTemplate)
   }
 
@@ -58,17 +56,14 @@ export default class TemplateController {
   }
 
   @GET({
-    url: "/templates",
+    url: "",
     options: {
       schema: TemplateGetAllSchema
     }
   })
   @HasApiKey()
   @HasSchemaScope()
-  async getTemplates(
-    req: RequestWithKey,
-    reply: FastifyReply
-  ) {
+  async getTemplates(req: RequestWithKey, reply: FastifyReply) {
     const fetchedTemplates = await this.templateService.fetchTemplates()
     return reply.code(200).send(fetchedTemplates)
   }
