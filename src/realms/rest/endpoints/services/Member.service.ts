@@ -30,6 +30,14 @@ export default class MemberService {
     })
   }
 
+  async getMembers(): Promise<Partial<Member>[]> {
+    const result = await prisma.member.findMany({
+      select: MemberService.MemberPublicSelect
+    })
+
+    return result
+  }
+
   async getMember(discordId: string): Promise<Partial<Member>> {
     const result = await prisma.member.findUnique({
       where: {

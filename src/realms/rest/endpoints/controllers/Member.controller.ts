@@ -10,13 +10,27 @@ import {
   MemberGetSchema,
   MemberRemoveSchema,
   MemberUpdateBodySchema,
-  MemberUpdateSchema
+  MemberUpdateSchema,
+  MembersGetSchema
 } from "../schemas/Member.schema"
 import { FastifyReply } from "fastify"
 
-@Controller({ route: "/member" })
+@Controller({ route: "/members" })
 export default class MemberController {
   constructor(private memberService: MemberService) {}
+
+  @GET({
+    url: "",
+    options: {
+      schema: MembersGetSchema
+    }
+  })
+  @HasApiKey()
+  @HasSchemaScope()
+  async getMembers(req: RequestWithKey, reply: FastifyReply) {
+    const fetchedMembers = await this.memberService.getMembers()
+    return reply.code(200).send(fetchedMembers)
+  }
 
   @POST({
     url: "",
