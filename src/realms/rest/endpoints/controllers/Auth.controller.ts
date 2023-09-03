@@ -36,8 +36,6 @@ export default class GamesController {
   ) {
     const code = request.body.code
     const userInfo = await this.authService.redeemCode(code)
-
-    console.log(userInfo)
     return reply.code(200).send(userInfo)
   }
 }

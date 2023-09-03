@@ -93,7 +93,19 @@ export default class AuthService {
         select: AuthService.AdminAccessSelect
       })
 
-      if (!adminAccess) {
+      if (adminAccess) {
+        adminAccess = await prisma.adminAccess.update({
+          where: {
+            email: userInfo.email
+          },
+          data: {
+            name: userInfo.name,
+            nickname: userInfo.nickname,
+            groups: userInfo.groups
+          },
+          select: AuthService.AdminAccessSelect
+        })
+      } else {
         adminAccess = await prisma.adminAccess.create({
           data: {
             ...userInfo,
