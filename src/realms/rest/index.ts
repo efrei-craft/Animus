@@ -12,6 +12,7 @@ import FastifyWebsocket from "@fastify/websocket"
 
 import { bootstrap } from "fastify-decorators"
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox"
+import { prepareRedisListeners } from "./emitter"
 
 export class AnimusRestServer {
   private static instance: AnimusRestServer
@@ -94,6 +95,7 @@ export class AnimusRestServer {
 
   async start() {
     await this.registerServerRoutes()
+    prepareRedisListeners()
 
     this.getServer()
       .listen({
