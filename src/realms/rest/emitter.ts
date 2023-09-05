@@ -6,6 +6,9 @@ export const emitter = new EventEmitter() as Emitter<EmitterMessage>
 emitter.setMaxListeners(0)
 
 export enum EmitterMessageTypes {
+  ping = "ping",
+  pong = "pong",
+
   setSubscriptions = "setSubscriptions",
   hello = "hello",
 
@@ -18,6 +21,14 @@ export const emitterMessageTypes = Type.Enum(EmitterMessageTypes)
 
 export const emitterMessage = Type.Union(
   [
+    Type.Object({
+      type: Type.Literal("ping"),
+      payload: Type.Null()
+    }),
+    Type.Object({
+      type: Type.Literal("pong"),
+      payload: Type.Null()
+    }),
     Type.Object({
       type: Type.Literal("setSubscriptions"),
       payload: Type.Object({
@@ -32,7 +43,7 @@ export const emitterMessage = Type.Union(
     }),
     Type.Object({
       type: Type.Literal("serverPlayersChanged"),
-      payload: Type.Object({})
+      payload: Type.Null()
     })
   ],
   {

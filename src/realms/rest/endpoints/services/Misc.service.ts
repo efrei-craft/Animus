@@ -7,6 +7,7 @@ import {
   emitter
 } from "../../emitter"
 import { AnimusRestServer } from "../.."
+import { WebSocket } from "ws"
 
 @Service()
 export default class MiscService {
@@ -41,6 +42,8 @@ export default class MiscService {
           this.websockets.set(connection, subscriptions)
         } else if (body.type === "hello") {
           emitter.emit("hello", { ok: true })
+        } else if (body.type === "ping") {
+          connection.socket.send(JSON.stringify({ type: "pong" }))
         }
       } catch (e) {
         connection.socket.off("message", handleMessage)
@@ -56,5 +59,13 @@ export default class MiscService {
         .getLogger()
         .debug("Websocket connection closed")
     })
+
+    const pingInterval = setInterval(() => {
+      if (connection.socket.readyState !== WebSocket.OPEN) {
+        clearInterval(pingInterval)
+        return
+      }
+      connection.socket.send(JSON.stringify({ type: "ping" }))
+    }, 10000)
   }
 }

@@ -161,7 +161,7 @@ export default class PlayerController {
     const fetchedPlayer = await this.playerService.disconnectPlayer(
       req.params.uuid
     )
-    emitter.emit("serverPlayersChanged", {})
+    emitter.emit("serverPlayersChanged", null)
     return reply.code(200).send(fetchedPlayer)
   }
 
@@ -192,7 +192,7 @@ export default class PlayerController {
     } catch (_) {
       /* empty */
     }
-    emitter.emit("serverPlayersChanged", {})
+    emitter.emit("serverPlayersChanged", null)
     return reply.code(200).send(serverPlayer)
   }
 
