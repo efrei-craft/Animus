@@ -36,6 +36,8 @@ services:
         - "traefik.http.routers.animus.rule=Host(`api.efreicraft.fr`)"
         - "traefik.http.routers.animus.entrypoints=websecure"
         - "traefik.http.services.animus.loadbalancer.server.port=3000"
+        - "traefik.http.services.animus.loadbalancer.sticky=true"
+        - "traefik.http.services.animus.loadbalancer.sticky.cookie.name=AnimusRestInstance"
     depends_on:
       - db
       - redis

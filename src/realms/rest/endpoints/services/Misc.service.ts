@@ -1,6 +1,49 @@
 import { Service } from "fastify-decorators"
+import { SocketStream } from "@fastify/websocket"
+import {
+  EmitterMessage,
+  EmitterMessageType,
+  EmitterMessageTypes,
+  emitter
+} from "../../emitter"
 
 @Service()
 export default class MiscService {
+  websockets = new Map<SocketStream, Set<EmitterMessageType>>()
 
+  constructor() {
+    this.prepareListeners()
+  }
+
+  private prepareListeners() {
+    for (const messageType of Object.keys(EmitterMessageTypes)) {
+      const type = messageType as EmitterMessageType
+      emitter.on(type, (payload) => {
+        for (const [connection, subscriptions] of this.websockets.entries()) {
+          if (subscriptions.has(type)) {
+            connection.socket.send(JSON.stringify({ type, payload }))
+          }
+        }
+      })
+    }
+  }
+
+  handleWebSocket(connection: SocketStream) {
+    const handleMessage = (message: string) => {
+      try {
+        const body = JSON.parse(message.toString()) as EmitterMessage
+
+        if (body.type === "SET_SUBSCRIPTIONS") {
+          const subscriptions = new Set(body.payload.subscriptions)
+          this.websockets.set(connection, subscriptions)
+        } else if (body.type === "HELLO") {
+          emitter.emit("HELLO", { ok: true })
+        }
+      } catch (e) {
+        connection.socket.off("message", handleMessage)
+      }
+    }
+
+    connection.socket.on("message", handleMessage)
+  }
 }
