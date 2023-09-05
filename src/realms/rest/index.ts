@@ -47,7 +47,11 @@ export class AnimusRestServer {
       origin: "*"
     })
 
-    this.getServer().register(FastifyWebsocket)
+    this.getServer().register(FastifyWebsocket, {
+      options: {
+        clientTracking: true
+      }
+    })
 
     this.getServer().get("/", async (request, reply) => {
       reply.redirect("/docs")

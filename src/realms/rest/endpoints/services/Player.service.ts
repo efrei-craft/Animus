@@ -6,7 +6,7 @@ import {
   PlayerCreateBodySchema,
   PlayerMigrateBodySchema
 } from "../schemas/Player.schema"
-import { AnimusWorker } from "../../../worker"
+import { AnimusRestServer } from "../.."
 
 @Service()
 export default class PlayerService {
@@ -92,7 +92,7 @@ export default class PlayerService {
   }
 
   async createPlayer(body: PlayerCreateBodySchema): Promise<Partial<Player>> {
-    AnimusWorker.getInstance()
+    AnimusRestServer.getInstance()
       .getLogger()
       .info("Creating player with payload " + JSON.stringify(body, null, 2))
 

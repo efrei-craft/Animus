@@ -6,6 +6,7 @@ import {
   EmitterMessageTypes,
   emitter
 } from "../../emitter"
+import { AnimusRestServer } from "../.."
 
 @Service()
 export default class MiscService {
@@ -29,6 +30,8 @@ export default class MiscService {
   }
 
   handleWebSocket(connection: SocketStream) {
+    AnimusRestServer.getInstance().getLogger().debug("New websocket connection")
+
     const handleMessage = (message: string) => {
       try {
         const body = JSON.parse(message.toString()) as EmitterMessage
@@ -45,5 +48,13 @@ export default class MiscService {
     }
 
     connection.socket.on("message", handleMessage)
+
+    connection.socket.on("close", () => {
+      this.websockets.delete(connection)
+
+      AnimusRestServer.getInstance()
+        .getLogger()
+        .debug("Websocket connection closed")
+    })
   }
 }
