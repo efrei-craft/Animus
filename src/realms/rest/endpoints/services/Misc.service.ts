@@ -22,8 +22,13 @@ export default class MiscService {
       const type = messageType as EmitterMessageType
       emitter.on(type, (payload) => {
         for (const [connection, subscriptions] of this.websockets.entries()) {
-          if (subscriptions.has(type)) {
+          if (
+            subscriptions.has(type) &&
+            connection.socket.readyState === WebSocket.OPEN
+          ) {
             connection.socket.send(JSON.stringify({ type, payload }))
+          } else if (connection.socket.readyState !== WebSocket.OPEN) {
+            this.websockets.delete(connection)
           }
         }
       })
