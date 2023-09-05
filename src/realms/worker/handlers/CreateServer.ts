@@ -152,6 +152,7 @@ export const method: WorkerMethod = {
       }
     }
 
+    await docker.pull(template.repository)
     await docker.createContainer(containerInfo)
 
     const container = await docker.getContainer(serverName)
