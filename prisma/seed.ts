@@ -25,7 +25,7 @@ async function loadTemplates() {
     update: {},
     create: {
       name: "proxy.dev",
-      repository: "dev.efrei-craft/acv/templates/proxy",
+      repository: "docker.nexus.jiveoff.fr/efrei-craft/templates/proxy.dev",
       type: ServerType.VELOCITY,
       port: 25566,
       minimumServers: 1,
@@ -50,7 +50,7 @@ async function loadTemplates() {
     update: {},
     create: {
       name: "mini.dev",
-      repository: "dev.efrei-craft/acp/templates/mini",
+      repository: "docker.nexus.jiveoff.fr/efrei-craft/templates/mini.dev",
       type: ServerType.PAPER,
       parentTemplateName: "proxy.dev"
     }
@@ -61,7 +61,7 @@ async function loadTemplates() {
     update: {},
     create: {
       name: "lobby.dev",
-      repository: "dev.efrei-craft/acp/templates/lobby",
+      repository: "docker.nexus.jiveoff.fr/efrei-craft/templates/lobby.dev",
       type: ServerType.PAPER,
       parentTemplateName: "proxy.dev",
       minimumServers: 1
