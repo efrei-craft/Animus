@@ -33,11 +33,11 @@ export default class MiscService {
       try {
         const body = JSON.parse(message.toString()) as EmitterMessage
 
-        if (body.type === "SET_SUBSCRIPTIONS") {
+        if (body.type === "setSubscriptions") {
           const subscriptions = new Set(body.payload.subscriptions)
           this.websockets.set(connection, subscriptions)
-        } else if (body.type === "HELLO") {
-          emitter.emit("HELLO", { ok: true })
+        } else if (body.type === "hello") {
+          emitter.emit("hello", { ok: true })
         }
       } catch (e) {
         connection.socket.off("message", handleMessage)

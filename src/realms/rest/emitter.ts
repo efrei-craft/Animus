@@ -6,10 +6,10 @@ export const emitter = new EventEmitter() as Emitter<EmitterMessage>
 emitter.setMaxListeners(0)
 
 export enum EmitterMessageTypes {
-  SET_SUBSCRIPTIONS = "SET_SUBSCRIPTIONS",
-  HELLO = "HELLO",
+  setSubscriptions = "setSubscriptions",
+  hello = "hello",
 
-  ONLINE_PLAYERS_CHANGED = "ONLINE_PLAYERS_CHANGED"
+  serverPlayersChanged = "serverPlayersChanged"
 }
 
 export type EmitterMessageType = keyof typeof EmitterMessageTypes
@@ -19,19 +19,19 @@ export const emitterMessageTypes = Type.Enum(EmitterMessageTypes)
 export const emitterMessage = Type.Union(
   [
     Type.Object({
-      type: Type.Literal("SET_SUBSCRIPTIONS"),
+      type: Type.Literal("setSubscriptions"),
       payload: Type.Object({
         subscriptions: Type.Array(emitterMessageTypes)
       })
     }),
     Type.Object({
-      type: Type.Literal("HELLO"),
+      type: Type.Literal("hello"),
       payload: Type.Object({
         ok: Type.Boolean()
       })
     }),
     Type.Object({
-      type: Type.Literal("ONLINE_PLAYERS_CHANGED"),
+      type: Type.Literal("serverPlayersChanged"),
       payload: Type.Object({})
     })
   ],

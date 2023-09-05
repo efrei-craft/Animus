@@ -133,7 +133,6 @@ export default class PlayerController {
       true,
       req.body.username
     )
-    emitter.emit("ONLINE_PLAYERS_CHANGED", {})
     return reply.code(200).send(fetchedPlayer)
   }
 
@@ -162,7 +161,7 @@ export default class PlayerController {
     const fetchedPlayer = await this.playerService.disconnectPlayer(
       req.params.uuid
     )
-    emitter.emit("ONLINE_PLAYERS_CHANGED", {})
+    emitter.emit("serverPlayersChanged", {})
     return reply.code(200).send(fetchedPlayer)
   }
 
@@ -193,6 +192,7 @@ export default class PlayerController {
     } catch (_) {
       /* empty */
     }
+    emitter.emit("serverPlayersChanged", {})
     return reply.code(200).send(serverPlayer)
   }
 
