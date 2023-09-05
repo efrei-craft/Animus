@@ -8,7 +8,7 @@ export default class RedisClient {
   private static instance: RedisClient
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  private constructor() {}
+  constructor() {}
 
   public async publishToPlugin(channel: string, ...args: Array<string>) {
     await this.client.publish(channel, args.join(RedisClient.SEPARATOR))
