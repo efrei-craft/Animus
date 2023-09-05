@@ -45,7 +45,7 @@ export function IsWSAuthenticated() {
         req.key = await fetchApiKey(key)
 
         connection.socket.send(
-          JSON.stringify({ type: "HELLO", payload: { ok: true } })
+          JSON.stringify({ type: "hello", payload: { ok: true } })
         )
       } catch (e) {
         connection.socket.close(401, e.message)
