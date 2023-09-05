@@ -37,7 +37,8 @@ services:
         - "traefik.http.routers.animus.entrypoints=websecure"
         - "traefik.http.services.animus.loadbalancer.server.port=3000"
         - "traefik.http.services.animus.loadbalancer.sticky=true"
-        - "traefik.http.services.animus.loadbalancer.sticky.cookie.name=AnimusRestInstance"
+        - "traefik.http.services.animus.loadbalancer.sticky.cookie.name=server_id"
+        - "traefik.http.services.animus.loadbalancer.sticky.cookie.httpOnly=true"
     depends_on:
       - db
       - redis
