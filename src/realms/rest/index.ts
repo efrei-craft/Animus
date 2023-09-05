@@ -1,14 +1,17 @@
+import * as fs from "fs"
 import { resolve } from "path"
+import SwaggerConfig from "./config/SwaggerConfig"
+
 import consolaGlobalInstance, { Consola } from "consola"
 
 import Fastify, { FastifyInstance } from "fastify"
-import { bootstrap } from "fastify-decorators"
 import FastifySwagger from "@fastify/swagger"
 import FastifySwaggerUI from "@fastify/swagger-ui"
 import FastifyCors from "@fastify/cors"
-import * as fs from "fs"
+import FastifyWebsocket from "@fastify/websocket"
+
+import { bootstrap } from "fastify-decorators"
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox"
-import SwaggerConfig from "./config/SwaggerConfig"
 
 export class AnimusRestServer {
   private static instance: AnimusRestServer
@@ -43,6 +46,8 @@ export class AnimusRestServer {
     this.getServer().register(FastifyCors, {
       origin: "*"
     })
+
+    this.getServer().register(FastifyWebsocket)
 
     this.getServer().get("/", async (request, reply) => {
       reply.redirect("/docs")
