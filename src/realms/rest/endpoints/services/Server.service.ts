@@ -86,7 +86,10 @@ export default class ServerService {
           }
         }
       },
-      select: ServerService.ServerPublicSelect
+      select: ServerService.ServerPublicSelect,
+      orderBy: {
+        createdAt: "asc"
+      }
     })
 
     servers = servers.map((server) => removeNullUndefined(server))
