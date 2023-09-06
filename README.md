@@ -94,6 +94,6 @@ La techno pour le front-end n'a pas encore été décidée.
 
 ## Déployer en production
 
-L'image de production est construite à partir du Dockerfile de production (`Dockerfile.prod`) et est publiée sur le registry Docker `docker.nexus.jiveoff.fr` (de façon temporaire).
+L'image de production est construite à partir du Dockerfile de production (`Dockerfile.prod`) et est publiée sur le registry Docker `registry.efreicraft.fr`.
 
 La composition des services en production est définie dans le fichier `docker-compose.prod.yml`.

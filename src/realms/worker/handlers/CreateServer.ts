@@ -1,6 +1,6 @@
 import prisma from "../../../clients/Prisma"
 import { serverNameGenerator } from "../helpers/ServerNameGenerator"
-import docker from "../../../clients/Docker"
+import docker, { dockerAuth } from "../../../clients/Docker"
 import { getNeededVars } from "../helpers/EnvGetter"
 
 import * as crypto from "crypto"
@@ -152,7 +152,25 @@ export const method: WorkerMethod = {
       }
     }
 
-    // await docker.pull(template.repository)
+    await new Promise((resolve) => {
+      docker.pull(
+        template.repository,
+        {},
+        (err, res) => {
+          if (err) {
+            AnimusWorker.getInstance()
+              .getLogger()
+              .error(`Error while pulling image ${template.repository}`)
+            AnimusWorker.getInstance().getLogger().error(err)
+            resolve(void 0)
+            return
+          }
+
+          docker.modem.followProgress(res, resolve)
+        },
+        dockerAuth
+      )
+    })
     await docker.createContainer(containerInfo)
 
     const container = await docker.getContainer(serverName)
