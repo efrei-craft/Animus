@@ -23,7 +23,7 @@ services:
       PGDATA: /data/postgres
 
   rest:
-    image: docker.nexus.jiveoff.fr/efrei-craft/animus:stable
+    image: registry.efreicraft.fr/animus:stable
     restart: always
     tty: true
     deploy:
@@ -64,7 +64,7 @@ services:
       net:
 
   worker:
-    image: docker.nexus.jiveoff.fr/efrei-craft/animus:stable
+    image: registry.efreicraft.fr/animus:stable
     restart: always
     tty: true
     deploy:
