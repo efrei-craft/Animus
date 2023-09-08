@@ -8,6 +8,7 @@ import { WorkerMethod } from "../types"
 import { AnimusWorker } from "../index"
 import { ServerType, StorageMode } from "@prisma/client"
 import Dockerode from "dockerode"
+import { emitMessage } from "../../rest/emitter"
 
 function getForwardingSecret() {
   return crypto
@@ -197,6 +198,8 @@ export const method: WorkerMethod = {
             .IPAddress
         })`
       )
+
+    emitMessage("serversChanged", null)
   },
   meta: {
     queueType: "set"

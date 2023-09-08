@@ -15,6 +15,7 @@ import {
 import ServerService from "../services/Server.service"
 import { HasSchemaScope } from "../../helpers/decorators/HasSchemaScope"
 import { HasTableParams } from "../../helpers/decorators/HasTableParams"
+import { emitMessage } from "../../emitter"
 
 @Controller({ route: "/servers" })
 export default class ServerController {
@@ -74,6 +75,7 @@ export default class ServerController {
     const readyServer = await this.serverService.readyServer(
       req.params.serverId
     )
+    emitMessage("serversChanged", null)
     return reply.code(200).send(readyServer)
   }
 
@@ -96,6 +98,7 @@ export default class ServerController {
       req.params.serverId,
       req.body
     )
+    emitMessage("serversChanged", null)
     return reply.code(200).send(updatedServer)
   }
 
