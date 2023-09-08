@@ -17,7 +17,8 @@ export enum EmitterMessageTypes {
   setSubscriptions = "setSubscriptions",
   hello = "hello",
 
-  serverPlayersChanged = "serverPlayersChanged"
+  serverPlayersChanged = "serverPlayersChanged",
+  serversChanged = "serversChanged"
 }
 
 export type EmitterMessageType = keyof typeof EmitterMessageTypes
@@ -46,8 +47,13 @@ export const emitterMessage = Type.Union(
         ok: Type.Boolean()
       })
     }),
+
     Type.Object({
       type: Type.Literal("serverPlayersChanged"),
+      payload: Type.Null()
+    }),
+    Type.Object({
+      type: Type.Literal("serversChanged"),
       payload: Type.Null()
     })
   ],
