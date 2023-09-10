@@ -127,7 +127,7 @@ services:
       endpoint_mode: dnsrr
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.adminer.rule=Host(`toolkit.efreicraft.fr`) && Path(`/studio`)"
+        - "traefik.http.routers.adminer.rule=Host(`studio.efreicraft.fr`)"
         - "traefik.http.routers.traefik.middlewares=authentik@docker"
         - "traefik.http.routers.adminer.entrypoints=websecure"
         - "traefik.http.services.adminer.loadbalancer.server.port=5555"
@@ -148,7 +148,7 @@ services:
     deploy:
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.commander.rule=Host(`toolkit.efreicraft.fr`) && PathPrefix(`/commander`)"
+        - "traefik.http.routers.commander.rule=Host(`redis.efreicraft.fr`)"
         - "traefik.http.routers.traefik.middlewares=authentik@docker"
         - "traefik.http.routers.commander.entrypoints=websecure"
         - "traefik.http.services.commander.loadbalancer.server.port=8081"
