@@ -36,6 +36,22 @@ export const MemberCreateSchema: FastifySchema = {
   }
 }
 
+// Members Get
+
+export const MembersGetSchema: FastifySchema = {
+  tags: ["members"],
+  summary: "Gets all members",
+  operationId: "getMembers",
+  security: [
+    {
+      apiKey: [ApiScope.MEMBERS]
+    }
+  ],
+  response: {
+    200: Type.Array(Type.Ref(MemberSchema))
+  }
+}
+
 // Member Get
 
 export const MemberGetSchema: FastifySchema = {

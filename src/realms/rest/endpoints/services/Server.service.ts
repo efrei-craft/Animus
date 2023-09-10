@@ -47,7 +47,6 @@ export default class ServerService {
         ...PlayerService.PlayerPublicSelect
       }
     },
-    permissionToJoin: true,
     lastPlayerUpdate: true
   }
 
@@ -87,7 +86,10 @@ export default class ServerService {
           }
         }
       },
-      select: ServerService.ServerPublicSelect
+      select: ServerService.ServerPublicSelect,
+      orderBy: {
+        createdAt: "asc"
+      }
     })
 
     servers = servers.map((server) => removeNullUndefined(server))

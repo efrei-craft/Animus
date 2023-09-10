@@ -23,7 +23,7 @@ services:
       PGDATA: /data/postgres
 
   rest:
-    image: docker.nexus.jiveoff.fr/efrei-craft/animus:stable
+    image: registry.efreicraft.fr/animus:stable
     restart: always
     tty: true
     deploy:
@@ -36,6 +36,9 @@ services:
         - "traefik.http.routers.animus.rule=Host(`api.efreicraft.fr`)"
         - "traefik.http.routers.animus.entrypoints=websecure"
         - "traefik.http.services.animus.loadbalancer.server.port=3000"
+        - "traefik.http.services.animus.loadbalancer.sticky=true"
+        - "traefik.http.services.animus.loadbalancer.sticky.cookie.name=server_id"
+        - "traefik.http.services.animus.loadbalancer.sticky.cookie.httpOnly=true"
     depends_on:
       - db
       - redis
@@ -52,12 +55,16 @@ services:
       REDIS_HOST: ${REDIS_HOST}
       REDIS_PORT: ${REDIS_PORT}
       REDIS_PASSWORD: ${REDIS_PASSWORD}
+
+      OAUTH2_CLIENT_ID: ${OAUTH2_CLIENT_ID}
+      OAUTH2_CLIENT_SECRET: ${OAUTH2_CLIENT_SECRET}
+      OAUTH2_REDIRECT_URI: ${OAUTH2_REDIRECT_URI}
     networks:
       traefik_public:
       net:
 
   worker:
-    image: docker.nexus.jiveoff.fr/efrei-craft/animus:stable
+    image: registry.efreicraft.fr/animus:stable
     restart: always
     tty: true
     deploy:
@@ -85,6 +92,10 @@ services:
       REDIS_PORT: ${REDIS_PORT}
       REDIS_PASSWORD: ${REDIS_PASSWORD}
       REDIS_DB: ${REDIS_DB}
+
+      DOCKER_REGISTRY: ${DOCKER_REGISTRY}
+      DOCKER_USERNAME: ${DOCKER_USERNAME}
+      DOCKER_PASSWORD: ${DOCKER_PASSWORD}
     networks:
       net:
 
@@ -139,6 +150,20 @@ services:
         - "traefik.http.routers.commander.rule=Host(`toolkit.efreicraft.fr`) && PathPrefix(`/commander`)"
         - "traefik.http.routers.commander.entrypoints=websecure"
         - "traefik.http.services.commander.loadbalancer.server.port=8081"
+
+  tower:
+    image: ghcr.io/efrei-craft/controltower:stable
+    restart: always
+    tty: true
+    networks:
+      net:
+      traefik_public:
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.tower.rule=Host(`tower.efreicraft.fr`)"
+        - "traefik.http.routers.tower.entrypoints=websecure"
+        - "traefik.http.services.tower.loadbalancer.server.port=3000"
 
 volumes:
   pg:

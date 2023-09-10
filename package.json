@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start:dev": "prisma migrate dev && npx nodemon",
+    "start:dev": "prisma migrate deploy && npx nodemon",
     "build": "rimraf ./dist && tsc",
     "start:prod": "node dist/index.js",
     "start:migrate:prod": "prisma migrate deploy && npm run start:prod",
@@ -24,14 +24,17 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@fastify/cors": "^8.3.0",
     "@fastify/swagger": "^8.3.1",
     "@fastify/swagger-ui": "^1.3.0",
     "@fastify/type-provider-typebox": "^2.4.0",
-    "@prisma/client": "^4.10.1",
+    "@fastify/websocket": "^8.2.0",
+    "@prisma/client": "^5.2.0",
     "@sinclair/typebox": "^0.25.21",
+    "axios": "^1.5.0",
     "consola": "^2.15.3",
     "dockerode": "^3.3.4",
-    "fastify": "^4.12.0",
+    "fastify": "^4.16.0",
     "fastify-decorators": "^3.15.0",
     "ioredis": "^5.3.1",
     "reflect-metadata": "^0.1.13"
@@ -39,6 +42,7 @@
   "devDependencies": {
     "@types/dockerode": "^3.3.14",
     "@types/node": "^18.11.18",
+    "@types/ws": "^8.5.5",
     "@typescript-eslint/eslint-plugin": "^5.50.0",
     "@typescript-eslint/parser": "^5.50.0",
     "cross-env": "^7.0.3",
@@ -50,7 +54,7 @@
     "eslint-plugin-promise": "^6.1.1",
     "nodemon": "2.0.20",
     "prettier": "2.8.3",
-    "prisma": "^4.10.1",
+    "prisma": "^5.2.0",
     "rimraf": "^3.0.2",
     "ts-node": "^10.9.1",
     "typescript": "^4.9.5"

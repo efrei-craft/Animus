@@ -33,6 +33,7 @@ import { HasSchemaScope } from "../../helpers/decorators/HasSchemaScope"
 import { Permission } from "@prisma/client"
 import QueueService from "../services/Queue.service"
 import PartyService from "../services/Party.service"
+import { emitMessage } from "../../emitter"
 
 @Controller({ route: "/players" })
 export default class PlayerController {
@@ -160,6 +161,7 @@ export default class PlayerController {
     const fetchedPlayer = await this.playerService.disconnectPlayer(
       req.params.uuid
     )
+    emitMessage("serverPlayersChanged", null)
     return reply.code(200).send(fetchedPlayer)
   }
 
@@ -190,6 +192,7 @@ export default class PlayerController {
     } catch (_) {
       /* empty */
     }
+    emitMessage("serverPlayersChanged", null)
     return reply.code(200).send(serverPlayer)
   }
 

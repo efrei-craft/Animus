@@ -4,6 +4,7 @@ import RedisClient from "../../../clients/Redis"
 import docker from "../../../clients/Docker"
 import { AnimusWorker } from "../index"
 import { ServerType } from "@prisma/client"
+import { emitMessage } from "../../rest/emitter"
 
 export const method: WorkerMethod = {
   exec: async (arg: string) => {
@@ -63,6 +64,8 @@ export const method: WorkerMethod = {
         }
       })
     }
+
+    emitMessage("serversChanged", null)
   },
   meta: {
     queueType: "set",

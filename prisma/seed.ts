@@ -8,7 +8,7 @@ async function loadTemplates() {
     update: {},
     create: {
       name: "proxy",
-      repository: "docker.nexus.jiveoff.fr/efrei-craft/templates/proxy",
+      repository: "registry.efreicraft.fr/templates/proxy",
       type: ServerType.VELOCITY,
       autoremove: true,
       minimumServers: 0,
@@ -25,7 +25,7 @@ async function loadTemplates() {
     update: {},
     create: {
       name: "proxy.dev",
-      repository: "dev.efrei-craft/acv/templates/proxy",
+      repository: "registry.efreicraft.fr/templates/proxy.dev",
       type: ServerType.VELOCITY,
       port: 25566,
       minimumServers: 1,
@@ -38,7 +38,7 @@ async function loadTemplates() {
     update: {},
     create: {
       name: "mini",
-      repository: "docker.nexus.jiveoff.fr/efrei-craft/templates/mini",
+      repository: "registry.efreicraft.fr/templates/mini",
       type: ServerType.PAPER,
       autoremove: true,
       parentTemplateName: "proxy"
@@ -50,7 +50,7 @@ async function loadTemplates() {
     update: {},
     create: {
       name: "mini.dev",
-      repository: "dev.efrei-craft/acp/templates/mini",
+      repository: "registry.efreicraft.fr/templates/mini.dev",
       type: ServerType.PAPER,
       parentTemplateName: "proxy.dev"
     }
@@ -61,7 +61,7 @@ async function loadTemplates() {
     update: {},
     create: {
       name: "lobby.dev",
-      repository: "dev.efrei-craft/acp/templates/lobby",
+      repository: "registry.efreicraft.fr/templates/lobby.dev",
       type: ServerType.PAPER,
       parentTemplateName: "proxy.dev",
       minimumServers: 1
@@ -73,7 +73,7 @@ async function loadTemplates() {
     update: {},
     create: {
       name: "lobby",
-      repository: "docker.nexus.jiveoff.fr/efrei-craft/templates/lobby",
+      repository: "registry.efreicraft.fr/templates/lobby",
       type: ServerType.PAPER,
       autoremove: true,
       parentTemplateName: "proxy",

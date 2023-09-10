@@ -14,7 +14,7 @@ services:
       PGDATA: /data/postgres
 
   rest:
-    image: docker.nexus.jiveoff.fr/efrei-craft/animus:stable
+    image: registry.efreicraft.fr/animus:stable
     restart: always
     tty: true
     deploy:
@@ -47,7 +47,7 @@ services:
       net:
 
   worker:
-    image: docker.nexus.jiveoff.fr/efrei-craft/animus:stable
+    image: registry.efreicraft.fr/animus:stable
     restart: always
     tty: true
     deploy:
@@ -119,6 +119,17 @@ services:
         - "traefik.http.routers.commander.rule=Host(`toolkit.dev.efreicraft.fr`) && PathPrefix(`/commander`)"
         - "traefik.http.routers.commander.entrypoints=websecure"
         - "traefik.http.services.commander.loadbalancer.server.port=8081"
+
+  tower:
+    image: ghcr.io/efrei-craft/controltower:stable
+    restart: always
+    tty: true
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.tower.rule=Host(`tower.efreicraft.fr`)"
+        - "traefik.http.routers.tower.entrypoints=websecure"
+        - "traefik.http.services.tower.loadbalancer.server.port=3000"
 
 volumes:
   pg:

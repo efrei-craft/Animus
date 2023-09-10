@@ -19,10 +19,6 @@ export default Type.Object(
       description: "The server's maximum player count",
       default: 16
     }),
-    permissionToJoin: Type.String({
-      description: "The server's permission to join",
-      default: ""
-    }),
     ready: Type.Boolean({
       description: "Whether the server is ready",
       default: false
