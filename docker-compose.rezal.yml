@@ -127,10 +127,10 @@ services:
       endpoint_mode: dnsrr
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.adminer.rule=Host(`studio.efreicraft.fr`)"
-        - "traefik.http.routers.traefik.middlewares=authentik@docker"
-        - "traefik.http.routers.adminer.entrypoints=websecure"
-        - "traefik.http.services.adminer.loadbalancer.server.port=5555"
+        - "traefik.http.routers.studio.rule=Host(`studio.efreicraft.fr`)"
+        - "traefik.http.routers.studio.middlewares=authentik@docker"
+        - "traefik.http.routers.studio.entrypoints=websecure"
+        - "traefik.http.services.studio.loadbalancer.server.port=5555"
 
   redis-commander:
     container_name: redis-commander
@@ -149,7 +149,7 @@ services:
       labels:
         - "traefik.enable=true"
         - "traefik.http.routers.commander.rule=Host(`redis.efreicraft.fr`)"
-        - "traefik.http.routers.traefik.middlewares=authentik@docker"
+        - "traefik.http.routers.commander.middlewares=authentik@docker"
         - "traefik.http.routers.commander.entrypoints=websecure"
         - "traefik.http.services.commander.loadbalancer.server.port=8081"
 
