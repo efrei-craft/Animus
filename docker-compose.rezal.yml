@@ -121,6 +121,8 @@ services:
     networks:
       net:
       traefik_public:
+    depends_on:
+      - db
     environment:
       POSTGRES_URL: ${DATABASE_URL}
     deploy:
