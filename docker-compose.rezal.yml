@@ -143,7 +143,6 @@ services:
       REDIS_HOST: ${REDIS_HOST}
       REDIS_PORT: ${REDIS_PORT}
       REDIS_PASSWORD: ${REDIS_PASSWORD}
-      URL_PREFIX: /commander
     networks:
       net:
       traefik_public:
