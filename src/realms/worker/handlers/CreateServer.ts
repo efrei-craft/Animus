@@ -133,7 +133,9 @@ export const method: WorkerMethod = {
     if (template.static) {
       if (template.storageMode === StorageMode.HOST) {
         containerInfo.HostConfig.Binds = [
-          `${process.env.STORAGE_PATH}/${serverName}:/data:rw`
+          `${process.env.STORAGE_PATH}/${serverName}:/data:rw`,
+          `/data/plugins`,
+          `/data/libraries`
         ]
       } else if (template.storageMode === StorageMode.VOLUME) {
         const volumes = await docker.listVolumes()
