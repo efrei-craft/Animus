@@ -70,8 +70,10 @@ export const method: WorkerMethod = {
           }
         }
       })
-
-      if (server) {
+      AnimusWorker.getInstance()
+        .getLogger()
+        .info(`Supposedly existing container ${docker.getContainer(serverName)} `)
+      if (server && docker.getContainer(serverName)) {
         AnimusWorker.getInstance()
           .getLogger()
           .warn(`Server ${server.name} already exists.`)
