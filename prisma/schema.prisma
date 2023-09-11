@@ -172,6 +172,7 @@ enum ServerType {
 enum StorageMode {
   VOLUME
   HOST
+  NONE
 }
 
 model Template {
