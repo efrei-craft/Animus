@@ -1,11 +1,12 @@
 type WorkerMethod = {
-  exec: (arg: string) => Promise<void>
+  exec: (args: string[]) => Promise<void>
   meta: Partial<WorkerMethodMeta>
 }
 
 enum DockerHookType {
   DIE = "die",
-  KILL = "kill"
+  KILL = "kill",
+  DESTROY = "destroy"
 }
 
 type WorkerMethodMeta = {

@@ -18,7 +18,7 @@ function getForwardingSecret() {
 }
 
 export const method: WorkerMethod = {
-  exec: async (templateName: string) => {
+  exec: async ([templateName, permanent]) => {
     const template = await prisma.template.findUnique({
       where: {
         name: templateName
@@ -58,7 +58,11 @@ export const method: WorkerMethod = {
 
     AnimusWorker.getInstance()
       .getLogger()
-      .info(`Creating server with the ${template.name} template...`)
+      .info(
+        `Creating server with the ${template.name} template (permanent: ${
+          permanent === "true"
+        })...`
+      )
 
     let serverName = serverNameGenerator(template.name)
 
@@ -72,7 +76,9 @@ export const method: WorkerMethod = {
       })
       AnimusWorker.getInstance()
         .getLogger()
-        .info(`Supposedly existing container ${docker.getContainer(serverName)} `)
+        .info(
+          `Supposedly existing container ${docker.getContainer(serverName)} `
+        )
       if (server && docker.getContainer(serverName)) {
         AnimusWorker.getInstance()
           .getLogger()
@@ -92,7 +98,7 @@ export const method: WorkerMethod = {
             name: template.name
           }
         },
-        permanent: template.static
+        permanent: template.static ? true : permanent === "true"
       }
     })
 

@@ -1,4 +1,4 @@
-import { Controller, GET, PATCH, PUT } from "fastify-decorators"
+import { Controller, GET, PATCH, POST, PUT } from "fastify-decorators"
 import { HasApiKey, RequestWithKey } from "../../helpers/decorators/HasApiKey"
 import { FastifyReply } from "fastify"
 import {
@@ -7,6 +7,9 @@ import {
   ServerReadySchema,
   ServersQueryStringSchema,
   ServersSchema,
+  TaskCreateServerBodySchema,
+  TaskCreateServerSchema,
+  TaskStopServerSchema,
   TransferPlayersBodySchema,
   TransferPlayersSchema,
   UpdateGameServerBodySchema,
@@ -122,5 +125,38 @@ export default class ServerController {
       req.body.playerUuids
     )
     return reply.code(200).send(updatedServer)
+  }
+
+  @POST({
+    url: "/tasks/create-server",
+    options: {
+      schema: TaskCreateServerSchema
+    }
+  })
+  @HasApiKey()
+  @HasSchemaScope()
+  async createServer(
+    req: RequestWithKey<{ Body: TaskCreateServerBodySchema }>,
+    reply: FastifyReply
+  ) {
+    await this.serverService.createServer(req.body.templateName)
+    emitMessage("serversChanged", null)
+    return reply.code(201).send()
+  }
+
+  @POST({
+    url: "/tasks/stop-server/:serverId",
+    options: {
+      schema: TaskStopServerSchema
+    }
+  })
+  @HasApiKey()
+  @HasSchemaScope()
+  async stopServer(
+    req: RequestWithKey<{ Params: ServerInfoParamsSchema }>,
+    reply: FastifyReply
+  ) {
+    await this.serverService.stopServer(req.params.serverId)
+    return reply.code(200).send()
   }
 }

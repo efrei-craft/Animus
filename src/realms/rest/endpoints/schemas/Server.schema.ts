@@ -145,3 +145,47 @@ export const TransferPlayersSchema: FastifySchema = {
     200: Type.Object({})
   }
 }
+
+// Stop Server
+
+export const TaskStopServerSchema: FastifySchema = {
+  tags: ["servers"],
+  summary: "Creates a StopServer task for the workers",
+  operationId: "stopServer",
+  security: [
+    {
+      apiKey: [ApiScope.SERVER]
+    }
+  ],
+  params: ServerInfoParamsSchema,
+  response: {
+    200: Type.Null()
+  }
+}
+
+// Create Server
+
+const TaskCreateServerBodySchema = Type.Object({
+  templateName: Type.String({
+    description: "The template to create the server with"
+  })
+})
+
+export type TaskCreateServerBodySchema = Static<
+  typeof TaskCreateServerBodySchema
+>
+
+export const TaskCreateServerSchema: FastifySchema = {
+  tags: ["servers"],
+  summary: "Creates a CreateServer task for the workers",
+  operationId: "createServer",
+  security: [
+    {
+      apiKey: [ApiScope.SERVER]
+    }
+  ],
+  body: TaskCreateServerBodySchema,
+  response: {
+    201: Type.Ref(ServerSchema)
+  }
+}

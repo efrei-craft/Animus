@@ -7,10 +7,10 @@ import { ServerType } from "@prisma/client"
 import { emitMessage } from "../../rest/emitter"
 
 export const method: WorkerMethod = {
-  exec: async (arg: string) => {
+  exec: async ([serverName]) => {
     const serverTemplate = await prisma.server.findFirst({
       where: {
-        name: arg
+        name: serverName
       },
       select: {
         template: {
@@ -36,41 +36,56 @@ export const method: WorkerMethod = {
         serverTemplate.template.parentTemplate.name,
         "Vicarius",
         "removeServer",
-        arg
+        serverName
       )
     }
 
-    if (serverTemplate?.template.autoremove) {
-      try {
-        const container = await docker.getContainer(arg)
-        await container.remove()
-      } catch (e) {
-        AnimusWorker.getInstance().getLogger().error(e)
-      }
-
-      await prisma.server.delete({
-        where: {
-          name: arg
-        }
-      })
-    } else {
-      await prisma.server.update({
-        where: {
-          name: arg
-        },
-        data: {
-          ready: false,
-          address: null
-        }
-      })
+    try {
+      const container = await docker.getContainer(serverName)
+      await container.remove()
+    } catch (e) {
+      AnimusWorker.getInstance().getLogger().debug(e)
     }
+
+    await prisma.server.delete({
+      where: {
+        name: serverName
+      }
+    })
+
+    // ***** Partie à revoir: redémarrage de l'infra entière
+    //
+    // if (serverTemplate?.template.autoremove) {
+    //   try {
+    //     const container = await docker.getContainer(arg)
+    //     await container.remove()
+    //   } catch (e) {
+    //     AnimusWorker.getInstance().getLogger().error(e)
+    //   }
+
+    //   await prisma.server.delete({
+    //     where: {
+    //       name: arg
+    //     }
+    //   })
+    // } else {
+    //   await prisma.server.update({
+    //     where: {
+    //       name: arg
+    //     },
+    //     data: {
+    //       ready: false,
+    //       address: null
+    //     }
+    //   })
+    // }
 
     emitMessage("serversChanged", null)
   },
   meta: {
     queueType: "set",
     hooks: {
-      docker: [DockerHookType.DIE]
+      docker: [DockerHookType.DIE, DockerHookType.DESTROY]
     }
   }
 }
