@@ -97,11 +97,7 @@ export default class GameServerWatcher {
         minimumServers: true,
         _count: {
           select: {
-            servers: {
-              where: {
-                permanent: false
-              }
-            }
+            servers: true
           }
         }
       }
