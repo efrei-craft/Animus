@@ -212,7 +212,7 @@ model Server {
   address String?
 
   players    Player[]
-  maxPlayers Int      @default(16)
+  maxPlayers Int      @default(100)
 
   ready     Boolean @default(false)
   permanent Boolean @default(false)

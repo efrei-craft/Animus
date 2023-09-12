@@ -6,6 +6,7 @@ import docker from "../../clients/Docker"
 import { WorkerMethod } from "./types"
 import { PlayerQueueManager } from "./player-queues"
 import GameServerWatcher from "./watchers/GameServerWatcher"
+import prisma from "../../clients/Prisma"
 
 export class AnimusWorker {
   private logger: Consola
@@ -31,7 +32,7 @@ export class AnimusWorker {
       this.workerMethods = [
         ...this.workerMethods,
         {
-          exec: async (arg: string) => await handlerContent.exec(arg),
+          exec: async (arg: string[]) => await handlerContent.exec(arg),
           meta: {
             name: handlerName,
             ...handlerContent.meta
@@ -46,11 +47,12 @@ export class AnimusWorker {
   }
 
   private async executeQueuedMethod(method: WorkerMethod, arg: string) {
+    const args = arg.split(":")
     try {
-      await method.exec(arg)
-      this.getLogger().success(`Executed ${method.meta.name} with ${arg}`)
+      await method.exec(args)
+      this.getLogger().success(`Executed ${method.meta.name} with ${args}`)
     } catch (err) {
-      await this.insertIntoQueue(method.meta.name, arg)
+      await this.insertIntoQueue(method.meta.name, args.join(":"))
       this.getLogger().error(
         `Failed to execute ${method.meta.name} with ${arg}: `,
         err
@@ -80,7 +82,7 @@ export class AnimusWorker {
     }
   }
 
-  public async insertIntoQueue(methodName: string, arg: string) {
+  public async insertIntoQueue(methodName: string, ...arg: string[]) {
     if (!this.workerRegistered) {
       await this.registerWorkerMethods()
     }
@@ -94,9 +96,15 @@ export class AnimusWorker {
     }
 
     if (method.meta.queueType === "list") {
-      await RedisClient.getInstance().client.rpush(`queue:${methodName}`, arg)
+      await RedisClient.getInstance().client.rpush(
+        `queue:${methodName}`,
+        arg.join(":")
+      )
     } else if (method.meta.queueType === "set") {
-      await RedisClient.getInstance().client.sadd(`queue:${methodName}`, arg)
+      await RedisClient.getInstance().client.sadd(
+        `queue:${methodName}`,
+        arg.join(":")
+      )
     }
   }
 
@@ -115,6 +123,14 @@ export class AnimusWorker {
                 method.meta?.hooks?.docker.some((hook) => hook === event.status)
               )
 
+            if (statusMethods.length > 0) {
+              AnimusWorker.getInstance()
+                .getLogger()
+                .debug(
+                  `Docker Event from ${event.Actor.Attributes.name}: ${event.status}`
+                )
+            }
+
             for (const method of statusMethods) {
               AnimusWorker.getInstance().insertIntoQueue(
                 method.meta.name,
@@ -125,6 +141,49 @@ export class AnimusWorker {
         })
       }
     })
+  }
+
+  private async cleanUpServers() {
+    AnimusWorker.getInstance().getLogger().info("Cleaning up servers...")
+
+    const containers = await docker.listContainers({
+      all: true,
+      filters: {
+        status: ["exited"],
+        label: ["animus.server=true"]
+      }
+    })
+
+    const deadContainers = containers.map((container) =>
+      container.Names[0].slice(1)
+    )
+
+    const servers = await prisma.server.findMany({
+      where: {
+        name: {
+          in: deadContainers
+        }
+      },
+      select: {
+        name: true
+      }
+    })
+
+    for (const server of servers) {
+      await prisma.server.delete({
+        where: {
+          name: server.name
+        }
+      })
+    }
+
+    for (const container of deadContainers) {
+      await docker.getContainer(container).remove()
+    }
+
+    AnimusWorker.getInstance()
+      .getLogger()
+      .success(`Cleaned up ${servers.length} servers`)
   }
 
   private async initPlayerQueues() {
@@ -143,8 +202,11 @@ export class AnimusWorker {
       throw new Error("Worker already registered")
     }
 
+    await this.cleanUpServers()
+
     await this.initDockerEvents()
     await this.registerWorkerMethods()
+
     this.getLogger().ready(`Worker now listening for Redis queue events...`)
 
     await this.initWatching()

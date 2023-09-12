@@ -14,6 +14,7 @@ import { removeNullUndefined } from "../../helpers/NullUndefinedRemover"
 import PlayerService from "./Player.service"
 import GamesService from "./Games.service"
 import TemplateService from "./Template.service"
+import { AnimusWorker } from "../../../worker"
 
 @Service()
 export default class ServerService {
@@ -64,6 +65,25 @@ export default class ServerService {
       throw new ApiError("server-not-found", 404)
     }
 
+    if (server.template.type === ServerType.VELOCITY) {
+      server.players = await prisma.server
+        .findMany({
+          where: {
+            template: {
+              parentTemplateName: server.template.name
+            }
+          },
+          select: {
+            players: {
+              select: {
+                ...PlayerService.PlayerPublicSelect
+              }
+            }
+          }
+        })
+        .then((servers) => servers.flatMap((server) => server.players))
+    }
+
     server = removeNullUndefined(server)
 
     return server
@@ -92,7 +112,29 @@ export default class ServerService {
       }
     })
 
+    for (const server of servers) {
+      if (server.template.type === ServerType.VELOCITY) {
+        server.players = await prisma.server
+          .findMany({
+            where: {
+              template: {
+                parentTemplateName: server.template.name
+              }
+            },
+            select: {
+              players: {
+                select: {
+                  ...PlayerService.PlayerPublicSelect
+                }
+              }
+            }
+          })
+          .then((servers) => servers.flatMap((server) => server.players))
+      }
+    }
+
     servers = servers.map((server) => removeNullUndefined(server))
+
     return servers
   }
 
@@ -313,5 +355,43 @@ export default class ServerService {
         playersGroupedByParentTemplate[parentTemplateName].join(",")
       )
     }
+  }
+
+  async stopServer(serverId: string) {
+    const server = await prisma.server.findFirst({
+      where: {
+        name: serverId
+      },
+      select: {
+        ...ServerService.ServerPublicSelect
+      }
+    })
+
+    if (!server) {
+      throw new ApiError("server-not-found", 404)
+    }
+
+    await AnimusWorker.getInstance().insertIntoQueue("StopServer", server.name)
+  }
+
+  async createServer(templateName: string) {
+    const template = await prisma.template.findUnique({
+      where: {
+        name: templateName
+      },
+      select: {
+        name: true
+      }
+    })
+
+    if (!template) {
+      throw new ApiError("template-not-found", 404)
+    }
+
+    await AnimusWorker.getInstance().insertIntoQueue(
+      "CreateServer",
+      template.name,
+      "true"
+    )
   }
 }

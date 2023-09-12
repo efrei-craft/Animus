@@ -4,7 +4,7 @@ import { WorkerMethod } from "../types"
 import { AnimusWorker } from "../index"
 
 export const method: WorkerMethod = {
-  exec: async (serverName: string) => {
+  exec: async ([serverName]) => {
     const server = await prisma.server.findUnique({
       where: {
         name: serverName
