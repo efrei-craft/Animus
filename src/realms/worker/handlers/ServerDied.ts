@@ -53,6 +53,11 @@ export const method: WorkerMethod = {
       }
     })
 
+    emitMessage("serverStateInfo", {
+      server: serverName,
+      message: `Le serveur a été supprimé.`
+    })
+
     // ***** Partie à revoir: redémarrage de l'infra entière
     //
     // if (serverTemplate?.template.autoremove) {
