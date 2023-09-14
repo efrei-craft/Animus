@@ -40,6 +40,9 @@ export const method: WorkerMethod = {
     })
 
     if (!template) {
+      emitMessage("serverStateError", {
+        message: `Le template ${templateName} n'existe pas.`
+      })
       AnimusWorker.getInstance()
         .getLogger()
         .error(`Template ${templateName} does not exist.`)
@@ -50,6 +53,9 @@ export const method: WorkerMethod = {
       template.maximumServers &&
       template._count.servers >= template.maximumServers
     ) {
+      emitMessage("serverStateError", {
+        message: `Le template ${template.name} a atteint son nombre maximum de serveurs.`
+      })
       AnimusWorker.getInstance()
         .getLogger()
         .warn(`Template ${template.name} has reached its maximum server count.`)
@@ -161,6 +167,11 @@ export const method: WorkerMethod = {
       }
     }
 
+    emitMessage("serverStateInfo", {
+      server: serverName,
+      message: `Récupération de l'image et création du serveur...`
+    })
+
     await new Promise((resolve) => {
       docker.pull(
         template.repository,
@@ -196,6 +207,11 @@ export const method: WorkerMethod = {
           inspection.NetworkSettings.Networks[process.env.INFRASTRUCTURE_NAME]
             .IPAddress
       }
+    })
+
+    emitMessage("serverStateInfo", {
+      server: serverName,
+      message: `Serveur créé. Démarrage du serveur...`
     })
 
     AnimusWorker.getInstance()

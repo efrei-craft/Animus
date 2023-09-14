@@ -15,6 +15,7 @@ import PlayerService from "./Player.service"
 import GamesService from "./Games.service"
 import TemplateService from "./Template.service"
 import { AnimusWorker } from "../../../worker"
+import { emitMessage } from "../../emitter"
 
 @Service()
 export default class ServerService {
@@ -187,6 +188,11 @@ export default class ServerService {
         name
       )
     }
+
+    emitMessage("serverStateInfo", {
+      server: name,
+      message: `Le serveur est prêt.`
+    })
 
     return removeNullUndefined(server)
   }

@@ -144,7 +144,14 @@ export class AnimusWorker {
   }
 
   private async cleanUpServers() {
-    AnimusWorker.getInstance().getLogger().info("Cleaning up servers...")
+    await this.cleanUpDeadContainers()
+    await this.cleanUpDeadServers()
+  }
+
+  private async cleanUpDeadContainers() {
+    AnimusWorker.getInstance()
+      .getLogger()
+      .info("Cleaning up dead containers...")
 
     const containers = await docker.listContainers({
       all: true,
@@ -170,20 +177,75 @@ export class AnimusWorker {
     })
 
     for (const server of servers) {
-      await prisma.server.delete({
-        where: {
-          name: server.name
-        }
-      })
+      try {
+        await prisma.server.delete({
+          where: {
+            name: server.name
+          }
+        })
+      } catch (err) {
+        AnimusWorker.getInstance()
+          .getLogger()
+          .error(`Failed to delete server ${server.name}: ${err}`)
+      }
     }
 
     for (const container of deadContainers) {
-      await docker.getContainer(container).remove()
+      try {
+        await docker.getContainer(container).remove()
+      } catch (err) {
+        AnimusWorker.getInstance()
+          .getLogger()
+          .error(`Failed to delete container ${container}: ${err}`)
+      }
     }
 
     AnimusWorker.getInstance()
       .getLogger()
-      .success(`Cleaned up ${servers.length} servers`)
+      .success(`Cleaned up ${servers.length} dead containers`)
+  }
+
+  private async cleanUpDeadServers() {
+    AnimusWorker.getInstance().getLogger().info("Cleaning up dead servers...")
+
+    const servers = await prisma.server.findMany({
+      select: {
+        name: true
+      }
+    })
+
+    const containers = await docker.listContainers({
+      all: true,
+      filters: {
+        label: ["animus.server=true"]
+      }
+    })
+
+    const runningContainers = containers.map((container) =>
+      container.Names[0].slice(1)
+    )
+
+    const deadServers = servers.filter(
+      (server) => !runningContainers.includes(server.name)
+    )
+
+    for (const server of deadServers) {
+      try {
+        await prisma.server.delete({
+          where: {
+            name: server.name
+          }
+        })
+      } catch (err) {
+        AnimusWorker.getInstance()
+          .getLogger()
+          .error(`Failed to delete server ${server.name}: ${err}`)
+      }
+    }
+
+    AnimusWorker.getInstance()
+      .getLogger()
+      .success(`Cleaned up ${deadServers.length} dead servers`)
   }
 
   private async initPlayerQueues() {
