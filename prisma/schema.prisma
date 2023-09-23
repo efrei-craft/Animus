@@ -195,6 +195,7 @@ model Template {
 
   static      Boolean     @default(false)
   storageMode StorageMode @default(VOLUME)
+  extraBinds  String[]    @default([])
 
   minimumServers Int  @default(0)
   maximumServers Int?
@@ -249,6 +250,7 @@ enum ApiScope {
   GROUPS
   PUNISHMENTS
   GAMES
+  LOGS
   GAMESERVERS
   CHAT
   QUEUES
@@ -277,4 +279,24 @@ model AdminAccess {
 
   apiKey ApiKey @relation(fields: [key], references: [key], onDelete: Cascade)
   key    String @unique
+}
+
+enum LogLevel {
+  INFO
+  WARN
+  ERROR
+}
+
+model Log {
+  id        String      @id @default(uuid())
+  timestamp DateTime @default(now())
+  message   String
+  level     LogLevel
+  from      String?
+  data      String?
+
+  serverName String?
+  gameServerName String?
+  playerUuid String?
+  templateName String?
 }

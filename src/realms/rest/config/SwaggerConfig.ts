@@ -27,6 +27,7 @@ const SwaggerConfig: RegisterOptions & FastifyDynamicSwaggerOptions = {
       {name: "party", description: "Party related end-points"},
       {name: "members", description: "Member related end-points"},
       {name: "games", description: "Games related end-points"},
+      {name: "logs", description: "Logs related end-points"},
       {name: "servers", description: "Servers related end-points"},
       {name: "templates", description: "Templates related end-points"},
       {name: "queues", description: "Queues related end-points"},

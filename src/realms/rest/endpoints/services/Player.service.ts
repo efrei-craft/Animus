@@ -298,24 +298,15 @@ export default class PlayerService {
       throw new ApiError("player-not-found", 404)
     }
 
-    const permissions: Permission[] = []
-
-    playerPermissions.permGroups.forEach((group) => {
-      group.permissions.forEach((permission) => {
-        permissions.push(permission)
-      })
-      if (group.parentGroup) {
-        group.parentGroup.permissions.forEach((permission) => {
-          permissions.push(permission)
-        })
-      }
-    })
-
-    playerPermissions.perms.forEach((permission) => {
-      permissions.push(permission)
-    })
-
-    return permissions
+    return [
+      ...playerPermissions.perms,
+      ...playerPermissions.permGroups.map((group) => group.permissions).flat(),
+      ...playerPermissions.permGroups
+        .map((group) => group.parentGroup)
+        .filter((group) => group !== null)
+        .map((group) => group.permissions)
+        .flat()
+    ]
   }
 
   /**
