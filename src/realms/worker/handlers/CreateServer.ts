@@ -27,6 +27,7 @@ export const method: WorkerMethod = {
         name: true,
         repository: true,
         storageMode: true,
+        extraBinds: true,
         port: true,
         type: true,
         maximumServers: true,
@@ -149,7 +150,11 @@ export const method: WorkerMethod = {
         containerInfo.HostConfig.Binds = [
           `${process.env.STORAGE_PATH}/${serverName}:/data:rw`,
           `/data/plugins`,
-          `/data/libraries`
+          `/data/libraries`,
+          ...template.extraBinds.map(
+            (bind) =>
+              `${process.env.STORAGE_PATH}/${serverName}/${bind}:/data/${bind}:rw`
+          )
         ]
       } else if (template.storageMode === StorageMode.VOLUME) {
         const volumes = await docker.listVolumes()
@@ -180,8 +185,7 @@ export const method: WorkerMethod = {
           if (err) {
             AnimusWorker.getInstance()
               .getLogger()
-              .error(`Error while pulling image ${template.repository}`)
-            AnimusWorker.getInstance().getLogger().error(err)
+              .debug(`Error while pulling image ${template.repository}: ${err}`)
             resolve(void 0)
             return
           }

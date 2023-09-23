@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start:dev": "prisma migrate deploy && npx nodemon",
+    "start:dev": "prisma migrate deploy && prisma generate && npx nodemon",
     "build": "rimraf ./dist && tsc",
     "start:prod": "node dist/index.js",
     "start:migrate:prod": "prisma migrate deploy && npm run start:prod",
