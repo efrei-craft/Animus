@@ -39,7 +39,8 @@ export default class PlayerService {
     serverName: true,
     chatChannel: true,
     lastSeen: true,
-    memberDiscordId: true
+    memberDiscordId: true,
+    punishments: true
   }
 
   /**

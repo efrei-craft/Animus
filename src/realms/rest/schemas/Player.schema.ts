@@ -2,6 +2,7 @@ import { Type } from "@sinclair/typebox"
 import { ChatChannels } from "@prisma/client"
 import PermGroupPlayer from "./PermGroupPlayer.schema"
 import PermissionSchema from "./Permission.schema";
+import PunishmentSchema from "./Punishment.schema"
 
 export default Type.Object(
   {
@@ -22,6 +23,7 @@ export default Type.Object(
     memberDiscordId: Type.Optional(
       Type.String({ description: "The player's Discord ID" })
     ),
+    punishments: Type.Array(Type.Ref(PunishmentSchema)),
   },
   {
     $id: "Player",
