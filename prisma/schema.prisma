@@ -79,9 +79,7 @@ model Party {
 
 enum PunishmentType {
   WARN
-  TEMPMUTE
   MUTE
-  TEMPBAN
   BAN
 }
 
@@ -91,6 +89,8 @@ model Punishment {
   reason       String?
   punisher     Player?        @relation(fields: [punisherUuid], references: [uuid])
   punisherUuid String?
+  template     Template?      @relation(fields: [templateName], references: [name])
+  templateName String?
   expires      DateTime?
 }
 
@@ -203,6 +203,8 @@ model Template {
   permissionToJoin String @default("")
 
   motd String? @default("                 &e&lEFREI CRAFT &8• &61.19.3\n                        &bBienvenue !")
+
+  punishments Punishment[]
 }
 
 model Server {

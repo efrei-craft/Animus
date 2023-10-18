@@ -140,6 +140,7 @@ export const method: WorkerMethod = {
       Env: [
         `TEMPLATE_NAME=${template.name}`,
         `ENV_FORWARDING_SECRET=${getForwardingSecret()}`,
+        `ENV_DISCORD_TOKEN=${process.env.DISCORD_TOKEN}`,
         `INFRASTRUCTURE_NAME=${process.env.INFRASTRUCTURE_NAME}`,
         ...getNeededVars()
       ]
@@ -149,12 +150,12 @@ export const method: WorkerMethod = {
       if (template.storageMode === StorageMode.HOST) {
         containerInfo.HostConfig.Binds = [
           `${process.env.STORAGE_PATH}/${serverName}:/data:rw`,
-          `/data/plugins`,
-          `/data/libraries`,
           ...template.extraBinds.map(
             (bind) =>
               `${process.env.STORAGE_PATH}/${serverName}/${bind}:/data/${bind}:rw`
-          )
+          ),
+          `/data/plugins`,
+          `/data/libraries`
         ]
       } else if (template.storageMode === StorageMode.VOLUME) {
         const volumes = await docker.listVolumes()
