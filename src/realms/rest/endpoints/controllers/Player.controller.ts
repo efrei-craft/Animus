@@ -67,7 +67,7 @@ export default class PlayerController {
   })
   @HasApiKey()
   @HasSchemaScope()
-  async getAllPlayers(req: RequestWithKey, reply: FastifyReply) {
+  async getAllPlayers(_req: RequestWithKey, reply: FastifyReply) {
     const fetchedPlayers = await this.playerService.fetchAllPlayers()
     return reply.code(200).send(fetchedPlayers)
   }
@@ -184,14 +184,16 @@ export default class PlayerController {
       req.params.uuid,
       req.body.serverName
     )
-    try {
-      await this.partyService.transferServerParty(
-        req.params.uuid,
-        req.body.serverName
-      )
-    } catch (_) {
+
+    this.queueService.removePlayerFromGameQueue(req.params.uuid).catch(() => {
       /* empty */
-    }
+    })
+    this.partyService
+      .transferServerParty(req.params.uuid, req.body.serverName)
+      .catch(() => {
+        /* empty */
+      })
+
     emitMessage("serverPlayersChanged", null)
     return reply.code(200).send(serverPlayer)
   }
@@ -362,7 +364,7 @@ export default class PlayerController {
   })
   @HasApiKey()
   @HasSchemaScope()
-  async getOnlinePlayers(req: RequestWithKey, reply: FastifyReply) {
+  async getOnlinePlayers(_req: RequestWithKey, reply: FastifyReply) {
     const onlinePlayers = await this.playerService.getOnlinePlayers()
     return reply.code(200).send(onlinePlayers)
   }
