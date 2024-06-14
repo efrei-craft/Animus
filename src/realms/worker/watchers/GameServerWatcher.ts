@@ -4,6 +4,9 @@ import { AnimusWorker } from "../index"
 
 export default class GameServerWatcher {
   private async getServersToReset() {
+    const allServsDebug = await prisma.server.findMany();
+    console.log("==================== FETCHING POSSIBLE RESETS ====================")
+    console.log(allServsDebug);
     const servers = await prisma.server.findMany({
       where: {
         permanent: false,
@@ -11,7 +14,7 @@ export default class GameServerWatcher {
         gameServer: {
           requestedGameName: {
             not: null
-          }
+          },
         },
         lastPlayerUpdate: {
           lt: new Date(Date.now() - 1000 * 60)
