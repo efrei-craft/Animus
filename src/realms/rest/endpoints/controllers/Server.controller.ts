@@ -4,6 +4,8 @@ import { FastifyReply } from "fastify"
 import {
   ServerInfoParamsSchema,
   ServerInfoSchema,
+  ServerLogsQueryParamsSchema,
+  ServerLogsSchema,
   ServerReadySchema,
   ServersQueryStringSchema,
   ServersSchema,
@@ -80,6 +82,28 @@ export default class ServerController {
     )
     emitMessage("serversChanged", null)
     return reply.code(200).send(readyServer)
+  }
+
+  @GET({
+    url: "/:serverId/logs",
+    options: {
+      schema: ServerLogsSchema
+    }
+  })
+  @HasApiKey()
+  @HasSchemaScope()
+  async getServerLogs(
+    req: RequestWithKey<{
+      Params: ServerInfoParamsSchema
+      Querystring: ServerLogsQueryParamsSchema
+    }>,
+    reply: FastifyReply
+  ) {
+    const logs = await this.serverService.fetchServerLogs(
+      req.params.serverId,
+      req.query.lines
+    )
+    return reply.code(200).send(logs)
   }
 
   @PUT({

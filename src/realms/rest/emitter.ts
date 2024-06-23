@@ -21,7 +21,9 @@ export enum EmitterMessageTypes {
   serversChanged = "serversChanged",
 
   serverStateInfo = "serverStateInfo",
-  serverStateError = "serverStateError"
+  serverStateError = "serverStateError",
+
+  serverLog = "serverLog"
 }
 
 export type EmitterMessageType = keyof typeof EmitterMessageTypes
@@ -70,6 +72,14 @@ export const emitterMessage = Type.Union(
       type: Type.Literal("serverStateError"),
       payload: Type.Object({
         server: Type.Optional(Type.String()),
+        message: Type.String()
+      })
+    }),
+
+    Type.Object({
+      type: Type.Literal("serverLog"),
+      payload: Type.Object({
+        server: Type.String(),
         message: Type.String()
       })
     })

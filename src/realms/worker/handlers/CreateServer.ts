@@ -9,12 +9,51 @@ import { AnimusWorker } from "../index"
 import { ServerType, StorageMode } from "@prisma/client"
 import Dockerode from "dockerode"
 import { emitMessage } from "../../rest/emitter"
+import { PassThrough } from "stream"
+import RedisClient from "../../../clients/Redis"
 
 function getForwardingSecret() {
   return crypto
     .createHash("md5")
     .update(process.env.INFRASTRUCTURE_NAME)
     .digest("hex")
+}
+
+const listenToServerLogs = async (serverName: string) => {
+  const logStream = new PassThrough()
+  logStream.on("data", async (chunk) => {
+    const data = chunk.toString() // TODO: demux logs
+
+    await RedisClient.getInstance().client.rpush(
+      `server:${serverName}:logs`,
+      data.toString()
+    )
+
+    emitMessage("serverLog", {
+      server: serverName,
+      message: data.toString()
+    })
+  })
+
+  AnimusWorker.getInstance()
+    .getLogger()
+    .info(`Listening to logs of server ${serverName}`)
+
+  const container = docker.getContainer(serverName)
+  const stream = await container.logs({
+    follow: true,
+    stdout: true,
+    stderr: true
+  })
+
+  stream.pipe(logStream)
+
+  stream.on("end", () => {
+    AnimusWorker.getInstance()
+      .getLogger()
+      .info(`Stopped listening to logs of server ${serverName}`)
+    logStream.end()
+  })
 }
 
 export const method: WorkerMethod = {
@@ -202,6 +241,8 @@ export const method: WorkerMethod = {
     await container.start()
 
     const inspection = await container.inspect()
+
+    listenToServerLogs(serverName)
 
     await prisma.server.update({
       where: {
