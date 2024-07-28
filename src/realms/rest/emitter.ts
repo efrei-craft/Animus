@@ -92,7 +92,7 @@ export const emitterMessage = Type.Union(
 export type EmitterMessage = Static<typeof emitterMessage>
 
 // eslint-disable-next-line no-control-regex
-const ANSI_ESCAPE = /\x1b\[[0-9;]*m/g;
+const ANSI_ESCAPE = /\x1b\[*m/g;
 
 function removeAnsiColorCodes(str: string):string {
   return str.replace(ANSI_ESCAPE, "");
