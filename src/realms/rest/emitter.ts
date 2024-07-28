@@ -91,12 +91,22 @@ export const emitterMessage = Type.Union(
 
 export type EmitterMessage = Static<typeof emitterMessage>
 
+// eslint-disable-next-line no-control-regex
+const ANSI_ESCAPE = /\x1b\[[0-9;]*m/g;
+
+function removeAnsiColorCodes(str: string):string {
+  return str.replace(ANSI_ESCAPE, "");
+}
+
 export const prepareRedisListeners = () => {
   const redisSubscriptionClient = new RedisClient()
   redisSubscriptionClient.client.subscribe("emitter")
   redisSubscriptionClient.client.on("message", (channel, message) => {
     if (channel === "emitter") {
       const body = JSON.parse(message.toString()) as EmitterMessage
+      if (body.type === "serverLog") {
+        body.payload.message = removeAnsiColorCodes(body.payload.message)
+      }
       emitter.emit(body.type, body.payload)
     }
   })
