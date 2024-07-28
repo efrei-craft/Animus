@@ -400,4 +400,31 @@ export default class ServerService {
       "true"
     )
   }
+
+  async fetchServerLogs(serverId: string, tail?: number) {
+    const server = await prisma.server.findFirst({
+      where: {
+        name: serverId
+      },
+      select: {
+        name: true
+      }
+    })
+
+    if (!server) {
+      throw new ApiError("server-not-found", 404)
+    }
+
+    const logsLength = await RedisClient.getInstance().client.llen(
+      `server:${serverId}:logs`
+    )
+
+    const logs = await RedisClient.getInstance().client.lrange(
+      `server:${serverId}:logs`,
+      Math.max(0, logsLength - (tail || 100)),
+      logsLength
+    )
+
+    return logs
+  }
 }

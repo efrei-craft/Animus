@@ -217,7 +217,6 @@ export class AnimusWorker {
     const containers = await docker.listContainers({
       all: true,
       filters: {
-        status: ["exited"],
         label: ["animus.server=true"]
       }
     })

@@ -189,3 +189,35 @@ export const TaskCreateServerSchema: FastifySchema = {
     201: Type.Ref(ServerSchema)
   }
 }
+
+// Get Server Logs
+
+const ServerLogsQueryParamsSchema = Type.Object({
+  lines: Type.Optional(
+    Type.Number({
+      description: "The number of lines to fetch",
+      minimum: 1,
+      maximum: 1000
+    })
+  )
+})
+
+export type ServerLogsQueryParamsSchema = Static<
+  typeof ServerLogsQueryParamsSchema
+>
+
+export const ServerLogsSchema: FastifySchema = {
+  tags: ["servers"],
+  summary: "Gets server logs",
+  operationId: "getServerLogs",
+  security: [
+    {
+      apiKey: [ApiScope.SERVER]
+    }
+  ],
+  params: ServerInfoParamsSchema,
+  querystring: ServerLogsQueryParamsSchema,
+  response: {
+    200: Type.Array(Type.String())
+  }
+}

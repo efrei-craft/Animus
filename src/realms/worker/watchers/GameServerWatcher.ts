@@ -11,10 +11,13 @@ export default class GameServerWatcher {
         gameServer: {
           requestedGameName: {
             not: null
-          }
+          },
         },
         lastPlayerUpdate: {
           lt: new Date(Date.now() - 1000 * 60)
+        },
+        createdAt: {
+          lt: new Date(Date.now() - 1000 * 60 * 5)
         }
       },
       select: {

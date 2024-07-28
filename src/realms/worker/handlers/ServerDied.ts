@@ -53,37 +53,12 @@ export const method: WorkerMethod = {
       }
     })
 
+    await RedisClient.getInstance().client.del(`server:${serverName}:logs`)
+
     emitMessage("serverStateInfo", {
       server: serverName,
       message: `Le serveur a été supprimé.`
     })
-
-    // ***** Partie à revoir: redémarrage de l'infra entière
-    //
-    // if (serverTemplate?.template.autoremove) {
-    //   try {
-    //     const container = await docker.getContainer(arg)
-    //     await container.remove()
-    //   } catch (e) {
-    //     AnimusWorker.getInstance().getLogger().error(e)
-    //   }
-
-    //   await prisma.server.delete({
-    //     where: {
-    //       name: arg
-    //     }
-    //   })
-    // } else {
-    //   await prisma.server.update({
-    //     where: {
-    //       name: arg
-    //     },
-    //     data: {
-    //       ready: false,
-    //       address: null
-    //     }
-    //   })
-    // }
 
     emitMessage("serversChanged", null)
   },
