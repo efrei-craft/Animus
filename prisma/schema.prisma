@@ -43,13 +43,16 @@ model Player {
   party   Party? @relation("partyOwner")
   partyId Int?
 
-  memberOfParty   Party? @relation(fields: [memberOfPartyId], references: [id])
+  memberOfParty   Party? @relation(name: "memberOfParty", fields: [memberOfPartyId], references: [id])
   memberOfPartyId Int?
 
-  invitedToParty Party[] @relation("partyInvited")
+  invitedToParty Party[] @relation(name: "partyInvited")
 
   member          Member? @relation(fields: [memberDiscordId], references: [discordId])
   memberDiscordId String? @unique
+
+  statValues PlayerStatisticValue[]
+  statTransactions PlayerStatisticTransaction[]
 }
 
 model Member {
@@ -67,7 +70,7 @@ model Party {
   owner     Player @relation("partyOwner", fields: [ownerUuid], references: [uuid])
   ownerUuid String @unique
 
-  members Player[]
+  members Player[] @relation("memberOfParty")
   invited Player[] @relation("partyInvited")
 
   public    Boolean  @default(false)
@@ -301,4 +304,51 @@ model Log {
   gameServerName String?
   playerUuid String?
   templateName String?
+}
+
+enum StatisticType {
+  VALUE
+  TRANSACTION
+}
+
+model Statistic {
+  id        String      @id @default(uuid())
+  key       String
+
+  displayName String?
+  color       String @default("&7")
+
+  type StatisticType @default(TRANSACTION)
+
+  transactions PlayerStatisticTransaction[]
+  values       PlayerStatisticValue[]
+}
+
+model PlayerStatisticTransaction {
+  id        String      @id @default(uuid())
+
+  player Player @relation(fields: [playerUuid], references: [uuid])
+  playerUuid String
+
+  statistic Statistic @relation(fields: [statisticId], references: [id])
+  statisticId String
+
+  value Int
+  reason String?
+
+  timestamp DateTime @default(now())
+}
+
+model PlayerStatisticValue {
+  id        String      @id @default(uuid())
+
+  player Player @relation(fields: [playerUuid], references: [uuid])
+  playerUuid String
+
+  statistic Statistic @relation(fields: [statisticId], references: [id])
+  statisticId String
+
+  value Int
+
+  updatedAt DateTime @updatedAt
 }
