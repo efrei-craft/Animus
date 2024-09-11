@@ -4,7 +4,6 @@ import { Static, Type } from "@sinclair/typebox"
 import { SocketStream } from "@fastify/websocket"
 import { WebSocket } from "ws"
 import RedisClient from "../../clients/Redis"
-import iconv from 'iconv-lite'
 
 export const websockets = new Map<SocketStream, Set<EmitterMessageType>>()
 
@@ -92,22 +91,13 @@ export const emitterMessage = Type.Union(
 
 export type EmitterMessage = Static<typeof emitterMessage>
 
-function ANSItoUTF8(text: string): string {
-  // convert string to buffer for iconv
-  const buffer = Buffer.from(text, 'binary');
-  const res_buff = iconv.encode(iconv.decode(buffer, 'win1251'), 'utf8');
-  return res_buff.toString('utf8');
-}
-
 export const prepareRedisListeners = () => {
   const redisSubscriptionClient = new RedisClient()
   redisSubscriptionClient.client.subscribe("emitter")
+
   redisSubscriptionClient.client.on("message", (channel, message) => {
     if (channel === "emitter") {
       const body = JSON.parse(message.toString()) as EmitterMessage
-      if (body.type === "serverLog") {
-        body.payload.message = ANSItoUTF8(body.payload.message)
-      }
       emitter.emit(body.type, body.payload)
     }
   })
