@@ -51,7 +51,7 @@ model Player {
   member          Member? @relation(fields: [memberDiscordId], references: [discordId])
   memberDiscordId String? @unique
 
-  statValues PlayerStatisticValue[]
+  statValues       PlayerStatisticValue[]
   statTransactions PlayerStatisticTransaction[]
 }
 
@@ -277,10 +277,10 @@ model ApiKey {
 model AdminAccess {
   id String @id @default(uuid())
 
-  name String
+  name     String
   nickname String
-  email String @unique
-  groups String[]
+  email    String   @unique
+  groups   String[]
 
   apiKey ApiKey @relation(fields: [key], references: [key], onDelete: Cascade)
   key    String @unique
@@ -293,17 +293,17 @@ enum LogLevel {
 }
 
 model Log {
-  id        String      @id @default(uuid())
+  id        String   @id @default(uuid())
   timestamp DateTime @default(now())
   message   String
   level     LogLevel
   from      String?
   data      String?
 
-  serverName String?
+  serverName     String?
   gameServerName String?
-  playerUuid String?
-  templateName String?
+  playerUuid     String?
+  templateName   String?
 }
 
 enum StatisticType {
@@ -312,11 +312,11 @@ enum StatisticType {
 }
 
 model Statistic {
-  id        String      @id @default(uuid())
-  key       String
+  id  String @id @default(uuid())
+  key String
 
   displayName String?
-  color       String @default("&7")
+  color       String  @default("&7")
 
   type StatisticType @default(TRANSACTION)
 
@@ -325,30 +325,31 @@ model Statistic {
 }
 
 model PlayerStatisticTransaction {
-  id        String      @id @default(uuid())
+  id String @id @default(uuid())
 
-  player Player @relation(fields: [playerUuid], references: [uuid])
+  player     Player @relation(fields: [playerUuid], references: [uuid])
   playerUuid String
 
-  statistic Statistic @relation(fields: [statisticId], references: [id])
+  statistic   Statistic @relation(fields: [statisticId], references: [id])
   statisticId String
 
-  value Int
+  value  Int
   reason String?
 
   timestamp DateTime @default(now())
 }
 
 model PlayerStatisticValue {
-  id        String      @id @default(uuid())
+  id String @id @default(uuid())
 
-  player Player @relation(fields: [playerUuid], references: [uuid])
+  player     Player @relation(fields: [playerUuid], references: [uuid])
   playerUuid String
 
-  statistic Statistic @relation(fields: [statisticId], references: [id])
+  statistic   Statistic @relation(fields: [statisticId], references: [id])
   statisticId String
 
-  value Int
+  value  Int
+  reason String?
 
   updatedAt DateTime @updatedAt
 }
