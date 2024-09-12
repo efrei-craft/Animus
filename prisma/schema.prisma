@@ -51,8 +51,7 @@ model Player {
   member          Member? @relation(fields: [memberDiscordId], references: [discordId])
   memberDiscordId String? @unique
 
-  statValues PlayerStatisticValue[]
-  statTransactions PlayerStatisticTransaction[]
+  stats PlayerStatisticRecord[]
 }
 
 model Member {
@@ -312,43 +311,28 @@ enum StatisticType {
 }
 
 model Statistic {
-  id        String      @id @default(uuid())
-  key       String
+  key       String      @id
 
   displayName String?
   color       String @default("&7")
 
   type StatisticType @default(TRANSACTION)
 
-  transactions PlayerStatisticTransaction[]
-  values       PlayerStatisticValue[]
+  values       PlayerStatisticRecord[]
 }
 
-model PlayerStatisticTransaction {
+model PlayerStatisticRecord {
   id        String      @id @default(uuid())
 
   player Player @relation(fields: [playerUuid], references: [uuid])
   playerUuid String
 
-  statistic Statistic @relation(fields: [statisticId], references: [id])
-  statisticId String
+  statistic Statistic @relation(fields: [statisticKey], references: [key])
+  statisticKey String
 
   value Int
   reason String?
 
   timestamp DateTime @default(now())
-}
-
-model PlayerStatisticValue {
-  id        String      @id @default(uuid())
-
-  player Player @relation(fields: [playerUuid], references: [uuid])
-  playerUuid String
-
-  statistic Statistic @relation(fields: [statisticId], references: [id])
-  statisticId String
-
-  value Int
-
   updatedAt DateTime @updatedAt
 }

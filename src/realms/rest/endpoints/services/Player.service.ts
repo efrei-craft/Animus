@@ -1,12 +1,21 @@
 import prisma from "../../../../clients/Prisma"
-import { ChatChannels, Permission, Player, Prisma } from "@prisma/client"
+import {
+  ChatChannels,
+  Permission,
+  Player,
+  Prisma,
+  StatisticType
+} from "@prisma/client"
 import { Service } from "fastify-decorators"
 import { ApiError } from "../../helpers/Error"
 import {
   PlayerCreateBodySchema,
-  PlayerMigrateBodySchema
+  PlayerMigrateBodySchema,
+  PlayerStatBatchBodySchema
 } from "../schemas/Player.schema"
 import { AnimusRestServer } from "../.."
+import PlayerStatisticRecordSchema from "../../schemas/PlayerStatisticRecord.schema"
+import { Static } from "@sinclair/typebox"
 
 @Service()
 export default class PlayerService {
@@ -585,5 +594,188 @@ export default class PlayerService {
       },
       select: PlayerService.PlayerPublicSelect
     })
+  }
+
+  async getPlayerStatistic(
+    uuid: string,
+    statKey: string
+  ): Promise<Static<typeof PlayerStatisticRecordSchema>> {
+    const stat = await prisma.statistic.findUnique({
+      where: {
+        key: statKey
+      },
+      select: {
+        displayName: true,
+        color: true,
+        type: true,
+        values: {
+          where: {
+            playerUuid: uuid
+          },
+          select: {
+            id: true,
+            value: true
+          }
+        }
+      }
+    })
+
+    if (!stat) {
+      throw new ApiError("statistic-not-found", 404)
+    }
+
+    return {
+      key: statKey,
+      displayName: stat.displayName,
+      color: stat.color,
+      value: stat.values.reduce((acc, curr) => acc + curr.value, 0)
+    }
+  }
+
+  async getPlayerStatistics(
+    uuid: string
+  ): Promise<Static<typeof PlayerStatisticRecordSchema>[]> {
+    const stats = await prisma.statistic.findMany({
+      select: {
+        key: true,
+        displayName: true,
+        color: true,
+        type: true,
+        values: {
+          where: {
+            playerUuid: uuid
+          },
+          select: {
+            id: true,
+            value: true
+          }
+        }
+      }
+    })
+
+    return stats.map((stat) => {
+      return {
+        key: stat.key,
+        displayName: stat.displayName,
+        color: stat.color,
+        value: stat.values.reduce((acc, curr) => acc + curr.value, 0)
+      }
+    })
+  }
+
+  async batchUpdateStats(body: PlayerStatBatchBodySchema) {
+    return Promise.all(
+      body.map((stat) => {
+        return this.manipulatePlayerStatistic(
+          stat.playerUuid,
+          stat.statKey,
+          stat.value,
+          stat.reason
+        )
+      })
+    )
+  }
+
+  async manipulatePlayerStatistic(
+    playerUuid: string,
+    key: string,
+    value: number,
+    reason: string,
+    set = false
+  ): Promise<void> {
+    let stat = await prisma.statistic.findUnique({
+      where: {
+        key
+      },
+      select: {
+        type: true,
+        values: {
+          where: {
+            playerUuid
+          }
+        }
+      }
+    })
+
+    if (!stat) {
+      stat = await prisma.statistic.create({
+        data: {
+          key
+        },
+        select: {
+          type: true,
+          values: {
+            where: {
+              playerUuid
+            }
+          }
+        }
+      })
+    }
+
+    if (stat.type === StatisticType.TRANSACTION) {
+      if (set) {
+        const existingValues = stat.values.filter(
+          (value) => value.playerUuid === playerUuid
+        )
+
+        if (!existingValues) {
+          await prisma.playerStatisticRecord.create({
+            data: {
+              playerUuid,
+              statisticKey: key,
+              value,
+              reason
+            }
+          })
+        } else {
+          const diff =
+            value - existingValues.reduce((acc, curr) => acc + curr.value, 0)
+
+          await prisma.playerStatisticRecord.create({
+            data: {
+              playerUuid,
+              statisticKey: key,
+              value: diff,
+              reason
+            }
+          })
+        }
+      } else {
+        await prisma.playerStatisticRecord.create({
+          data: {
+            playerUuid,
+            statisticKey: key,
+            value,
+            reason
+          }
+        })
+      }
+    } else {
+      const existingValue = stat.values.find(
+        (value) => value.playerUuid === playerUuid
+      )
+
+      if (!existingValue) {
+        await prisma.playerStatisticRecord.create({
+          data: {
+            playerUuid,
+            statisticKey: key,
+            value,
+            reason
+          }
+        })
+      } else {
+        await prisma.playerStatisticRecord.update({
+          where: {
+            id: existingValue.id
+          },
+          data: {
+            value: set ? value : existingValue.value + value,
+            reason
+          }
+        })
+      }
+    }
   }
 }

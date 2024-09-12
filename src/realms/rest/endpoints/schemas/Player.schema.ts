@@ -4,6 +4,7 @@ import PlayerSchema from "../../schemas/Player.schema"
 import { ApiScope, ChatChannels } from "@prisma/client"
 import PermissionSchema from "../../schemas/Permission.schema"
 import PermissionInputSchema from "../../schemas/PermissionInput.schema"
+import PlayerStatisticRecordSchema from "../../schemas/PlayerStatisticRecord.schema"
 
 const PlayerCreateBodySchema = Type.Object({
   memberDiscordId: Type.String(),
@@ -365,5 +366,119 @@ export const PlayerMigrateSchema: FastifySchema = {
   params: PlayerInfoParamsSchema,
   response: {
     200: Type.Ref(PlayerSchema)
+  }
+}
+
+// Increment Player Stat
+
+const PlayerStatParamsSchema = Type.Intersect([
+  PlayerInfoParamsSchema,
+  Type.Object({
+    statKey: Type.String()
+  })
+])
+
+export type PlayerStatParamsSchema = Static<typeof PlayerStatParamsSchema>
+
+const PlayerStatManageBodySchema = Type.Object({
+  value: Type.Number(),
+  reason: Type.Optional(Type.String())
+})
+
+export type PlayerStatManageBodySchema = Static<
+  typeof PlayerStatManageBodySchema
+>
+
+const PlayerStatQuerySchema = Type.Object({
+  set: Type.Optional(Type.Boolean())
+})
+
+export type PlayerStatQuerySchema = Static<typeof PlayerStatQuerySchema>
+
+export const PlayerStatManipulationSchema: FastifySchema = {
+  tags: ["players"],
+  summary: "Increment/set a player's stat",
+  operationId: "manipulatePlayerStatistic",
+  security: [
+    {
+      apiKey: [ApiScope.PLAYERS]
+    }
+  ],
+  params: PlayerStatParamsSchema,
+  querystring: PlayerStatQuerySchema,
+  body: PlayerStatManageBodySchema,
+  response: {
+    204: Type.Object({}),
+    404: Type.Object({
+      error: Type.String({ enum: ["player-not-found"] })
+    })
+  }
+}
+
+// Batch Stat Manipulation
+
+const PlayerStatBatchBodySchema = Type.Array(
+  Type.Object({
+    playerUuid: Type.String(),
+    statKey: Type.String(),
+    value: Type.Number(),
+    reason: Type.Optional(Type.String())
+  })
+)
+
+export type PlayerStatBatchBodySchema = Static<typeof PlayerStatBatchBodySchema>
+
+export const PlayerStatManipulationMultipleSchema: FastifySchema = {
+  tags: ["batch"],
+  summary: "Increment/set multiple player stats",
+  operationId: "batchManipulatePlayerStatistics",
+  security: [
+    {
+      apiKey: [ApiScope.PLAYERS]
+    }
+  ],
+  body: PlayerStatBatchBodySchema,
+  response: {
+    200: Type.Object({})
+  }
+}
+
+// Get All Player Stats
+
+export const PlayerStatGetSchema: FastifySchema = {
+  tags: ["players"],
+  summary: "Get a player's stats",
+  operationId: "getPlayerStatistics",
+  security: [
+    {
+      apiKey: [ApiScope.PLAYERS]
+    }
+  ],
+  params: PlayerInfoParamsSchema,
+  response: {
+    200: Type.Array(Type.Ref(PlayerStatisticRecordSchema)),
+    404: Type.Object({
+      error: Type.String({ enum: ["statistic-not-found"] })
+    })
+  }
+}
+
+// Get Player Stat
+
+export const PlayerStatGetSingleSchema: FastifySchema = {
+  tags: ["players"],
+  summary: "Get a player's single stat",
+  operationId: "getPlayerStatistic",
+  security: [
+    {
+      apiKey: [ApiScope.PLAYERS]
+    }
+  ],
+  params: PlayerStatParamsSchema,
+  response: {
+    200: Type.Ref(PlayerStatisticRecordSchema),
+    404: Type.Object({
+      error: Type.String({ enum: ["statistic-not-found"] })
+    })
   }
 }
