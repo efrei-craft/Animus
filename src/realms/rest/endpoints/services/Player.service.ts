@@ -681,8 +681,11 @@ export default class PlayerService {
     key: string,
     value: number,
     reason: string,
-    set = false
-  ): Promise<void> {
+    set = false,
+    type?: StatisticType,
+    displayName?: string,
+    color?: string
+  ) {
     let stat = await prisma.statistic.findUnique({
       where: {
         key
@@ -700,7 +703,10 @@ export default class PlayerService {
     if (!stat) {
       stat = await prisma.statistic.create({
         data: {
-          key
+          key,
+          type,
+          displayName,
+          color
         },
         select: {
           type: true,

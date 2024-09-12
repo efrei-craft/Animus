@@ -1,7 +1,7 @@
 import { FastifySchema } from "fastify"
 import { Static, Type } from "@sinclair/typebox"
 import PlayerSchema from "../../schemas/Player.schema"
-import { ApiScope, ChatChannels } from "@prisma/client"
+import { ApiScope, ChatChannels, StatisticType } from "@prisma/client"
 import PermissionSchema from "../../schemas/Permission.schema"
 import PermissionInputSchema from "../../schemas/PermissionInput.schema"
 import PlayerStatisticRecordSchema from "../../schemas/PlayerStatisticRecord.schema"
@@ -382,7 +382,11 @@ export type PlayerStatParamsSchema = Static<typeof PlayerStatParamsSchema>
 
 const PlayerStatManageBodySchema = Type.Object({
   value: Type.Number(),
-  reason: Type.Optional(Type.String())
+  reason: Type.Optional(Type.String()),
+
+  type: Type.Optional(Type.Enum(StatisticType)),
+  displayName: Type.Optional(Type.String()),
+  color: Type.Optional(Type.String())
 })
 
 export type PlayerStatManageBodySchema = Static<

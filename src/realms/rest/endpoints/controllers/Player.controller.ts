@@ -396,7 +396,10 @@ export default class PlayerController {
       req.params.statKey,
       req.body.value,
       req.body.reason,
-      req.query.set
+      req.query.set,
+      req.body.type,
+      req.body.displayName,
+      req.body.color
     )
     return reply.code(204).send()
   }
