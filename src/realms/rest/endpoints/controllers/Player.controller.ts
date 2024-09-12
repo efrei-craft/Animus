@@ -27,7 +27,13 @@ import {
   PlayerRemovePermissionGroupSchema,
   PlayerRemovePermissionsBodySchema,
   PlayerRemovePermissionsSchema,
-  PlayerSetPermissionGroupsSchema
+  PlayerSetPermissionGroupsSchema,
+  PlayerStatGetSchema,
+  PlayerStatGetSingleSchema,
+  PlayerStatManipulationSchema,
+  PlayerStatManageBodySchema,
+  PlayerStatParamsSchema,
+  PlayerStatQuerySchema
 } from "../schemas/Player.schema"
 import { HasSchemaScope } from "../../helpers/decorators/HasSchemaScope"
 import { Permission } from "@prisma/client"
@@ -367,5 +373,68 @@ export default class PlayerController {
   async getOnlinePlayers(_req: RequestWithKey, reply: FastifyReply) {
     const onlinePlayers = await this.playerService.getOnlinePlayers()
     return reply.code(200).send(onlinePlayers)
+  }
+
+  @PUT({
+    url: "/:uuid/stats/:statKey/manipulate",
+    options: {
+      schema: PlayerStatManipulationSchema
+    }
+  })
+  @HasApiKey()
+  @HasSchemaScope()
+  async manipulatePlayerStatistic(
+    req: RequestWithKey<{
+      Params: PlayerStatParamsSchema
+      Querystring: PlayerStatQuerySchema
+      Body: PlayerStatManageBodySchema
+    }>,
+    reply: FastifyReply
+  ) {
+    await this.playerService.manipulatePlayerStatistic(
+      req.params.uuid,
+      req.params.statKey,
+      req.body.value,
+      req.body.reason,
+      req.query.set
+    )
+    return reply.code(204).send()
+  }
+
+  @GET({
+    url: "/:uuid/stats/:statKey",
+    options: {
+      schema: PlayerStatGetSingleSchema
+    }
+  })
+  @HasApiKey()
+  @HasSchemaScope()
+  async getPlayerStatistic(
+    req: RequestWithKey<{ Params: PlayerStatParamsSchema }>,
+    reply: FastifyReply
+  ) {
+    const playerStatistic = await this.playerService.getPlayerStatistic(
+      req.params.uuid,
+      req.params.statKey
+    )
+    return reply.code(200).send(playerStatistic)
+  }
+
+  @GET({
+    url: "/:uuid/stats",
+    options: {
+      schema: PlayerStatGetSchema
+    }
+  })
+  @HasApiKey()
+  @HasSchemaScope()
+  async getPlayerStatistics(
+    req: RequestWithKey<{ Params: PlayerInfoParamsSchema }>,
+    reply: FastifyReply
+  ) {
+    const playerStatistics = await this.playerService.getPlayerStatistics(
+      req.params.uuid
+    )
+    return reply.code(200).send(playerStatistics)
   }
 }
