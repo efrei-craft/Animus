@@ -5,6 +5,7 @@ import { ApiError } from "../../helpers/Error"
 import { sendMessageToPlayer } from "../../helpers/SendMessage"
 import RedisClient from "../../../../clients/Redis"
 import PlayerService from "./Player.service"
+import { ampersandColorToName } from "../../helpers/Colors"
 
 @Service()
 export default class PartyService {
@@ -26,12 +27,17 @@ export default class PartyService {
   private static sendMessageToPlayer(
     proxyServer: string,
     uuid: string,
-    message: string
+    message: string,
+    mini = false
   ) {
-    return sendMessageToPlayer(proxyServer, "PARTY", uuid, message)
+    return sendMessageToPlayer(proxyServer, "PARTY", uuid, message, mini)
   }
 
-  public static async sendMessageToParty(partyId: number, message: string) {
+  public static async sendMessageToParty(
+    partyId: number,
+    message: string,
+    mini = false
+  ) {
     const party = await prisma.party.findUnique({
       where: {
         id: partyId
@@ -66,7 +72,8 @@ export default class PartyService {
     await PartyService.sendMessageToPlayer(
       party.owner.server.template.parentTemplateName,
       allPlayerUUIDs.join(","),
-      message
+      message,
+      mini
     )
   }
 
@@ -180,14 +187,17 @@ export default class PartyService {
         " &7a été invité dans le groupe !"
     )
 
+    const miniMessage = `<${ampersandColorToName[owner.permGroups[0].color]}>${
+      owner.username
+    } <green>t'a invité dans son groupe ! <gray>Cliquez <yellow><hover:show_text:'<yellow>Rejoindre le groupe'><click:run_command:/party join ${
+      owner.username
+    }>ici</click></hover> <gray>pour rejoindre le groupe !`
+
     await PartyService.sendMessageToPlayer(
       player.server.template.parentTemplateName,
       playerUuid,
-      owner.permGroups[0].color +
-        owner.username +
-        "&a t'a invité dans son groupe ! &7Faites &e/party join " +
-        owner.username +
-        " &7pour rejoindre le groupe !"
+      miniMessage,
+      true
     )
 
     await prisma.party.update({

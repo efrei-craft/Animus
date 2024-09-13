@@ -12,12 +12,13 @@ const sendMessageToPlayer = (
   proxyServer: string,
   prefix: string,
   uuid: string,
-  message: string
+  message: string,
+  mini = false
 ) => {
   return RedisClient.getInstance().publishToPlugin(
     proxyServer,
     "Vicarius",
-    "sendMessage",
+    mini ? "sendMiniMessage" : "sendMessage",
     prefix,
     message,
     uuid
