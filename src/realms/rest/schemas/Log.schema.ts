@@ -6,7 +6,10 @@ export default Type.Object(
     id: Type.Integer({ description: "The log ID" }),
     timestamp: Type.String({ description: "The log's timestamp" }),
     message: Type.String({ description: "The log's message" }),
-    level: Type.Enum(LogLevel, { description: "The log's level" }),
+    level: Type.String({
+      description: "The log's level",
+      enum: Object.keys(LogLevel)
+    }),
     from: Type.Optional(Type.String({ description: "The log's source" })),
     data: Type.Optional(Type.Any({ description: "The log's data" })),
     serverName: Type.Optional(

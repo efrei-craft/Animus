@@ -324,10 +324,10 @@ model Statistic {
 model PlayerStatisticRecord {
   id        String      @id @default(uuid())
 
-  player     Player @relation(fields: [playerUuid], references: [uuid])
+  player     Player @relation(fields: [playerUuid], references: [uuid], onDelete: Cascade)
   playerUuid String
 
-  statistic Statistic @relation(fields: [statisticKey], references: [key])
+  statistic Statistic @relation(fields: [statisticKey], references: [key], onDelete: Cascade)
   statisticKey String
 
   value  Int

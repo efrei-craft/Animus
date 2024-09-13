@@ -626,6 +626,7 @@ export default class PlayerService {
 
     return {
       key: statKey,
+      type: stat.type,
       displayName: stat.displayName,
       color: stat.color,
       value: stat.values.reduce((acc, curr) => acc + curr.value, 0)
@@ -656,6 +657,7 @@ export default class PlayerService {
     return stats.map((stat) => {
       return {
         key: stat.key,
+        type: stat.type,
         displayName: stat.displayName,
         color: stat.color,
         value: stat.values.reduce((acc, curr) => acc + curr.value, 0)

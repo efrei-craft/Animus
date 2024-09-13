@@ -384,7 +384,12 @@ const PlayerStatManageBodySchema = Type.Object({
   value: Type.Number(),
   reason: Type.Optional(Type.String()),
 
-  type: Type.Optional(Type.Enum(StatisticType)),
+  type: Type.Optional(
+    Type.String({
+      description: "The type of the statistic",
+      enum: Object.keys(StatisticType)
+    })
+  ),
   displayName: Type.Optional(Type.String()),
   color: Type.Optional(Type.String())
 })

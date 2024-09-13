@@ -36,7 +36,7 @@ import {
   PlayerStatQuerySchema
 } from "../schemas/Player.schema"
 import { HasSchemaScope } from "../../helpers/decorators/HasSchemaScope"
-import { Permission } from "@prisma/client"
+import { Permission, StatisticType } from "@prisma/client"
 import QueueService from "../services/Queue.service"
 import PartyService from "../services/Party.service"
 import { emitMessage } from "../../emitter"
@@ -397,7 +397,7 @@ export default class PlayerController {
       req.body.value,
       req.body.reason,
       req.query.set,
-      req.body.type,
+      req.body.type as StatisticType,
       req.body.displayName,
       req.body.color
     )

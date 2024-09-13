@@ -1,6 +1,6 @@
 import { Service } from "fastify-decorators"
 import { CreateLogBodySchema } from "../schemas/Logs.schema"
-import { Prisma } from "@prisma/client"
+import { LogLevel, Prisma } from "@prisma/client"
 import prisma from "../../../../clients/Prisma"
 
 @Service()
@@ -21,7 +21,8 @@ export default class LogService {
   createLog(body: CreateLogBodySchema) {
     return prisma.log.create({
       data: {
-        ...body
+        ...body,
+        level: body.level as LogLevel
       },
       select: LogService.LogPublicSelect
     })

@@ -1,8 +1,13 @@
+import { StatisticType } from "@prisma/client"
 import { Type } from "@sinclair/typebox"
 
 export default Type.Object(
   {
     key: Type.String({ description: "The key of the statistic" }),
+    type: Type.String({
+      description: "The type of the statistic",
+      enum: Object.keys(StatisticType)
+    }),
     displayName: Type.String({
       description: "The display name of the statistic"
     }),
